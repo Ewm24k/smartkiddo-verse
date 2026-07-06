@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+  <title>SmartKiddo Verse</title>
+  <meta name="description" content="SmartKiddo Verse — a playful learning world for kids." />
+  <meta name="theme-color" content="#0a0714" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg" />
+
+  <!-- Fonts: Fredoka (playful display) + Nunito (clean body/UI) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Separated CSS: each file owns one concern -->
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/loader.css" />
+  <link rel="stylesheet" href="css/sidemenu.css" />
+  <link rel="stylesheet" href="css/video-stage.css" />
+  <link rel="stylesheet" href="css/cta-button.css" />
+</head>
+<body>
+
+  <!-- ============ LOADING SCREEN ============ -->
+  <!-- Full black screen, plays the intro video you prepared, then fades out -->
+  <div id="loader" class="loader">
+    <video
+      id="loaderVideo"
+      class="loader__video"
+      src="assets/videos/loading.mp4"
+      autoplay
+      muted
+      playsinline
+      preload="auto"
+    ></video>
+  </div>
+
+  <!-- ============ MAIN APP (hidden until loader finishes) ============ -->
+  <div id="app" class="app" hidden>
+
+    <!-- Top-left overlay bar: hamburger + brand, floats over the video -->
+    <div class="topbar">
+      <button id="menuToggle" class="menu-toggle" aria-label="Buka menu" aria-expanded="false" aria-controls="sideMenu">
+        <span class="menu-toggle__bar"></span>
+        <span class="menu-toggle__bar"></span>
+        <span class="menu-toggle__bar"></span>
+      </button>
+      <span class="brand">SmartKiddo <span class="brand__accent">Verse</span></span>
+    </div>
+
+    <!-- Side menu (slides in from left) -->
+    <div id="sideMenuBackdrop" class="side-menu-backdrop"></div>
+    <nav id="sideMenu" class="side-menu" aria-hidden="true">
+      <button id="menuClose" class="side-menu__close" aria-label="Tutup menu">&times;</button>
+
+      <div class="side-menu__brand">SmartKiddo <span class="brand__accent">Verse</span></div>
+
+      <form id="loginForm" class="login-form" autocomplete="off">
+        <label class="login-form__label" for="username">Nama Pengguna</label>
+        <input class="login-form__input" type="text" id="username" name="username" placeholder="Masukkan nama" required />
+
+        <label class="login-form__label" for="password">Kata Laluan</label>
+        <input class="login-form__input" type="password" id="password" name="password" placeholder="Masukkan kata laluan" required />
+
+        <button type="submit" class="login-form__submit">Log Masuk</button>
+        <a href="#" class="login-form__forgot">Lupa kata laluan?</a>
+      </form>
+
+      <ul class="side-menu__links">
+        <li><a href="#">Rumah</a></li>
+        <li><a href="#">Permainan</a></li>
+        <li><a href="#">Pencapaian Saya</a></li>
+        <li><a href="#">Tentang Kami</a></li>
+      </ul>
+    </nav>
+
+    <!-- Fullscreen video stage -->
+    <main class="video-stage">
+      <video
+        id="mainVideo"
+        class="video-stage__video"
+        src="assets/videos/main-video.mp4"
+        playsinline
+        preload="auto"
+      ></video>
+
+      <!-- Unmute prompt, shown only if browser blocks autoplay-with-sound -->
+      <button id="unmutePrompt" class="unmute-prompt" hidden>🔊 Sentuh untuk bunyi</button>
+
+      <!-- CTA revealed only after the video finishes playing -->
+      <div id="ctaWrap" class="cta-wrap" hidden>
+        <span class="cta-arrow cta-arrow--left" aria-hidden="true">➜</span>
+        <button id="startBtn" class="cta-button">Mula Sekarang</button>
+        <span class="cta-arrow cta-arrow--right" aria-hidden="true">➜</span>
+      </div>
+    </main>
+
+  </div>
+
+  <!-- Separated JS: each file owns one concern -->
+  <script src="js/sound.js"></script>
+  <script src="js/loader.js"></script>
+  <script src="js/sidemenu.js"></script>
+  <script src="js/video-controller.js"></script>
+</body>
+</html>
