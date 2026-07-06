@@ -1,0 +1,92 @@
+/* =========================================================
+   cta-button.css — "Mula Sekarang" button + guiding arrows
+   ========================================================= */
+
+.cta-wrap {
+  position: absolute;
+  left: 50%;
+  bottom: 12%;
+  transform: translateX(-50%);
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  animation: ctaEnter 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes ctaEnter {
+  from { opacity: 0; transform: translate(-50%, 20px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+
+.cta-button {
+  position: relative;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(18px, 4vw, 26px);
+  color: #06331c;
+  background: var(--color-neon-green);
+  padding: 16px 36px;
+  border-radius: 999px;
+  letter-spacing: 0.3px;
+  box-shadow: 0 6px 18px rgba(57, 255, 136, 0.35);
+  transition: transform 0.12s ease;
+}
+
+.cta-button:active {
+  transform: scale(0.94);
+}
+
+/* Looping neon border glow, like an arcade "press start" button */
+.cta-button::before {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: inherit;
+  border: 3px solid var(--color-neon-green);
+  animation: neonPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes neonPulse {
+  0%, 100% {
+    box-shadow: 0 0 8px 2px var(--color-neon-green);
+    opacity: 0.9;
+  }
+  50% {
+    box-shadow: 0 0 22px 8px var(--color-neon-green);
+    opacity: 0.55;
+  }
+}
+
+/* Guiding arrows bouncing left/right toward the button, like a game hint */
+.cta-arrow {
+  font-size: clamp(20px, 4vw, 28px);
+  color: var(--color-neon-green);
+  filter: drop-shadow(0 0 6px rgba(57, 255, 136, 0.7));
+}
+
+.cta-arrow--left {
+  animation: pointRight 1s ease-in-out infinite;
+}
+
+.cta-arrow--right {
+  transform: scaleX(-1);
+  animation: pointLeft 1s ease-in-out infinite;
+}
+
+@keyframes pointRight {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(8px); }
+}
+
+@keyframes pointLeft {
+  0%, 100% { transform: scaleX(-1) translateX(0); }
+  50% { transform: scaleX(-1) translateX(8px); }
+}
+
+@media (min-width: 768px) {
+  .cta-wrap {
+    bottom: 15%;
+    gap: 20px;
+  }
+}
