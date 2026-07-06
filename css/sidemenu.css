@@ -1,0 +1,207 @@
+/* =========================================================
+   sidemenu.css — top bar, hamburger, brand, sliding side menu
+   ========================================================= */
+
+.topbar {
+  position: fixed;
+  top: calc(16px + var(--safe-top));
+  left: calc(16px + var(--safe-left));
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.menu-toggle {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(10, 7, 20, 0.45);
+  backdrop-filter: blur(6px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.menu-toggle:active {
+  transform: scale(0.92);
+}
+
+.menu-toggle__bar {
+  width: 22px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--color-white);
+  transition: transform 0.25s ease, opacity 0.2s ease;
+}
+
+/* Animate hamburger into an X when menu is open */
+.menu-toggle[aria-expanded="true"] .menu-toggle__bar:nth-child(1) {
+  transform: translateY(8px) rotate(45deg);
+}
+.menu-toggle[aria-expanded="true"] .menu-toggle__bar:nth-child(2) {
+  opacity: 0;
+}
+.menu-toggle[aria-expanded="true"] .menu-toggle__bar:nth-child(3) {
+  transform: translateY(-8px) rotate(-45deg);
+}
+
+.brand {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--color-white);
+  font-size: clamp(20px, 4.5vw, 30px);
+  letter-spacing: 0.3px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+  white-space: nowrap;
+}
+
+.brand__accent {
+  color: var(--color-neon-green);
+}
+
+/* Backdrop behind the sliding menu */
+.side-menu-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 60;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.side-menu-backdrop.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* The sliding panel itself */
+.side-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 70;
+  width: min(85vw, 320px);
+  height: 100dvh;
+  padding: calc(28px + var(--safe-top)) 24px 24px;
+  background: var(--color-purple-deep);
+  box-shadow: 8px 0 30px rgba(0, 0, 0, 0.35);
+  transform: translateX(-105%);
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow-y: auto;
+}
+
+.side-menu.is-open {
+  transform: translateX(0);
+}
+
+.side-menu__close {
+  align-self: flex-end;
+  font-size: 28px;
+  line-height: 1;
+  color: var(--color-white);
+}
+
+.side-menu__brand {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 22px;
+  color: var(--color-white);
+}
+
+/* Login form */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  padding: 18px;
+}
+
+.login-form__label {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.75);
+  font-weight: 600;
+  margin-top: 6px;
+}
+
+.login-form__input {
+  height: 42px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--color-white);
+  padding: 0 12px;
+  font-size: 15px;
+}
+
+.login-form__input::placeholder {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.login-form__submit {
+  margin-top: 10px;
+  height: 44px;
+  border-radius: 22px;
+  background: var(--color-teal);
+  color: #08302b;
+  font-weight: 800;
+  font-size: 15px;
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.login-form__submit:active {
+  transform: scale(0.96);
+  filter: brightness(0.95);
+}
+
+.login-form__forgot {
+  align-self: center;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 4px;
+}
+
+/* Extra nav links */
+.side-menu__links {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.side-menu__links li a {
+  display: block;
+  padding: 12px 10px;
+  border-radius: 10px;
+  color: var(--color-white);
+  font-weight: 700;
+  font-size: 15px;
+  transition: background 0.15s ease;
+}
+
+.side-menu__links li a:hover,
+.side-menu__links li a:active {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Tablet / desktop: menu can sit a little wider and calmer */
+@media (min-width: 768px) {
+  .side-menu {
+    width: 340px;
+    padding-top: 36px;
+  }
+  .brand {
+    font-size: 30px;
+  }
+}
