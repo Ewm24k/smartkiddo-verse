@@ -3,9 +3,10 @@
    ========================================================= */
 
 .signup-body {
+  height: calc(var(--vh, 1vh) * 100); /* reliable fallback, see viewport-fix.js */
+  height: 100dvh; /* modern browsers override the fallback above */
   overflow-y: auto;
-  height: auto;
-  min-height: 100dvh;
+  -webkit-overflow-scrolling: touch; /* smooth momentum scrolling on iOS */
   background: linear-gradient(180deg, #f4effc 0%, #eef7ff 50%, #fff3f8 100%);
   color: #3a2e57;
 }
@@ -52,7 +53,7 @@
 .signup-main {
   display: flex;
   justify-content: center;
-  padding: 24px 16px 60px;
+  padding: 24px 16px calc(60px + var(--safe-bottom));
 }
 
 .signup-card {
@@ -163,7 +164,7 @@
   border: 2px solid #e6def7;
   background: #ffffff;
   padding: 0 14px;
-  font-size: 15px;
+  font-size: 16px; /* must be >= 16px or iOS Safari auto-zooms the page on focus */
   font-family: var(--font-body);
   color: #3a2e57;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
