@@ -146,6 +146,10 @@
     if (e.target === video) e.preventDefault();
   });
 
+  startBtn.addEventListener("mouseenter", () => {
+    SmartKiddoSound.playHover();
+  });
+
   startBtn.addEventListener("click", () => {
     SmartKiddoSound.playStart();
     console.log("Mula Sekarang tapped — route to the next screen here.");
