@@ -1,11 +1,20 @@
 /* =========================================================
    video-controller.js — the main fullscreen video
    Job: only start the main video once the loading screen has
-   FULLY finished (waits for the "smartkiddo:appReady" event
-   dispatched by loader.js) — it must never play underneath the
-   loading screen. Then autoplay WITH sound as aggressively as
+   FULLY finished, then autoplay WITH sound as aggressively as
    the browser allows, and reveal the "Mula Sekarang" CTA once
-   the video finishes (with redundant safety nets).
+   the video finishes.
+
+   ROBUSTNESS: "loader finished" is detected THREE independent
+   ways, so a click/tap can never silently fail to do anything
+   again:
+     1. The "smartkiddo:appReady" custom event from loader.js
+     2. The window.smartKiddoAppReady flag set by loader.js
+     3. A short poll checking that flag every 250ms as backup
+   Click/tap listeners are registered immediately at page load
+   (not gated behind any single signal) — each click checks the
+   flag directly before doing anything, so it's never possible
+   for "no listener was ever attached" to happen again.
    ========================================================= */
 
 (function () {
@@ -56,6 +65,7 @@
   /* ---------------- Sound: force unmuted, keep forcing it ---------------- */
   let unmuted = false;
   let retryTimer = null;
+  let mainVideoStarted = false;
 
   function forceUnmute(label) {
     if (unmuted) return;
@@ -65,10 +75,7 @@
       .then(() => {
         unmuted = true;
         console.log("[SmartKiddoVerse] Playing WITH sound:", label);
-        clearInterval(retryTimer);
-        document.removeEventListener("touchstart", onFirstInteraction);
-        document.removeEventListener("click", onFirstInteraction);
-        document.removeEventListener("keydown", onFirstInteraction);
+        if (retryTimer) clearInterval(retryTimer);
       })
       .catch(() => {
         video.muted = true;
@@ -76,25 +83,15 @@
       });
   }
 
-  function onFirstInteraction() {
-    forceUnmute("user interaction");
+  /* ---------------- Wait for the loading screen to be 100% done ---------------- */
+  function isLoaderFinished() {
+    return window.smartKiddoAppReady === true;
   }
 
-  video.addEventListener("pause", () => {
-    if (!video.ended) video.play().catch(() => {});
-  });
-  video.addEventListener("volumechange", () => {
-    if (unmuted && video.muted) video.muted = false;
-  });
-  document.addEventListener("contextmenu", (e) => {
-    if (e.target === video) e.preventDefault();
-  });
-
-  /* ---------------- Wait for the loading screen to be 100% done ---------------- */
-  function startMainVideo() {
-    document.addEventListener("touchstart", onFirstInteraction, { passive: true });
-    document.addEventListener("click", onFirstInteraction);
-    document.addEventListener("keydown", onFirstInteraction);
+  function startMainVideo(reason) {
+    if (mainVideoStarted) return;
+    mainVideoStarted = true;
+    console.log("[SmartKiddoVerse] Starting main video:", reason);
 
     retryTimer = setInterval(() => {
       if (unmuted || video.ended) {
@@ -106,14 +103,48 @@
 
     forceUnmute("initial attempt after loader finished");
 
-    // Metadata-timeout safety net for the CTA, started from the same
-    // moment the video actually begins — not from page load.
     setTimeout(() => {
       if (video.readyState === 0) revealCta("metadata never loaded");
     }, 6000);
   }
 
-  document.addEventListener("smartkiddo:appReady", startMainVideo, { once: true });
+  // Signal 1: the custom event from loader.js
+  document.addEventListener("smartkiddo:appReady", () => startMainVideo("appReady event"), { once: true });
+
+  // Signal 2/3: poll the flag every 250ms as an independent backup,
+  // in case the event above is ever missed for any reason.
+  const readyPoll = setInterval(() => {
+    if (isLoaderFinished()) {
+      clearInterval(readyPoll);
+      startMainVideo("ready flag poll");
+    }
+  }, 250);
+
+  // Any click/tap/key press anywhere on the page: always registered
+  // immediately (never gated), always safe. If the loader has
+  // genuinely finished, this both starts the video (if it somehow
+  // hasn't yet) AND unmutes it. If the loader hasn't finished yet,
+  // this does nothing — so it can never make the video play early.
+  function onInteraction() {
+    if (!isLoaderFinished()) return;
+    startMainVideo("user interaction");
+    forceUnmute("user interaction");
+  }
+  document.addEventListener("touchstart", onInteraction, { passive: true });
+  document.addEventListener("click", onInteraction);
+  document.addEventListener("keydown", onInteraction);
+
+  // Prevent the video from ever being paused/stopped by the user,
+  // and make sure nothing external can re-mute it once sound is on.
+  video.addEventListener("pause", () => {
+    if (!video.ended) video.play().catch(() => {});
+  });
+  video.addEventListener("volumechange", () => {
+    if (unmuted && video.muted) video.muted = false;
+  });
+  document.addEventListener("contextmenu", (e) => {
+    if (e.target === video) e.preventDefault();
+  });
 
   startBtn.addEventListener("click", () => {
     SmartKiddoSound.playClick();
