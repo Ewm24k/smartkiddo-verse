@@ -1,0 +1,113 @@
+/* =========================================================
+   orientation-popup.css — "please rotate your device" prompt
+   Shown FIRST, above even the tap-to-start gate. Has an
+   animated phone icon flipping from portrait to landscape.
+   ========================================================= */
+
+.orientation-popup {
+  position: fixed;
+  inset: 0;
+  z-index: 1100; /* above the tap gate (1000) and loader (999) */
+  width: 100vw;
+  height: 100dvh;
+  background: rgba(0, 0, 0, 0.88);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  transition: opacity 0.35s ease;
+}
+
+.orientation-popup--hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.orientation-popup__card {
+  width: min(88vw, 340px);
+  background: var(--color-purple-deep);
+  border-radius: 24px;
+  padding: 32px 24px 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  text-align: center;
+}
+
+/* ---- Animated flipping phone icon ---- */
+.orientation-popup__phone {
+  width: 90px;
+  height: 130px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.orientation-popup__phone-shape {
+  position: relative;
+  width: 56px;
+  height: 100px;
+  border: 4px solid var(--color-neon-green);
+  border-radius: 12px;
+  background: rgba(57, 255, 136, 0.08);
+  animation: flipPhone 2.4s ease-in-out infinite;
+  transform-origin: center;
+}
+
+.orientation-popup__phone-shape::after {
+  content: "";
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--color-neon-green);
+}
+
+@keyframes flipPhone {
+  0%, 15% { transform: rotate(0deg); }
+  45%, 70% { transform: rotate(90deg); }
+  95%, 100% { transform: rotate(0deg); }
+}
+
+.orientation-popup__heading {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--color-white);
+  font-size: clamp(17px, 4.5vw, 21px);
+  line-height: 1.3;
+}
+
+.orientation-popup__heading strong {
+  color: var(--color-neon-green);
+}
+
+.orientation-popup__hint {
+  font-family: var(--font-body);
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: clamp(13px, 3.6vw, 15px);
+  line-height: 1.4;
+}
+
+.orientation-popup__button {
+  margin-top: 6px;
+  min-width: 160px;
+  height: 46px;
+  border-radius: 999px;
+  background: var(--color-neon-green);
+  color: #06331c;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 17px;
+  transition: transform 0.12s ease;
+}
+
+.orientation-popup__button:active {
+  transform: scale(0.94);
+}
