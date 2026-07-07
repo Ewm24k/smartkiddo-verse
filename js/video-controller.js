@@ -147,7 +147,7 @@
   });
 
   startBtn.addEventListener("click", () => {
-    SmartKiddoSound.playClick();
+    SmartKiddoSound.playStart();
     console.log("Mula Sekarang tapped — route to the next screen here.");
   });
 })();
