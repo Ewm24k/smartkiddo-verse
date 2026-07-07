@@ -28,6 +28,7 @@
 
     // Tell the rest of the app (main video, etc.) that the loading
     // screen is genuinely finished — nothing should start before this.
+    window.smartKiddoAppReady = true;
     document.dispatchEvent(new CustomEvent("smartkiddo:appReady"));
 
     setTimeout(() => {
