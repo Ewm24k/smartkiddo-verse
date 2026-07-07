@@ -1,13 +1,17 @@
 /* =========================================================
    loader.js — controls the pre-loading black screen
-   Job: play the intro video + run the animated text sequence,
-   then reveal the main app once BOTH are done.
+   Job: ONLY START once the tap-to-start gate has been dismissed
+   (so the loading video/text are never silently playing out
+   behind that gate — they always play in full, visibly, right
+   after the tap). Then play the intro video + run the animated
+   text sequence, and reveal the main app once BOTH are done.
 
    IMPORTANT: this is written so the app can NEVER get stuck on
    the loading screen — every path (video plays fine, video file
    missing, video errors, browser blocks something) eventually
    calls revealApp(). There is also a hard absolute-timeout as a
-   last-resort safety net.
+   last-resort safety net, including a fallback in case the tap
+   gate's own event is ever missed.
    ========================================================= */
 
 (function () {
@@ -15,6 +19,7 @@
   const loaderVideo = document.getElementById("loaderVideo");
   const app = document.getElementById("app");
 
+  let started = false;
   let revealed = false;
   let videoDone = false;
   let textDone = false;
@@ -47,44 +52,39 @@
     maybeReveal();
   }
 
-  /* ---- Video completion: several independent triggers ---- */
+  function beginLoaderSequence(reason) {
+    if (started) return;
+    started = true;
+    console.log("[SmartKiddoVerse] Loader sequence starting:", reason);
 
-  // 1. Normal path — the video actually finishes playing.
-  loaderVideo.addEventListener("ended", () => markVideoDone("ended event"));
+    /* ---- Video completion: several independent triggers ---- */
+    loaderVideo.addEventListener("ended", () => markVideoDone("ended event"));
+    loaderVideo.addEventListener("error", () => markVideoDone("error event"));
+    loaderVideo.addEventListener("loadedmetadata", () => {
+      if (isFinite(loaderVideo.duration) && loaderVideo.duration > 0) {
+        const backupMs = loaderVideo.duration * 1000 + 800;
+        setTimeout(() => markVideoDone("duration backup timer"), backupMs);
+      }
+    });
+    setTimeout(() => {
+      if (loaderVideo.readyState === 0) markVideoDone("metadata never loaded");
+    }, 4000);
+    setTimeout(() => markVideoDone("absolute safety timeout"), 10000);
 
-  // 2. The video file is missing / 404s / fails to decode.
-  loaderVideo.addEventListener("error", () => markVideoDone("error event"));
+    /* ---- Text sequence ---- */
+    SmartKiddoLoaderText.runSequence().then(() => {
+      textDone = true;
+      maybeReveal();
+    });
 
-  // 3. Belt-and-braces: once we know the real duration, schedule a
-  //    backup timer slightly longer than the video itself. If the
-  //    "ended" event is ever swallowed by a browser quirk, this fires
-  //    instead.
-  loaderVideo.addEventListener("loadedmetadata", () => {
-    if (isFinite(loaderVideo.duration) && loaderVideo.duration > 0) {
-      const backupMs = loaderVideo.duration * 1000 + 800;
-      setTimeout(() => markVideoDone("duration backup timer"), backupMs);
-    }
-  });
+    /* ---- Start the video now, not before ---- */
+    loaderVideo.play().catch(() => {});
+  }
 
-  // 4. If metadata never loads at all within 4s (bad path, blocked
-  //    request, unsupported format), don't wait forever on the video.
-  setTimeout(() => {
-    if (loaderVideo.readyState === 0) markVideoDone("metadata never loaded");
-  }, 4000);
+  // Normal path: start the moment the tap-to-start gate is dismissed.
+  document.addEventListener("smartkiddo:userGestureReceived", () => beginLoaderSequence("tap gate"), { once: true });
 
-  // 5. Absolute last resort — no matter what happens above, the
-  //    loading screen is forced to finish after 10 seconds.
-  setTimeout(() => markVideoDone("absolute safety timeout"), 10000);
-
-  /* ---- Text sequence ---- */
-  SmartKiddoLoaderText.runSequence().then(() => {
-    textDone = true;
-    maybeReveal();
-  });
-
-  /* ---- Try to start the video ---- */
-  loaderVideo.play().catch(() => {
-    // Autoplay (even muted) is very rarely blocked, but if it is,
-    // the timers above will still carry the sequence forward.
-  });
+  // Safety net: if the tap gate's event is ever missed for any reason,
+  // don't leave the app stuck on a black screen forever.
+  setTimeout(() => beginLoaderSequence("safety timeout"), 6000);
 })();
