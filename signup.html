@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+  <title>Daftar Akaun — SmartKiddo Verse</title>
+  <meta name="theme-color" content="#f4effc" />
+
+  <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/signup.css" />
+</head>
+<body class="signup-body">
+
+  <header class="signup-topbar">
+    <a href="index.html" class="signup-back" aria-label="Kembali ke halaman utama">←</a>
+    <span class="signup-brand">SmartKiddo <span class="signup-brand__accent">Verse</span></span>
+  </header>
+
+  <main class="signup-main">
+    <section class="signup-card" aria-labelledby="signupTitle">
+
+      <div class="signup-rainbow" aria-hidden="true"></div>
+
+      <h1 id="signupTitle" class="signup-title">Daftar Akaun Keluarga 🌈</h1>
+      <p class="signup-subtitle">
+        Borang ini sesuai diisi oleh <strong>ibu atau bapa</strong> untuk anak-anak anda meneroka SmartKiddo Verse dengan selamat.
+      </p>
+
+      <form id="signupForm" class="signup-form" novalidate>
+
+        <fieldset class="signup-fieldset">
+          <legend class="signup-legend">👨‍👩‍👧 Maklumat Ibu Bapa</legend>
+          <div class="signup-grid signup-grid--two">
+            <div class="signup-field">
+              <label for="fatherName">Nama Bapa</label>
+              <input type="text" id="fatherName" name="fatherName" placeholder="Contoh: Ahmad bin Ali" required />
+            </div>
+            <div class="signup-field">
+              <label for="motherName">Nama Ibu</label>
+              <input type="text" id="motherName" name="motherName" placeholder="Contoh: Siti binti Hassan" required />
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="signup-fieldset">
+          <legend class="signup-legend">🧒 Maklumat Anak-Anak</legend>
+          <div class="signup-field">
+            <label for="kidsCount">Berapa ramai anak?</label>
+            <input type="number" id="kidsCount" name="kidsCount" min="1" max="6" placeholder="Contoh: 2" required />
+          </div>
+
+          <!-- Filled in dynamically by signup.js based on kidsCount -->
+          <div id="kidsFieldsContainer" class="signup-kids-container"></div>
+        </fieldset>
+
+        <fieldset class="signup-fieldset">
+          <legend class="signup-legend">🔐 Kata Laluan</legend>
+          <div class="signup-field">
+            <label for="signupPassword">Cipta Kata Laluan</label>
+            <input type="password" id="signupPassword" name="signupPassword" maxlength="5" placeholder="Cth: Ab1!x" required />
+          </div>
+
+          <ul id="passwordChecklist" class="signup-password-checklist">
+            <li data-rule="length"><span class="check-dot"></span> Tepat 5 aksara</li>
+            <li data-rule="upper"><span class="check-dot"></span> 1 huruf besar</li>
+            <li data-rule="digit"><span class="check-dot"></span> 1 nombor</li>
+            <li data-rule="symbol"><span class="check-dot"></span> 1 simbol (!@#$ dll.)</li>
+          </ul>
+
+          <div class="signup-field">
+            <label for="signupPasswordConfirm">Sahkan Kata Laluan</label>
+            <input type="password" id="signupPasswordConfirm" name="signupPasswordConfirm" maxlength="5" placeholder="Taip semula" required />
+          </div>
+        </fieldset>
+
+        <p id="signupError" class="signup-error" role="alert" hidden></p>
+
+        <button type="submit" class="signup-submit">Daftar Sekarang 🎉</button>
+      </form>
+    </section>
+  </main>
+
+  <script src="js/sound.js"></script>
+  <script src="js/signup.js"></script>
+</body>
+</html>
