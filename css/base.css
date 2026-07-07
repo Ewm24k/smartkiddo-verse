@@ -70,7 +70,6 @@ img, video {
   position: fixed;
   inset: 0;
   width: 100vw;
-  height: calc(var(--vh, 1vh) * 100); /* reliable fallback, see viewport-fix.js */
-  height: 100dvh; /* modern browsers override the fallback above */
+  height: 100dvh;
   overflow: hidden;
 }
