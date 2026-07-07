@@ -7,7 +7,6 @@
   inset: 0;
   z-index: 999;
   width: 100vw;
-  height: calc(var(--vh, 1vh) * 100);
   height: 100dvh;
   background: #000000; /* pure black, as required */
   display: flex;
