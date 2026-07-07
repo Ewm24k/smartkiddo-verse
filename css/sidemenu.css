@@ -172,6 +172,18 @@
   margin-top: 4px;
 }
 
+.login-form__signup {
+  display: block;
+  text-align: center;
+  font-size: 13.5px;
+  color: rgba(255, 255, 255, 0.8);
+  padding: 4px 0 2px;
+}
+
+.login-form__signup strong {
+  color: var(--color-neon-green);
+}
+
 /* Extra nav links */
 .side-menu__links {
   list-style: none;
