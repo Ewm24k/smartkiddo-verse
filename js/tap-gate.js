@@ -12,6 +12,7 @@
   const gate = document.getElementById("tapToStart");
 
   function dismissGate() {
+    SmartKiddoSound.playClick();
     gate.classList.add("tap-gate--hidden");
     window.smartKiddoUserGestureReceived = true;
     document.dispatchEvent(new CustomEvent("smartkiddo:userGestureReceived"));
