@@ -14,6 +14,14 @@
   animation: ctaEnter 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* CRITICAL: without this, the "display: flex" rule above wins over the
+   browser's own [hidden] { display: none } rule, so the button would
+   show immediately regardless of the JS logic. This forces hidden to
+   always actually mean hidden. */
+.cta-wrap[hidden] {
+  display: none !important;
+}
+
 @keyframes ctaEnter {
   from { opacity: 0; transform: translate(-50%, 20px); }
   to   { opacity: 1; transform: translate(-50%, 0); }
