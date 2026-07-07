@@ -18,12 +18,23 @@
   <!-- Separated CSS: each file owns one concern -->
   <link rel="stylesheet" href="css/base.css" />
   <link rel="stylesheet" href="css/loader.css" />
+  <link rel="stylesheet" href="css/tap-gate.css" />
   <link rel="stylesheet" href="css/loader-text.css" />
   <link rel="stylesheet" href="css/sidemenu.css" />
   <link rel="stylesheet" href="css/video-stage.css" />
   <link rel="stylesheet" href="css/cta-button.css" />
 </head>
 <body>
+
+  <!-- ============ TAP-TO-START GATE ============ -->
+  <!-- The one natural, unavoidable first tap of the whole experience.
+       It captures a real, trusted user gesture up front so that
+       everything after it (loading screen, main video) can play
+       WITH sound automatically, with no further clicks needed. -->
+  <div id="tapToStart" class="tap-gate">
+    <span class="tap-gate__brand">SmartKiddo <span class="brand__accent">Verse</span></span>
+    <span class="tap-gate__hint">Ketuk skrin untuk mula</span>
+  </div>
 
   <!-- ============ LOADING SCREEN ============ -->
   <!-- Full black screen, plays the intro video you prepared, then fades out -->
@@ -91,8 +102,8 @@
         preload="auto"
       ></video>
 
-      <!-- Unmute prompt, shown only if browser blocks autoplay-with-sound -->
-      <button id="unmutePrompt" class="unmute-prompt" hidden>🔊 Sentuh untuk bunyi</button>
+      <!-- No visible "tap for sound" button anymore — sound is unmuted
+           automatically as early as the browser allows (see video-controller.js) -->
 
       <!-- CTA revealed only after the video finishes playing -->
       <div id="ctaWrap" class="cta-wrap" hidden>
@@ -106,6 +117,7 @@
 
   <!-- Separated JS: each file owns one concern -->
   <script src="js/sound.js"></script>
+  <script src="js/tap-gate.js"></script>
   <script src="js/loader-text.js"></script>
   <script src="js/loader.js"></script>
   <script src="js/sidemenu.js"></script>
