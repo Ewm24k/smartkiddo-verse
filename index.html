@@ -18,6 +18,7 @@
   <!-- Separated CSS: each file owns one concern -->
   <link rel="stylesheet" href="css/base.css" />
   <link rel="stylesheet" href="css/loader.css" />
+  <link rel="stylesheet" href="css/loader-text.css" />
   <link rel="stylesheet" href="css/sidemenu.css" />
   <link rel="stylesheet" href="css/video-stage.css" />
   <link rel="stylesheet" href="css/cta-button.css" />
@@ -36,6 +37,9 @@
       playsinline
       preload="auto"
     ></video>
+
+    <!-- Animated status text, overlaid near the bottom of the loading video -->
+    <div id="loaderText" class="loader-text" aria-live="polite"></div>
   </div>
 
   <!-- ============ MAIN APP (hidden until loader finishes) ============ -->
@@ -102,6 +106,7 @@
 
   <!-- Separated JS: each file owns one concern -->
   <script src="js/sound.js"></script>
+  <script src="js/loader-text.js"></script>
   <script src="js/loader.js"></script>
   <script src="js/sidemenu.js"></script>
   <script src="js/video-controller.js"></script>
