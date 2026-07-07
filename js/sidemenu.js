@@ -1,6 +1,8 @@
 /* =========================================================
-   sidemenu.js — hamburger toggle + login form
-   Job: open/close the side menu and handle the login submit.
+   sidemenu.js — hamburger toggle + login form + menu sounds
+   Job: open/close the side menu, handle the login submit, and
+   play the menu-open/close sound + a throttled scroll sound
+   while scrolling inside the menu.
    ========================================================= */
 
 (function () {
@@ -15,14 +17,16 @@
     backdrop.classList.add("is-visible");
     sideMenu.setAttribute("aria-hidden", "false");
     toggleBtn.setAttribute("aria-expanded", "true");
-    SmartKiddoSound.playClick();
+    SmartKiddoSound.playMenu();
   }
 
   function closeMenu() {
+    const wasOpen = sideMenu.classList.contains("is-open");
     sideMenu.classList.remove("is-open");
     backdrop.classList.remove("is-visible");
     sideMenu.setAttribute("aria-hidden", "true");
     toggleBtn.setAttribute("aria-expanded", "false");
+    if (wasOpen) SmartKiddoSound.playMenu();
   }
 
   toggleBtn.addEventListener("click", () => {
@@ -35,6 +39,18 @@
 
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") closeMenu();
+  });
+
+  // Throttled scroll sound: plays at most once every 250ms while the
+  // user scrolls the menu's link list, instead of firing constantly.
+  let scrollSoundReady = true;
+  sideMenu.addEventListener("scroll", () => {
+    if (!scrollSoundReady) return;
+    scrollSoundReady = false;
+    SmartKiddoSound.playScroll();
+    setTimeout(() => {
+      scrollSoundReady = true;
+    }, 250);
   });
 
   // Placeholder login handling — wire this up to your real auth backend.
