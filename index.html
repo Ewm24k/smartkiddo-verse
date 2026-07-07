@@ -19,12 +19,28 @@
   <link rel="stylesheet" href="css/base.css" />
   <link rel="stylesheet" href="css/loader.css" />
   <link rel="stylesheet" href="css/tap-gate.css" />
+  <link rel="stylesheet" href="css/orientation-popup.css" />
   <link rel="stylesheet" href="css/loader-text.css" />
   <link rel="stylesheet" href="css/sidemenu.css" />
   <link rel="stylesheet" href="css/video-stage.css" />
   <link rel="stylesheet" href="css/cta-button.css" />
 </head>
 <body>
+
+  <!-- ============ ROTATE-DEVICE POPUP ============ -->
+  <!-- Shown first, above everything, encouraging landscape mode -->
+  <div id="orientationPopup" class="orientation-popup">
+    <div class="orientation-popup__card">
+      <div class="orientation-popup__phone" aria-hidden="true">
+        <div class="orientation-popup__phone-shape"></div>
+      </div>
+      <p class="orientation-popup__heading">
+        Pusingkan peranti anda ke <strong>mendatar</strong> untuk pengalaman penuh!
+      </p>
+      <p class="orientation-popup__hint">Tekan Selesai selepas anda pusing peranti anda.</p>
+      <button id="orientationDoneBtn" class="orientation-popup__button">Selesai</button>
+    </div>
+  </div>
 
   <!-- ============ TAP-TO-START GATE ============ -->
   <!-- The one natural, unavoidable first tap of the whole experience.
@@ -117,6 +133,7 @@
 
   <!-- Separated JS: each file owns one concern -->
   <script src="js/sound.js"></script>
+  <script src="js/orientation-popup.js"></script>
   <script src="js/tap-gate.js"></script>
   <script src="js/loader-text.js"></script>
   <script src="js/loader.js"></script>
