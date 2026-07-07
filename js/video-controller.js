@@ -1,9 +1,11 @@
 /* =========================================================
    video-controller.js — the main fullscreen video
-   Job: guarantee the video is NEVER muted by our own code,
-   push as hard as the browser allows to get sound playing
-   automatically, and reveal the "Mula Sekarang" CTA once the
-   video finishes (with redundant safety nets).
+   Job: only start the main video once the loading screen has
+   FULLY finished (waits for the "smartkiddo:appReady" event
+   dispatched by loader.js) — it must never play underneath the
+   loading screen. Then autoplay WITH sound as aggressively as
+   the browser allows, and reveal the "Mula Sekarang" CTA once
+   the video finishes (with redundant safety nets).
    ========================================================= */
 
 (function () {
@@ -11,9 +13,9 @@
   const ctaWrap = document.getElementById("ctaWrap");
   const startBtn = document.getElementById("startBtn");
 
-  video.loop = false;        // this video must NOT loop
-  video.defaultMuted = false; // never start muted by default
-  video.muted = false;        // force unmuted state immediately
+  video.loop = false;
+  video.defaultMuted = false;
+  video.muted = false;
   video.volume = 1;
 
   /* ---------------- Diagnostics: does the file even HAVE audio? ---------------- */
@@ -25,10 +27,7 @@
 
     if (video.mozHasAudio !== undefined || video.webkitAudioDecodedByteCount !== undefined || video.audioTracks !== undefined) {
       if (!hasAudio) {
-        console.warn(
-          "[SmartKiddoVerse] This browser reports NO audio track in main-video.mp4. " +
-          "If sound is missing, re-export the video with its audio track included — this is not a code/mute issue."
-        );
+        console.warn("[SmartKiddoVerse] This browser reports NO audio track in main-video.mp4.");
       } else {
         console.log("[SmartKiddoVerse] Audio track detected in main-video.mp4.");
       }
@@ -53,12 +52,10 @@
       setTimeout(() => revealCta("duration backup timer"), backupMs);
     }
   });
-  setTimeout(() => {
-    if (video.readyState === 0) revealCta("metadata never loaded");
-  }, 6000);
 
   /* ---------------- Sound: force unmuted, keep forcing it ---------------- */
   let unmuted = false;
+  let retryTimer = null;
 
   function forceUnmute(label) {
     if (unmuted) return;
@@ -74,9 +71,6 @@
         document.removeEventListener("keydown", onFirstInteraction);
       })
       .catch(() => {
-        // Browser is still blocking unmuted playback — keep the video
-        // running muted for now so it plays in full; the interval
-        // below and the interaction listeners keep retrying.
         video.muted = true;
         video.play().catch(() => {});
       });
@@ -85,37 +79,41 @@
   function onFirstInteraction() {
     forceUnmute("user interaction");
   }
-  document.addEventListener("touchstart", onFirstInteraction, { passive: true });
-  document.addEventListener("click", onFirstInteraction);
-  document.addEventListener("keydown", onFirstInteraction);
 
-  // Keep actively retrying unmuted playback every second until it
-  // succeeds or the video ends — belt and braces alongside the
-  // interaction-based retry above.
-  const retryTimer = setInterval(() => {
-    if (unmuted || video.ended) {
-      clearInterval(retryTimer);
-      return;
-    }
-    forceUnmute("periodic retry");
-  }, 1000);
-
-  forceUnmute("initial attempt");
-
-  // Prevent the video from ever being paused/stopped by the user,
-  // and make sure nothing external can re-mute it once sound is on.
   video.addEventListener("pause", () => {
     if (!video.ended) video.play().catch(() => {});
   });
   video.addEventListener("volumechange", () => {
-    if (unmuted && video.muted) {
-      // Something (browser/extension) re-muted it — undo that.
-      video.muted = false;
-    }
+    if (unmuted && video.muted) video.muted = false;
   });
   document.addEventListener("contextmenu", (e) => {
     if (e.target === video) e.preventDefault();
   });
+
+  /* ---------------- Wait for the loading screen to be 100% done ---------------- */
+  function startMainVideo() {
+    document.addEventListener("touchstart", onFirstInteraction, { passive: true });
+    document.addEventListener("click", onFirstInteraction);
+    document.addEventListener("keydown", onFirstInteraction);
+
+    retryTimer = setInterval(() => {
+      if (unmuted || video.ended) {
+        clearInterval(retryTimer);
+        return;
+      }
+      forceUnmute("periodic retry");
+    }, 1000);
+
+    forceUnmute("initial attempt after loader finished");
+
+    // Metadata-timeout safety net for the CTA, started from the same
+    // moment the video actually begins — not from page load.
+    setTimeout(() => {
+      if (video.readyState === 0) revealCta("metadata never loaded");
+    }, 6000);
+  }
+
+  document.addEventListener("smartkiddo:appReady", startMainVideo, { once: true });
 
   startBtn.addEventListener("click", () => {
     SmartKiddoSound.playClick();
