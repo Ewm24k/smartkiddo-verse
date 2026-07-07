@@ -87,7 +87,9 @@
   // Normal path: start the moment the tap-to-start gate is dismissed.
   document.addEventListener("smartkiddo:userGestureReceived", () => beginLoaderSequence("tap gate"), { once: true });
 
-  // Safety net: if the tap gate's event is ever missed for any reason,
-  // don't leave the app stuck on a black screen forever.
-  setTimeout(() => beginLoaderSequence("safety timeout"), 6000);
+  // Safety net: if the tap gate's event is ever missed for any reason
+  // (broken script, etc.), don't leave the app stuck forever. This is
+  // set generously long so it never fires before a real user has had
+  // time to close the rotate-device popup and tap the gate themselves.
+  setTimeout(() => beginLoaderSequence("safety timeout"), 20000);
 })();
