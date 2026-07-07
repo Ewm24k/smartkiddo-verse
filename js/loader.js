@@ -26,6 +26,10 @@
     loader.classList.add("loader--hidden");
     app.hidden = false;
 
+    // Tell the rest of the app (main video, etc.) that the loading
+    // screen is genuinely finished — nothing should start before this.
+    document.dispatchEvent(new CustomEvent("smartkiddo:appReady"));
+
     setTimeout(() => {
       if (loader.parentNode) loader.remove();
     }, 650);
