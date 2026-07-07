@@ -7,6 +7,17 @@
 
 (function () {
   const popup = document.getElementById("orientationPopup");
+
+  // Only mobile phones benefit from a "rotate to landscape" prompt —
+  // desktop/PC browsers should never see this popup at all.
+  const isAndroid = /Android/i.test(navigator.userAgent);
+  const isIOSPhone = /iPhone|iPod/i.test(navigator.userAgent);
+
+  if (!isAndroid && !isIOSPhone) {
+    popup.remove();
+    return;
+  }
+
   const doneBtn = document.getElementById("orientationDoneBtn");
 
   doneBtn.addEventListener("click", () => {
