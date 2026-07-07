@@ -1,64 +1,85 @@
 /* =========================================================
-   loader-text.js — the 3-stage animated status text
-   Stage 1: "SMART KIDDO Loading...." (pulsing dots)
-   Stage 2: "Prepared Module..."      (typewriter effect)
-   Stage 3: "SMART KIDDO Ready..."    (pop-in)
-   Exposes runSequence() which resolves once all 3 stages finish.
+   loader.js — controls the pre-loading black screen
+   Job: play the intro video + run the animated text sequence,
+   then reveal the main app once BOTH are done.
+
+   IMPORTANT: this is written so the app can NEVER get stuck on
+   the loading screen — every path (video plays fine, video file
+   missing, video errors, browser blocks something) eventually
+   calls revealApp(). There is also a hard absolute-timeout as a
+   last-resort safety net.
    ========================================================= */
 
-const SmartKiddoLoaderText = (() => {
-  const el = document.getElementById("loaderText");
+(function () {
+  const loader = document.getElementById("loader");
+  const loaderVideo = document.getElementById("loaderVideo");
+  const app = document.getElementById("app");
 
-  function wait(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
+  let revealed = false;
+  let videoDone = false;
+  let textDone = false;
+
+  function revealApp() {
+    if (revealed) return; // never run twice
+    revealed = true;
+
+    loader.classList.add("loader--hidden");
+    app.hidden = false;
+
+    setTimeout(() => {
+      if (loader.parentNode) loader.remove();
+    }, 650);
   }
 
-  async function fadeOut() {
-    el.classList.remove("is-visible");
-    await wait(350); // matches the CSS opacity transition
+  function maybeReveal() {
+    if (videoDone && textDone) revealApp();
   }
 
-  async function showDots(label, holdMs) {
-    el.className = "loader-text";
-    el.innerHTML =
-      `${label}` +
-      `<span class="loader-text__dots"><span>.</span><span>.</span><span>.</span><span>.</span></span>`;
-    // Force reflow so the transition re-triggers, then fade in
-    void el.offsetWidth;
-    el.classList.add("is-visible");
-    await wait(holdMs);
-    await fadeOut();
+  function markVideoDone(reason) {
+    if (videoDone) return;
+    videoDone = true;
+    console.log("[SmartKiddoVerse] loader video finished:", reason);
+    maybeReveal();
   }
 
-  async function typewrite(text, speed = 55) {
-    el.className = "loader-text";
-    el.innerHTML = `<span class="loader-text__typed"></span><span class="loader-text__cursor">&nbsp;</span>`;
-    const typedEl = el.querySelector(".loader-text__typed");
-    void el.offsetWidth;
-    el.classList.add("is-visible");
+  /* ---- Video completion: several independent triggers ---- */
 
-    for (let i = 0; i < text.length; i++) {
-      typedEl.textContent += text[i];
-      await wait(speed);
+  // 1. Normal path — the video actually finishes playing.
+  loaderVideo.addEventListener("ended", () => markVideoDone("ended event"));
+
+  // 2. The video file is missing / 404s / fails to decode.
+  loaderVideo.addEventListener("error", () => markVideoDone("error event"));
+
+  // 3. Belt-and-braces: once we know the real duration, schedule a
+  //    backup timer slightly longer than the video itself. If the
+  //    "ended" event is ever swallowed by a browser quirk, this fires
+  //    instead.
+  loaderVideo.addEventListener("loadedmetadata", () => {
+    if (isFinite(loaderVideo.duration) && loaderVideo.duration > 0) {
+      const backupMs = loaderVideo.duration * 1000 + 800;
+      setTimeout(() => markVideoDone("duration backup timer"), backupMs);
     }
-    await wait(500); // let the finished word sit for a moment
-    await fadeOut();
-  }
+  });
 
-  async function showReady(label, holdMs) {
-    el.className = "loader-text loader-text--ready";
-    el.textContent = label;
-    void el.offsetWidth;
-    el.classList.add("is-visible");
-    await wait(holdMs);
-    await fadeOut();
-  }
+  // 4. If metadata never loads at all within 4s (bad path, blocked
+  //    request, unsupported format), don't wait forever on the video.
+  setTimeout(() => {
+    if (loaderVideo.readyState === 0) markVideoDone("metadata never loaded");
+  }, 4000);
 
-  async function runSequence() {
-    await showDots("SMART KIDDO Loading", 1800);
-    await typewrite("Prepared Module...", 55);
-    await showReady("SMART KIDDO Ready...", 1300);
-  }
+  // 5. Absolute last resort — no matter what happens above, the
+  //    loading screen is forced to finish after 10 seconds.
+  setTimeout(() => markVideoDone("absolute safety timeout"), 10000);
 
-  return { runSequence };
+  /* ---- Text sequence ---- */
+  SmartKiddoLoaderText.runSequence().then(() => {
+    textDone = true;
+    maybeReveal();
+  });
+
+  /* ---- Try to start the video ---- */
+  loaderVideo.play().catch(() => {
+    // Autoplay (even muted) is very rarely blocked, but if it is,
+    // the timers above will still carry the sequence forward.
+  });
 })();
