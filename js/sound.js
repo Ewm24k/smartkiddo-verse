@@ -12,6 +12,7 @@ const SmartKiddoSound = (() => {
     scroll: "assets/audio/scroll.mp3",     // scrolling inside the side menu
     start: "assets/audio/start-button.mp3",// "Mula Sekarang" button
     loading: "assets/audio/loading.mp3",   // loading screen chime
+    hover: "assets/audio/hover.mp3",       // mouse hover on buttons/menu items
   };
 
   const cache = {};
@@ -40,5 +41,6 @@ const SmartKiddoSound = (() => {
     playScroll: () => play("scroll", 0.5),
     playStart: () => play("start"),
     playLoading: () => play("loading"),
+    playHover: () => play("hover", 0.4),
   };
 })();
