@@ -38,10 +38,16 @@
     SmartKiddoSound.playHover();
   });
 
-  // Hover sound on each individual link inside the side menu
+  // Hover sound + explicit click sound on each side menu link — click is
+  // wired separately from hover because on a real PC, moving the mouse
+  // onto a link (hover) and later clicking it are two separate moments,
+  // so relying on hover alone misses the click entirely on desktop.
   document.querySelectorAll(".side-menu__links a").forEach((link) => {
     link.addEventListener("mouseenter", () => {
       SmartKiddoSound.playHover();
+    });
+    link.addEventListener("click", () => {
+      SmartKiddoSound.playClick();
     });
   });
 
