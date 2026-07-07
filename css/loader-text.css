@@ -1,0 +1,76 @@
+/* =========================================================
+   loader-text.css — animated status text over the loading video
+   Three stages driven by js/loader-text.js:
+     1. "SMART KIDDO Loading...."  (pulsing dots)
+     2. "Prepared Module..."      (typewriter)
+     3. "SMART KIDDO Ready..."    (pop-in)
+   ========================================================= */
+
+.loader-text {
+  position: absolute;
+  left: 50%;
+  bottom: 10%;
+  transform: translateX(-50%);
+  z-index: 5;
+  width: 90%;
+  text-align: center;
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--color-white);
+  font-size: clamp(18px, 5vw, 30px);
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+}
+
+.loader-text.is-visible {
+  opacity: 1;
+}
+
+/* Stage 1: base label + pulsing dots */
+.loader-text__dots span {
+  display: inline-block;
+  animation: dotPulse 1.2s ease-in-out infinite;
+}
+.loader-text__dots span:nth-child(1) { animation-delay: 0s; }
+.loader-text__dots span:nth-child(2) { animation-delay: 0.15s; }
+.loader-text__dots span:nth-child(3) { animation-delay: 0.3s; }
+.loader-text__dots span:nth-child(4) { animation-delay: 0.45s; }
+
+@keyframes dotPulse {
+  0%, 100% { opacity: 0.25; transform: translateY(0); }
+  50%      { opacity: 1;    transform: translateY(-4px); }
+}
+
+/* Stage 2: typewriter cursor */
+.loader-text__cursor {
+  display: inline-block;
+  width: 3px;
+  margin-left: 2px;
+  background: var(--color-neon-green);
+  animation: cursorBlink 0.8s step-end infinite;
+}
+
+@keyframes cursorBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* Stage 3: ready pop-in */
+.loader-text--ready {
+  color: var(--color-neon-green);
+  animation: readyPop 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes readyPop {
+  0%   { transform: translateX(-50%) scale(0.7); opacity: 0; }
+  60%  { transform: translateX(-50%) scale(1.08); opacity: 1; }
+  100% { transform: translateX(-50%) scale(1); opacity: 1; }
+}
+
+@media (min-width: 768px) {
+  .loader-text {
+    bottom: 14%;
+  }
+}
