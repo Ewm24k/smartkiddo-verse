@@ -34,6 +34,17 @@
     isOpen ? closeMenu() : openMenu();
   });
 
+  toggleBtn.addEventListener("mouseenter", () => {
+    SmartKiddoSound.playHover();
+  });
+
+  // Hover sound on each individual link inside the side menu
+  document.querySelectorAll(".side-menu__links a").forEach((link) => {
+    link.addEventListener("mouseenter", () => {
+      SmartKiddoSound.playHover();
+    });
+  });
+
   closeBtn.addEventListener("click", closeMenu);
   backdrop.addEventListener("click", closeMenu);
 
