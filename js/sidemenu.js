@@ -42,7 +42,7 @@
   // wired separately from hover because on a real PC, moving the mouse
   // onto a link (hover) and later clicking it are two separate moments,
   // so relying on hover alone misses the click entirely on desktop.
-  document.querySelectorAll(".side-menu__links a").forEach((link) => {
+  document.querySelectorAll(".side-menu__links a, .login-form__signup").forEach((link) => {
     link.addEventListener("mouseenter", () => {
       SmartKiddoSound.playHover();
     });
