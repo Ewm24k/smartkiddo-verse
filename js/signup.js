@@ -21,21 +21,21 @@
   });
 
   /* ---------------- Dynamic kid name/age fields ---------------- */
-  let savedKids = []; // keeps entered values if the count changes
+  let savedKids = []; // keeps entered values if the count changes, e.g. { name, age, gender }
 
   function renderKidFields() {
     const count = Math.min(Math.max(parseInt(kidsCountInput.value, 10) || 0, 0), 6);
     kidsContainer.innerHTML = "";
 
     for (let i = 0; i < count; i++) {
-      const existing = savedKids[i] || { name: "", age: "" };
+      const existing = savedKids[i] || { name: "", age: "", gender: "" };
 
       const card = document.createElement("div");
       card.className = "signup-kid-card";
       card.innerHTML = `
         <span class="signup-kid-card__label">Anak ${i + 1}</span>
         <div class="signup-field">
-          <label for="kidName${i}">Nama Penuh</label>
+          <label for="kidName${i}">Nama Anak</label>
           <input type="text" id="kidName${i}" data-kid-index="${i}" data-kid-field="name"
                  placeholder="Nama penuh anak" value="${existing.name}" required />
         </div>
@@ -44,17 +44,31 @@
           <input type="number" id="kidAge${i}" data-kid-index="${i}" data-kid-field="age"
                  min="0" max="18" placeholder="Umur" value="${existing.age}" required />
         </div>
+        <div class="signup-field">
+          <label for="kidGender${i}">Jantina</label>
+          <select id="kidGender${i}" data-kid-index="${i}" data-kid-field="gender" required>
+            <option value="" disabled ${existing.gender ? "" : "selected"}>Pilih jantina</option>
+            <option value="Lelaki" ${existing.gender === "Lelaki" ? "selected" : ""}>Lelaki</option>
+            <option value="Perempuan" ${existing.gender === "Perempuan" ? "selected" : ""}>Perempuan</option>
+          </select>
+        </div>
       `;
       kidsContainer.appendChild(card);
     }
 
     // Wire sounds + change tracking on the freshly created inputs
-    kidsContainer.querySelectorAll("input").forEach((input) => {
+    kidsContainer.querySelectorAll("input, select").forEach((input) => {
       input.addEventListener("mouseenter", () => SmartKiddoSound.playHover());
       input.addEventListener("input", () => {
         const idx = parseInt(input.dataset.kidIndex, 10);
         const field = input.dataset.kidField;
-        savedKids[idx] = savedKids[idx] || { name: "", age: "" };
+        savedKids[idx] = savedKids[idx] || { name: "", age: "", gender: "" };
+        savedKids[idx][field] = input.value;
+      });
+      input.addEventListener("change", () => {
+        const idx = parseInt(input.dataset.kidIndex, 10);
+        const field = input.dataset.kidField;
+        savedKids[idx] = savedKids[idx] || { name: "", age: "", gender: "" };
         savedKids[idx][field] = input.value;
       });
     });
@@ -109,12 +123,18 @@
 
     const fatherName = document.getElementById("fatherName").value.trim();
     const motherName = document.getElementById("motherName").value.trim();
+    const parentEmail = document.getElementById("parentEmail").value.trim();
     const kidsCount = parseInt(kidsCountInput.value, 10) || 0;
     const password = passwordInput.value;
     const passwordConfirm = passwordConfirmInput.value;
 
     if (!fatherName || !motherName) {
       showError("Sila isi nama bapa dan ibu.");
+      return;
+    }
+
+    if (!parentEmail || !parentEmail.includes("@")) {
+      showError("Sila isi emel ibu bapa yang sah.");
       return;
     }
 
@@ -127,6 +147,10 @@
       const kid = savedKids[i];
       if (!kid || !kid.name || !kid.name.trim() || kid.age === "" || kid.age === undefined) {
         showError(`Sila lengkapkan maklumat untuk Anak ${i + 1}.`);
+        return;
+      }
+      if (!kid.gender) {
+        showError(`Sila pilih jantina untuk Anak ${i + 1}.`);
         return;
       }
     }
@@ -146,6 +170,7 @@
     const payload = {
       fatherName,
       motherName,
+      parentEmail,
       kids: savedKids.slice(0, kidsCount),
       password, // NOTE: hash this server-side — never store plain text.
     };
