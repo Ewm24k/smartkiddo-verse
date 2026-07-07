@@ -1,90 +1,65 @@
 /* =========================================================
-   loader.js — controls the pre-loading black screen
-   Job: ONLY START once the tap-to-start gate has been dismissed
-   (so the loading video/text are never silently playing out
-   behind that gate — they always play in full, visibly, right
-   after the tap). Then play the intro video + run the animated
-   text sequence, and reveal the main app once BOTH are done.
-
-   IMPORTANT: this is written so the app can NEVER get stuck on
-   the loading screen — every path (video plays fine, video file
-   missing, video errors, browser blocks something) eventually
-   calls revealApp(). There is also a hard absolute-timeout as a
-   last-resort safety net, including a fallback in case the tap
-   gate's own event is ever missed.
+   sidemenu.js — hamburger toggle + login form + menu sounds
+   Job: open/close the side menu, handle the login submit, and
+   play the menu-open/close sound + a throttled scroll sound
+   while scrolling inside the menu.
    ========================================================= */
 
 (function () {
-  const loader = document.getElementById("loader");
-  const loaderVideo = document.getElementById("loaderVideo");
-  const app = document.getElementById("app");
+  const toggleBtn = document.getElementById("menuToggle");
+  const closeBtn = document.getElementById("menuClose");
+  const sideMenu = document.getElementById("sideMenu");
+  const backdrop = document.getElementById("sideMenuBackdrop");
+  const loginForm = document.getElementById("loginForm");
 
-  let started = false;
-  let revealed = false;
-  let videoDone = false;
-  let textDone = false;
+  function openMenu() {
+    sideMenu.classList.add("is-open");
+    backdrop.classList.add("is-visible");
+    sideMenu.setAttribute("aria-hidden", "false");
+    toggleBtn.setAttribute("aria-expanded", "true");
+    SmartKiddoSound.playMenu();
+  }
 
-  function revealApp() {
-    if (revealed) return; // never run twice
-    revealed = true;
+  function closeMenu() {
+    const wasOpen = sideMenu.classList.contains("is-open");
+    sideMenu.classList.remove("is-open");
+    backdrop.classList.remove("is-visible");
+    sideMenu.setAttribute("aria-hidden", "true");
+    toggleBtn.setAttribute("aria-expanded", "false");
+    if (wasOpen) SmartKiddoSound.playMenu();
+  }
 
-    loader.classList.add("loader--hidden");
-    app.hidden = false;
+  toggleBtn.addEventListener("click", () => {
+    const isOpen = sideMenu.classList.contains("is-open");
+    isOpen ? closeMenu() : openMenu();
+  });
 
-    // Tell the rest of the app (main video, etc.) that the loading
-    // screen is genuinely finished — nothing should start before this.
-    window.smartKiddoAppReady = true;
-    document.dispatchEvent(new CustomEvent("smartkiddo:appReady"));
+  closeBtn.addEventListener("click", closeMenu);
+  backdrop.addEventListener("click", closeMenu);
 
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeMenu();
+  });
+
+  // Throttled scroll sound: plays at most once every 250ms while the
+  // user scrolls the menu's link list, instead of firing constantly.
+  let scrollSoundReady = true;
+  sideMenu.addEventListener("scroll", () => {
+    if (!scrollSoundReady) return;
+    scrollSoundReady = false;
+    SmartKiddoSound.playScroll();
     setTimeout(() => {
-      if (loader.parentNode) loader.remove();
-    }, 650);
-  }
+      scrollSoundReady = true;
+    }, 250);
+  });
 
-  function maybeReveal() {
-    if (videoDone && textDone) revealApp();
-  }
-
-  function markVideoDone(reason) {
-    if (videoDone) return;
-    videoDone = true;
-    console.log("[SmartKiddoVerse] loader video finished:", reason);
-    maybeReveal();
-  }
-
-  function beginLoaderSequence(reason) {
-    if (started) return;
-    started = true;
-    console.log("[SmartKiddoVerse] Loader sequence starting:", reason);
-
-    /* ---- Video completion: several independent triggers ---- */
-    loaderVideo.addEventListener("ended", () => markVideoDone("ended event"));
-    loaderVideo.addEventListener("error", () => markVideoDone("error event"));
-    loaderVideo.addEventListener("loadedmetadata", () => {
-      if (isFinite(loaderVideo.duration) && loaderVideo.duration > 0) {
-        const backupMs = loaderVideo.duration * 1000 + 800;
-        setTimeout(() => markVideoDone("duration backup timer"), backupMs);
-      }
-    });
-    setTimeout(() => {
-      if (loaderVideo.readyState === 0) markVideoDone("metadata never loaded");
-    }, 4000);
-    setTimeout(() => markVideoDone("absolute safety timeout"), 10000);
-
-    /* ---- Text sequence ---- */
-    SmartKiddoLoaderText.runSequence().then(() => {
-      textDone = true;
-      maybeReveal();
-    });
-
-    /* ---- Start the video now, not before ---- */
-    loaderVideo.play().catch(() => {});
-  }
-
-  // Normal path: start the moment the tap-to-start gate is dismissed.
-  document.addEventListener("smartkiddo:userGestureReceived", () => beginLoaderSequence("tap gate"), { once: true });
-
-  // Safety net: if the tap gate's event is ever missed for any reason,
-  // don't leave the app stuck on a black screen forever.
-  setTimeout(() => beginLoaderSequence("safety timeout"), 6000);
+  // Placeholder login handling — wire this up to your real auth backend.
+  loginForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    SmartKiddoSound.playClick();
+    const username = document.getElementById("username").value.trim();
+    // TODO: replace with a real authentication request (fetch/AJAX) to your backend.
+    console.log("Login attempt for:", username);
+    alert("Ciri log masuk akan disambungkan ke pelayan tidak lama lagi!");
+  });
 })();
