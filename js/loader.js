@@ -1,49 +1,64 @@
 /* =========================================================
-   video-stage.css — the fullscreen, non-interactive video
+   loader-text.js — the 3-stage animated status text
+   Stage 1: "SMART KIDDO Loading...." (pulsing dots)
+   Stage 2: "Prepared Module..."      (typewriter effect)
+   Stage 3: "SMART KIDDO Ready..."    (pop-in)
+   Exposes runSequence() which resolves once all 3 stages finish.
    ========================================================= */
 
-.video-stage {
-  position: relative;
-  width: 100vw;
-  height: 100dvh;
-  background: #000;
-  overflow: hidden;
-}
+const SmartKiddoLoaderText = (() => {
+  const el = document.getElementById("loaderText");
 
-.video-stage__video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;      /* fills every screen size: phone, tablet, desktop */
-  object-position: center;
-  pointer-events: none;   /* video cannot be tapped/clicked/paused by the user */
-}
-
-/* Small "tap for sound" chip — only appears if the browser blocked
-   autoplay-with-audio and we had to fall back to a muted start */
-.unmute-prompt {
-  position: absolute;
-  bottom: calc(24px + var(--safe-bottom));
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.55);
-  color: var(--color-white);
-  font-weight: 700;
-  font-size: 14px;
-  padding: 10px 18px;
-  border-radius: 999px;
-  backdrop-filter: blur(4px);
-  z-index: 20;
-  animation: pulseFade 1.6s ease-in-out infinite;
-}
-
-@keyframes pulseFade {
-  0%, 100% { opacity: 0.6; }
-  50% { opacity: 1; }
-}
-
-@media (min-width: 768px) {
-  .unmute-prompt {
-    font-size: 16px;
-    padding: 12px 22px;
+  function wait(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
-}
+
+  async function fadeOut() {
+    el.classList.remove("is-visible");
+    await wait(350); // matches the CSS opacity transition
+  }
+
+  async function showDots(label, holdMs) {
+    el.className = "loader-text";
+    el.innerHTML =
+      `${label}` +
+      `<span class="loader-text__dots"><span>.</span><span>.</span><span>.</span><span>.</span></span>`;
+    // Force reflow so the transition re-triggers, then fade in
+    void el.offsetWidth;
+    el.classList.add("is-visible");
+    await wait(holdMs);
+    await fadeOut();
+  }
+
+  async function typewrite(text, speed = 55) {
+    el.className = "loader-text";
+    el.innerHTML = `<span class="loader-text__typed"></span><span class="loader-text__cursor">&nbsp;</span>`;
+    const typedEl = el.querySelector(".loader-text__typed");
+    void el.offsetWidth;
+    el.classList.add("is-visible");
+
+    for (let i = 0; i < text.length; i++) {
+      typedEl.textContent += text[i];
+      await wait(speed);
+    }
+    await wait(500); // let the finished word sit for a moment
+    await fadeOut();
+  }
+
+  async function showReady(label, holdMs) {
+    el.className = "loader-text loader-text--ready";
+    el.textContent = label;
+    void el.offsetWidth;
+    el.classList.add("is-visible");
+    await wait(holdMs);
+    await fadeOut();
+  }
+
+  async function runSequence() {
+    await showDots("SMART KIDDO Loading", 1800);
+    await typewrite("Prepared Module...", 55);
+    await showReady("SMART KIDDO Ready...", 1300);
+  }
+
+  return { runSequence };
+})();
