@@ -1,96 +1,64 @@
 /* =========================================================
-   success-popup.css — fullscreen "verified" video popup
-   Shown after a successful signup. Covers the entire screen,
-   including under device rotation. Video is non-interactive
-   and cannot be paused. A "Teruskan" button appears once the
-   video ends (or an error-styled variant if it fails to load).
+   success-popup.js — fullscreen "verified" video popup
+   Call SmartKiddoSuccessPopup.show() after a successful signup.
+   Plays verified-video.mp4 fully (no pause, no skip, no loop),
+   then reveals a "Teruskan" button — a calm success-styled
+   button if the video played fine, or an error-styled variant
+   if the video failed to load/play, before redirecting home.
    ========================================================= */
 
-.success-popup {
-  position: fixed;
-  inset: 0;
-  z-index: 2000; /* above absolutely everything else on the page */
-  width: 100vw;
-  height: 100dvh;
-  background: #000000;
-  overflow: hidden;
-}
+const SmartKiddoSuccessPopup = (() => {
+  const popup = document.getElementById("successPopup");
+  const video = document.getElementById("successVideo");
+  const ctaWrap = document.getElementById("successCtaWrap");
+  const continueBtn = document.getElementById("successContinueBtn");
 
-.success-popup__video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* fills the entire screen edge-to-edge, any orientation */
-  object-position: center;
-  pointer-events: none; /* cannot be tapped/clicked/paused by the user */
-}
+  let ctaShown = false;
 
-.success-popup__cta {
-  position: absolute;
-  left: 50%;
-  bottom: 14%;
-  transform: translateX(-50%);
-  z-index: 10;
-  animation: successCtaEnter 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-}
+  function revealCta(state) {
+    if (ctaShown) return;
+    ctaShown = true;
+    if (state === "error") {
+      continueBtn.classList.add("success-popup__button--error");
+    }
+    ctaWrap.hidden = false;
+  }
 
-@keyframes successCtaEnter {
-  from { opacity: 0; transform: translate(-50%, 20px); }
-  to   { opacity: 1; transform: translate(-50%, 0); }
-}
+  video.loop = false;
+  video.addEventListener("ended", () => revealCta("success"));
+  video.addEventListener("error", () => revealCta("error"));
+  video.addEventListener("loadedmetadata", () => {
+    if (isFinite(video.duration) && video.duration > 0) {
+      setTimeout(() => revealCta("success"), video.duration * 1000 + 800);
+    }
+  });
+  // If the video never even starts loading, don't leave the parent stuck.
+  setTimeout(() => {
+    if (video.readyState === 0) revealCta("error");
+  }, 6000);
 
-.success-popup__button {
-  position: relative;
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: clamp(18px, 4vw, 26px);
-  color: #06331c;
-  background: var(--color-neon-green);
-  padding: 16px 40px;
-  border-radius: 999px;
-  box-shadow: 0 6px 18px rgba(57, 255, 136, 0.35);
-  transition: transform 0.12s ease;
-}
+  // Prevent the video from ever being paused/stopped by the user.
+  video.addEventListener("pause", () => {
+    if (!video.ended) video.play().catch(() => {});
+  });
+  video.addEventListener("contextmenu", (e) => e.preventDefault());
 
-.success-popup__button:active {
-  transform: scale(0.94);
-}
+  continueBtn.addEventListener("mouseenter", () => SmartKiddoSound.playHover());
+  continueBtn.addEventListener("click", () => {
+    SmartKiddoSound.playClick();
+    window.location.href = "home.html";
+  });
 
-/* Success state: same neon glow loop as the main "Mula Sekarang" button */
-.success-popup__button::before {
-  content: "";
-  position: absolute;
-  inset: -6px;
-  border-radius: inherit;
-  border: 3px solid var(--color-neon-green);
-  animation: successNeonPulse 1.4s ease-in-out infinite;
-}
+  function show() {
+    popup.hidden = false;
+    video.muted = false;
+    video.play().catch(() => {
+      // If unmuted autoplay is blocked, fall back to muted so the
+      // video still plays in full visually.
+      video.muted = true;
+      video.play().catch(() => {});
+    });
+  }
 
-@keyframes successNeonPulse {
-  0%, 100% { box-shadow: 0 0 8px 2px var(--color-neon-green); opacity: 0.9; }
-  50%      { box-shadow: 0 0 22px 8px var(--color-neon-green); opacity: 0.55; }
-}
-
-/* Error state: shown instead if the video fails to load/play — same
-   button, but an amber/red warning tone + a gentle shake instead of
-   the calm success glow, so it's clear something didn't play right */
-.success-popup__button--error {
-  background: #ffcf57;
-  color: #5c3d00;
-  animation: successErrorShake 0.4s ease-in-out 2;
-}
-
-.success-popup__button--error::before {
-  border-color: #ff6b6b;
-  animation: successErrorPulse 1s ease-in-out infinite;
-}
-
-@keyframes successErrorPulse {
-  0%, 100% { box-shadow: 0 0 8px 2px #ff6b6b; opacity: 0.9; }
-  50%      { box-shadow: 0 0 20px 7px #ff6b6b; opacity: 0.5; }
-}
-
-@keyframes successErrorShake {
-  0%, 100% { transform: translateX(0); }
-  25%      { transform: translateX(-4px); }
-  75%      { transform: translateX(4px); }
-}
+  return { show };
+})();
