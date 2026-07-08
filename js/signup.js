@@ -267,15 +267,17 @@
     }
 
     // Domain is a valid Gmail/Yahoo address — now check for duplicates.
+    // Uses a separate, minimal "email-lookup" collection (doc ID = the
+    // email itself) so the check can be allowed to READ without ever
+    // exposing the real signups data (names, kids, password, etc.).
     const token = emailCheckToken;
     setEmailState("checking");
-    db.collection("signups")
-      .where("parentEmail", "==", email)
-      .limit(1)
+    db.collection("email-lookup")
+      .doc(email)
       .get()
-      .then((snapshot) => {
+      .then((doc) => {
         if (token !== emailCheckToken) return; // a newer check has since started
-        if (!snapshot.empty) {
+        if (doc.exists) {
           setEmailState("invalid");
           setEmailMessage("Emel ini telah didaftarkan. Sila guna emel lain.", "error");
           parentEmailValid = false;
@@ -387,8 +389,20 @@
     submitBtn.disabled = true;
     submitBtn.textContent = "Menghantar...";
 
-    db.collection("signups")
-      .add(payload)
+    const signupRef = db.collection("signups").doc();
+    const emailLookupRef = db.collection("email-lookup").doc(parentEmail);
+
+    db.runTransaction((transaction) => {
+      return transaction.get(emailLookupRef).then((lookupDoc) => {
+        if (lookupDoc.exists) {
+          throw new Error("EMAIL_TAKEN");
+        }
+        transaction.set(emailLookupRef, {
+          registeredAt: firebase.firestore.FieldValue.serverTimestamp(),
+        });
+        transaction.set(signupRef, payload);
+      });
+    })
       .then(() => {
         form.reset();
         savedKids = [];
@@ -398,8 +412,14 @@
         SmartKiddoSuccessPopup.show();
       })
       .catch((err) => {
-        console.error("Firestore signup error:", err);
-        showError("Pendaftaran gagal. Sila semak sambungan internet anda dan cuba lagi.");
+        if (err.message === "EMAIL_TAKEN") {
+          showError("Emel ini telah didaftarkan. Sila guna emel lain.");
+          setEmailState("invalid");
+          setEmailMessage("Emel ini telah didaftarkan. Sila guna emel lain.", "error");
+        } else {
+          console.error("Firestore signup error:", err);
+          showError("Pendaftaran gagal. Sila semak sambungan internet anda dan cuba lagi.");
+        }
         submitBtn.disabled = false;
         submitBtn.textContent = originalBtnText;
       });
