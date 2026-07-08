@@ -82,9 +82,15 @@
               <input type="text" id="motherName" name="motherName" placeholder="Contoh: Siti binti Hassan" required />
             </div>
           </div>
+          <p class="signup-field-note">⚠️ Hanya emel <strong>Gmail</strong> atau <strong>Yahoo</strong> sahaja diterima.</p>
           <div class="signup-field">
             <label for="parentEmail">Emel Ibu Bapa</label>
-            <input type="email" id="parentEmail" name="parentEmail" placeholder="contoh@emel.com" required />
+            <div class="signup-input-wrap">
+              <input type="email" id="parentEmail" name="parentEmail" placeholder="contoh@gmail.com" required />
+              <span id="parentEmailSpinner" class="signup-input-spinner" hidden></span>
+              <span id="parentEmailCheck" class="signup-input-check" hidden>✓</span>
+            </div>
+            <p id="parentEmailMessage" class="signup-field-message" hidden></p>
           </div>
         </fieldset>
 
