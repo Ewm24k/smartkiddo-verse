@@ -13,6 +13,15 @@
 
   function dismissGate() {
     SmartKiddoSound.playClick();
+
+    // Works on Android Chrome (hides the address bar). iOS Safari does
+    // not support the Fullscreen API for regular web pages at all — this
+    // is a real platform limitation, not something any code can change.
+    // It's still safe to try: it silently does nothing where unsupported.
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    }
+
     gate.classList.add("tap-gate--hidden");
     window.smartKiddoUserGestureReceived = true;
     document.dispatchEvent(new CustomEvent("smartkiddo:userGestureReceived"));
