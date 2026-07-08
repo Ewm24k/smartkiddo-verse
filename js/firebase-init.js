@@ -11,3 +11,8 @@
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+
+// Optional: Firebase Analytics (your project has this enabled via measurementId)
+if (firebase.analytics) {
+  firebase.analytics();
+}
