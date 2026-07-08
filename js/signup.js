@@ -159,6 +159,148 @@
 
   passwordInput.addEventListener("input", updateChecklist);
 
+  /* ---------------- Email validation: domain rule + typo check + duplicate check ---------------- */
+  const ALLOWED_EMAIL_DOMAINS = ["gmail.com", "yahoo.com", "yahoo.com.my"];
+
+  const parentEmailInput = document.getElementById("parentEmail");
+  const parentEmailSpinner = document.getElementById("parentEmailSpinner");
+  const parentEmailCheck = document.getElementById("parentEmailCheck");
+  const parentEmailMessage = document.getElementById("parentEmailMessage");
+
+  let parentEmailValid = false;
+  let emailCheckToken = 0; // lets a fresh check ignore a stale/late response
+
+  function levenshtein(a, b) {
+    const m = a.length,
+      n = b.length;
+    const dp = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));
+    for (let i = 0; i <= m; i++) dp[i][0] = i;
+    for (let j = 0; j <= n; j++) dp[0][j] = j;
+    for (let i = 1; i <= m; i++) {
+      for (let j = 1; j <= n; j++) {
+        dp[i][j] =
+          a[i - 1] === b[j - 1]
+            ? dp[i - 1][j - 1]
+            : 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
+      }
+    }
+    return dp[m][n];
+  }
+
+  function closestAllowedDomain(domain) {
+    let best = null;
+    let bestDist = Infinity;
+    ALLOWED_EMAIL_DOMAINS.forEach((allowed) => {
+      const dist = levenshtein(domain, allowed);
+      if (dist < bestDist) {
+        bestDist = dist;
+        best = allowed;
+      }
+    });
+    return { best, bestDist };
+  }
+
+  function setEmailState(state) {
+    parentEmailInput.classList.remove("is-invalid", "is-valid");
+    parentEmailSpinner.hidden = true;
+    parentEmailCheck.hidden = true;
+    if (state === "checking") parentEmailSpinner.hidden = false;
+    if (state === "invalid") parentEmailInput.classList.add("is-invalid");
+    if (state === "valid") {
+      parentEmailInput.classList.add("is-valid");
+      parentEmailCheck.hidden = false;
+    }
+  }
+
+  function setEmailMessage(text, type) {
+    if (!text) {
+      parentEmailMessage.hidden = true;
+      parentEmailMessage.innerHTML = "";
+      return;
+    }
+    parentEmailMessage.hidden = false;
+    parentEmailMessage.className = `signup-field-message signup-field-message--${type}`;
+    parentEmailMessage.textContent = text;
+  }
+
+  function showEmailSuggestion(correctedEmail) {
+    parentEmailMessage.hidden = false;
+    parentEmailMessage.className = "signup-field-message signup-field-message--suggestion";
+    parentEmailMessage.innerHTML = `Adakah anda maksudkan <strong>${correctedEmail}</strong>? <button type="button" id="emailFixBtn" class="signup-field-fixbtn">Betulkan</button>`;
+    document.getElementById("emailFixBtn").addEventListener("click", () => {
+      SmartKiddoSound.playClick();
+      parentEmailInput.value = correctedEmail;
+      validateEmailField();
+    });
+  }
+
+  function validateEmailField() {
+    const email = parentEmailInput.value.trim().toLowerCase();
+    parentEmailValid = false;
+    emailCheckToken++; // invalidates any in-flight check from before this run
+    setEmailMessage("");
+    setEmailState("idle");
+
+    if (!email) return;
+
+    const basicFormatOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    if (!basicFormatOk) {
+      setEmailState("invalid");
+      setEmailMessage("Format emel tidak sah.", "error");
+      return;
+    }
+
+    const domain = email.split("@")[1];
+
+    if (!ALLOWED_EMAIL_DOMAINS.includes(domain)) {
+      const { best, bestDist } = closestAllowedDomain(domain);
+      // A small edit-distance (typo range) suggests a likely typo of an
+      // allowed domain, e.g. "gmial.com", "gmail.cun", "yaho.com".
+      if (bestDist > 0 && bestDist <= 3) {
+        setEmailState("invalid");
+        showEmailSuggestion(email.split("@")[0] + "@" + best);
+        return;
+      }
+      setEmailState("invalid");
+      setEmailMessage("Emel mesti guna Gmail atau Yahoo sahaja. Sila tukar emel anda.", "error");
+      return;
+    }
+
+    // Domain is a valid Gmail/Yahoo address — now check for duplicates.
+    const token = emailCheckToken;
+    setEmailState("checking");
+    db.collection("signups")
+      .where("parentEmail", "==", email)
+      .limit(1)
+      .get()
+      .then((snapshot) => {
+        if (token !== emailCheckToken) return; // a newer check has since started
+        if (!snapshot.empty) {
+          setEmailState("invalid");
+          setEmailMessage("Emel ini telah didaftarkan. Sila guna emel lain.", "error");
+          parentEmailValid = false;
+        } else {
+          setEmailState("valid");
+          setEmailMessage("");
+          parentEmailValid = true;
+        }
+      })
+      .catch((err) => {
+        if (token !== emailCheckToken) return;
+        console.error("Email duplicate-check error:", err);
+        setEmailState("idle");
+        setEmailMessage("Tidak dapat mengesahkan emel. Sila semak sambungan internet.", "error");
+        parentEmailValid = false;
+      });
+  }
+
+  let emailDebounceTimer = null;
+  parentEmailInput.addEventListener("input", () => {
+    clearTimeout(emailDebounceTimer);
+    emailDebounceTimer = setTimeout(validateEmailField, 600);
+  });
+  parentEmailInput.addEventListener("blur", validateEmailField);
+
   /* ---------------- Form submit ---------------- */
   function showError(message) {
     errorBox.textContent = message;
@@ -177,7 +319,7 @@
 
     const fatherName = document.getElementById("fatherName").value.trim();
     const motherName = document.getElementById("motherName").value.trim();
-    const parentEmail = document.getElementById("parentEmail").value.trim();
+    const parentEmail = document.getElementById("parentEmail").value.trim().toLowerCase();
     const kidsCount = parseInt(kidsCountInput.value, 10) || 0;
     const password = passwordInput.value;
     const passwordConfirm = passwordConfirmInput.value;
@@ -187,8 +329,18 @@
       return;
     }
 
-    if (!parentEmail || !parentEmail.includes("@")) {
-      showError("Sila isi emel ibu bapa yang sah.");
+    if (!parentEmail) {
+      showError("Sila isi emel ibu bapa.");
+      return;
+    }
+
+    if (!parentEmailSpinner.hidden) {
+      showError("Sila tunggu sebentar — kami sedang menyemak emel anda.");
+      return;
+    }
+
+    if (!parentEmailValid) {
+      showError("Sila gunakan emel Gmail/Yahoo yang sah dan belum didaftarkan.");
       return;
     }
 
