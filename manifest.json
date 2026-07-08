@@ -1,0 +1,12 @@
+{
+  "name": "SmartKiddo Verse",
+  "short_name": "SmartKiddo",
+  "start_url": "index.html",
+  "display": "fullscreen",
+  "orientation": "any",
+  "background_color": "#0a0714",
+  "theme_color": "#0a0714",
+  "icons": [
+    { "src": "assets/icons/favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}
