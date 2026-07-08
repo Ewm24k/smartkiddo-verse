@@ -9,7 +9,24 @@
   // here too: if this is a genuinely fresh visit with no prior interaction
   // on this domain, the browser may block it until the first tap/click —
   // that fallback is handled automatically below.
-  const welcomeAudio = new Audio("assets/audio/welcoming-parents.mp3");
+  //
+  // Tries welcoming-parents.wav first, and automatically falls back to
+  // welcoming-parents.mp3 if the .wav file isn't found — so either
+  // format works with no code changes needed.
+  function createSoundWithFallback(basePath, extensions) {
+    const audio = new Audio();
+    let index = 0;
+    function tryNextExtension() {
+      if (index >= extensions.length) return;
+      audio.src = `${basePath}.${extensions[index]}`;
+      index++;
+    }
+    audio.addEventListener("error", tryNextExtension);
+    tryNextExtension();
+    return audio;
+  }
+
+  const welcomeAudio = createSoundWithFallback("assets/audio/welcoming-parents", ["wav", "mp3"]);
   welcomeAudio.volume = 0.9;
 
   function tryPlayWelcome() {
