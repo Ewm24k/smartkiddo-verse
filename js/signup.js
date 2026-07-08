@@ -238,12 +238,12 @@
     db.collection("signups")
       .add(payload)
       .then(() => {
-        alert("Pendaftaran berjaya! Selamat datang ke SmartKiddo Verse 🎉");
         form.reset();
         savedKids = [];
         kidsContainer.innerHTML = "";
         submitBtn.disabled = false;
         submitBtn.textContent = originalBtnText;
+        SmartKiddoSuccessPopup.show();
       })
       .catch((err) => {
         console.error("Firestore signup error:", err);
