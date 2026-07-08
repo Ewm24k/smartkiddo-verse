@@ -70,6 +70,7 @@ img, video {
   position: fixed;
   inset: 0;
   width: 100vw;
-  height: 100dvh;
+  height: 100vh;  /* universally-supported fallback, pure CSS, no JS involved */
+  height: 100dvh; /* modern browsers override with the more accurate value */
   overflow: hidden;
 }
