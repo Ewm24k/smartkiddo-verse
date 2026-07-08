@@ -248,7 +248,92 @@
   box-shadow: 0 0 6px 1px rgba(47, 191, 143, 0.5);
 }
 
-/* ---- Error + submit ---- */
+/* ---- Email validation UI ---- */
+.signup-field-note {
+  font-size: 12px;
+  font-weight: 700;
+  color: #9a6b00;
+  background: #fff6e0;
+  border-radius: 10px;
+  padding: 8px 12px;
+  margin: -2px 0 2px;
+}
+
+.signup-input-wrap {
+  position: relative;
+  display: flex;
+}
+
+.signup-input-wrap input {
+  width: 100%;
+  padding-right: 42px;
+}
+
+.signup-input-spinner {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  width: 16px;
+  height: 16px;
+  margin-top: -8px;
+  border: 3px solid #e6def7;
+  border-top-color: var(--color-purple);
+  border-radius: 50%;
+  animation: emailSpin 0.7s linear infinite;
+}
+
+@keyframes emailSpin {
+  to { transform: rotate(360deg); }
+}
+
+.signup-input-check {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #2fbf8f;
+  font-weight: 800;
+  font-size: 17px;
+}
+
+.signup-field input.is-invalid {
+  border-color: #ff8fa3;
+  box-shadow: 0 0 0 4px rgba(214, 51, 108, 0.1);
+}
+
+.signup-field input.is-valid {
+  border-color: #6fe3b8;
+}
+
+.signup-field-message {
+  font-size: 12.5px;
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.signup-field-message--error {
+  color: #d6336c;
+}
+
+.signup-field-message--suggestion {
+  color: #9a6b00;
+}
+
+.signup-field-message--success {
+  color: #2fbf8f;
+}
+
+.signup-field-fixbtn {
+  display: inline-block;
+  margin-left: 4px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: #ffe1a8;
+  color: #6b4a00;
+  font-weight: 800;
+  font-size: 12px;
+}
+
 .signup-error {
   background: #fff0f3;
   color: #d6336c;
