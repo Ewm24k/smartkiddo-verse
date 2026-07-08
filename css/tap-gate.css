@@ -9,6 +9,7 @@
   inset: 0;
   z-index: 1000; /* above everything, including the loader */
   width: 100vw;
+  height: 100vh;
   height: 100dvh;
   background: #000000;
   display: flex;
