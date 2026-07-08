@@ -4,6 +4,27 @@
    ========================================================= */
 
 (function () {
+  /* ---------------- Welcome sound (auto-plays on page load) ---------------- */
+  // Same browser autoplay-with-sound rule as the rest of the app applies
+  // here too: if this is a genuinely fresh visit with no prior interaction
+  // on this domain, the browser may block it until the first tap/click —
+  // that fallback is handled automatically below.
+  const welcomeAudio = new Audio("assets/audio/welcoming-parents.mp3");
+  welcomeAudio.volume = 0.9;
+
+  function tryPlayWelcome() {
+    welcomeAudio.play().catch(() => {
+      const playOnFirstInteraction = () => {
+        welcomeAudio.play().catch(() => {});
+        document.removeEventListener("click", playOnFirstInteraction);
+        document.removeEventListener("touchstart", playOnFirstInteraction);
+      };
+      document.addEventListener("click", playOnFirstInteraction, { once: true });
+      document.addEventListener("touchstart", playOnFirstInteraction, { once: true, passive: true });
+    });
+  }
+  tryPlayWelcome();
+
   const form = document.getElementById("signupForm");
   const kidsCountInput = document.getElementById("kidsCount");
   const kidsContainer = document.getElementById("kidsFieldsContainer");
@@ -19,6 +40,22 @@
   document.querySelectorAll("button, a").forEach((el) => {
     el.addEventListener("click", () => SmartKiddoSound.playClick());
   });
+
+  // Throttled scroll sound (same one used in the side menu) — plays at
+  // most once every 250ms while the page scrolls, not continuously.
+  let scrollSoundReady = true;
+  document.body.addEventListener(
+    "scroll",
+    () => {
+      if (!scrollSoundReady) return;
+      scrollSoundReady = false;
+      SmartKiddoSound.playScroll();
+      setTimeout(() => {
+        scrollSoundReady = true;
+      }, 250);
+    },
+    { passive: true }
+  );
 
   /* ---------------- Dynamic kid name/age fields ---------------- */
   let savedKids = []; // keeps entered values if the count changes, e.g. { name, age, gender }
