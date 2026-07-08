@@ -13,9 +13,9 @@
   height: 100dvh;
   background: rgba(0, 0, 0, 0.88);
   backdrop-filter: blur(3px);
+  overflow-y: auto; /* lets the card be reached by scrolling if it's ever taller than the screen, e.g. in landscape */
+  -webkit-overflow-scrolling: touch;
   display: flex;
-  align-items: center;
-  justify-content: center;
   padding: 24px;
   transition: opacity 0.35s ease;
 }
@@ -27,6 +27,7 @@
 
 .orientation-popup__card {
   width: min(88vw, 340px);
+  margin: auto; /* centers the card while still allowing full scroll access */
   background: var(--color-purple-deep);
   border-radius: 24px;
   padding: 32px 24px 28px;
