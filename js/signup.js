@@ -220,15 +220,36 @@
       return;
     }
 
-    // TODO: replace with a real signup request (fetch/AJAX) to your backend.
     const payload = {
       fatherName,
       motherName,
       parentEmail,
       kids: savedKids.slice(0, kidsCount),
-      password, // NOTE: hash this server-side — never store plain text.
+      password, // NOTE: stored as plain text for now — see the security
+      // note in the README about hashing this before real launch.
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
     };
-    console.log("Signup payload ready:", payload);
-    alert("Pendaftaran berjaya! (Ciri ini akan disambungkan ke pelayan tidak lama lagi.)");
+
+    const submitBtn = form.querySelector(".signup-submit");
+    const originalBtnText = submitBtn.textContent;
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Menghantar...";
+
+    db.collection("signups")
+      .add(payload)
+      .then(() => {
+        alert("Pendaftaran berjaya! Selamat datang ke SmartKiddo Verse 🎉");
+        form.reset();
+        savedKids = [];
+        kidsContainer.innerHTML = "";
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalBtnText;
+      })
+      .catch((err) => {
+        console.error("Firestore signup error:", err);
+        showError("Pendaftaran gagal. Sila semak sambungan internet anda dan cuba lagi.");
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalBtnText;
+      });
   });
 })();
