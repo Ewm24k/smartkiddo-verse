@@ -25,17 +25,6 @@ const SmartKiddoSuccessPopup = (() => {
   }
 
   video.loop = false;
-  video.addEventListener("ended", () => revealCta("success"));
-  video.addEventListener("error", () => revealCta("error"));
-  video.addEventListener("loadedmetadata", () => {
-    if (isFinite(video.duration) && video.duration > 0) {
-      setTimeout(() => revealCta("success"), video.duration * 1000 + 800);
-    }
-  });
-  // If the video never even starts loading, don't leave the parent stuck.
-  setTimeout(() => {
-    if (video.readyState === 0) revealCta("error");
-  }, 6000);
 
   // Prevent the video from ever being paused/stopped by the user.
   video.addEventListener("pause", () => {
@@ -51,10 +40,32 @@ const SmartKiddoSuccessPopup = (() => {
 
   function show() {
     popup.hidden = false;
+    ctaShown = false;
+    ctaWrap.hidden = true;
+    continueBtn.classList.remove("success-popup__button--error");
+
+    // All "did the video actually finish" tracking starts HERE, at the
+    // moment the popup is actually shown — not at page load. That was
+    // the bug: a fixed timer set up when the page first loaded would
+    // fire while the user was still filling out the form, long before
+    // the video ever got a chance to play.
+    video.addEventListener("ended", () => revealCta("success"), { once: true });
+    video.addEventListener("error", () => revealCta("error"), { once: true });
+    video.addEventListener(
+      "loadedmetadata",
+      () => {
+        if (isFinite(video.duration) && video.duration > 0) {
+          setTimeout(() => revealCta("success"), video.duration * 1000 + 800);
+        }
+      },
+      { once: true }
+    );
+    setTimeout(() => {
+      if (video.readyState === 0) revealCta("error");
+    }, 6000);
+
     video.muted = false;
     video.play().catch(() => {
-      // If unmuted autoplay is blocked, fall back to muted so the
-      // video still plays in full visually.
       video.muted = true;
       video.play().catch(() => {});
     });
