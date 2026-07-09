@@ -51,6 +51,7 @@
   }
 
   let passed = false; // true = successRedirect, false = failRedirect
+  let loginErrorReason = null; // "no-account" | "wrong-password" | null
 
   function runCheck() {
     if (action === "login" && pendingEmail) {
@@ -59,11 +60,20 @@
         .doc(pendingEmail)
         .get()
         .then((doc) => {
-          passed = !!(doc.exists && doc.data().password === pendingPassword);
+          if (!doc.exists) {
+            passed = false;
+            loginErrorReason = "no-account";
+          } else if (doc.data().password !== pendingPassword) {
+            passed = false;
+            loginErrorReason = "wrong-password";
+          } else {
+            passed = true;
+          }
         })
         .catch((err) => {
           console.error("Auth check error:", err);
           passed = false;
+          loginErrorReason = "no-account";
         });
     }
 
@@ -81,8 +91,17 @@
     const elapsed = Date.now() - startedAt;
     const remaining = Math.max(MIN_DISPLAY_MS - elapsed, 0);
     setTimeout(() => {
-      if (passed) goSuccess();
-      else goFail();
+      if (passed) {
+        goSuccess();
+      } else if (loginErrorReason === "wrong-password") {
+        // Wrong password on an account that DOES exist — send them back
+        // to the login form itself with an inline error, not to signup.
+        sessionStorage.setItem("smartkiddo_login_error", "wrong-password");
+        sessionStorage.setItem("smartkiddo_login_error_email", pendingEmail);
+        window.location.href = "index.html";
+      } else {
+        goFail();
+      }
     }, remaining);
   });
 })();
