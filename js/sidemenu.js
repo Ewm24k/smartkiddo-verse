@@ -84,9 +84,28 @@
   // Login: stores the entered credentials briefly in sessionStorage,
   // then hands off to auth-check.html, which does the actual Firestore
   // verification and redirects to home.html or signup.html accordingly.
+  // If we were bounced back here after a wrong-password login attempt,
+  // reopen the menu, refill the email, and show the error inline —
+  // rather than sending the person toward signup for a problem that
+  // has nothing to do with not having an account.
+  const loginError = sessionStorage.getItem("smartkiddo_login_error");
+  if (loginError === "wrong-password") {
+    const errorEmail = sessionStorage.getItem("smartkiddo_login_error_email") || "";
+    sessionStorage.removeItem("smartkiddo_login_error");
+    sessionStorage.removeItem("smartkiddo_login_error_email");
+
+    openMenu();
+    document.getElementById("loginEmail").value = errorEmail;
+    const loginErrorEl = document.getElementById("loginError");
+    loginErrorEl.textContent = "Kata laluan salah. Sila cuba lagi.";
+    loginErrorEl.hidden = false;
+    document.getElementById("password").focus();
+  }
+
   loginForm.addEventListener("submit", (e) => {
     e.preventDefault();
     SmartKiddoSound.playClick();
+    document.getElementById("loginError").hidden = true;
     const email = document.getElementById("loginEmail").value.trim().toLowerCase();
     const password = document.getElementById("password").value;
 
