@@ -399,11 +399,13 @@
         }
         transaction.set(emailLookupRef, {
           registeredAt: firebase.firestore.FieldValue.serverTimestamp(),
+          password, // used by the login check on auth-check.html
         });
         transaction.set(signupRef, payload);
       });
     })
       .then(() => {
+        localStorage.setItem("smartkiddo_logged_in_email", parentEmail);
         form.reset();
         savedKids = [];
         kidsContainer.innerHTML = "";
