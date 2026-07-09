@@ -13,6 +13,93 @@
 
 .home-topbar {
   padding: calc(20px + var(--safe-top)) 20px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.home-logout {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  color: #06331c;
+  background: var(--color-neon-green);
+  padding: 10px 18px;
+  border-radius: 999px;
+  box-shadow: 0 4px 14px rgba(57, 255, 136, 0.3);
+  transition: transform 0.12s ease;
+}
+
+.home-logout:active {
+  transform: scale(0.94);
+}
+
+/* ---- Logout success notification ---- */
+.logout-notification {
+  position: fixed;
+  inset: 0;
+  z-index: 1500;
+  width: 100vw;
+  height: 100dvh;
+  background: rgba(10, 7, 20, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.3s ease;
+}
+
+.logout-notification--hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.logout-notification__card {
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 32px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+}
+
+.logout-notification__check {
+  width: 72px;
+  height: 72px;
+}
+
+.logout-notification__check-circle {
+  stroke: #2fbf8f;
+  stroke-width: 3;
+  stroke-dasharray: 145;
+  stroke-dashoffset: 145;
+  animation: checkCircleDraw 0.5s ease forwards;
+}
+
+.logout-notification__check-mark {
+  stroke: #2fbf8f;
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 36;
+  stroke-dashoffset: 36;
+  animation: checkMarkDraw 0.35s ease forwards 0.45s;
+}
+
+@keyframes checkCircleDraw {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes checkMarkDraw {
+  to { stroke-dashoffset: 0; }
+}
+
+.logout-notification__text {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 18px;
+  color: #2fbf8f;
 }
 
 .home-brand {
