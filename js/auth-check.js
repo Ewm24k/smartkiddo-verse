@@ -28,25 +28,29 @@
   const action = sessionStorage.getItem("smartkiddo_auth_action");
   const pendingEmail = (sessionStorage.getItem("smartkiddo_pending_email") || "").toLowerCase();
   const pendingPassword = sessionStorage.getItem("smartkiddo_pending_password");
+  const successRedirect = sessionStorage.getItem("smartkiddo_auth_success_redirect") || "home.html";
+  const failRedirect = sessionStorage.getItem("smartkiddo_auth_fail_redirect") || "signup.html";
 
   // Clear the credentials from sessionStorage immediately — they've
   // already been read into memory above and don't need to linger.
   sessionStorage.removeItem("smartkiddo_pending_password");
   sessionStorage.removeItem("smartkiddo_pending_email");
   sessionStorage.removeItem("smartkiddo_auth_action");
+  sessionStorage.removeItem("smartkiddo_auth_success_redirect");
+  sessionStorage.removeItem("smartkiddo_auth_fail_redirect");
 
-  function goHome() {
+  function goSuccess() {
     if (pendingEmail) {
       localStorage.setItem("smartkiddo_logged_in_email", pendingEmail);
     }
-    window.location.href = "home.html";
+    window.location.href = successRedirect;
   }
 
-  function goSignup() {
-    window.location.href = "signup.html";
+  function goFail() {
+    window.location.href = failRedirect;
   }
 
-  let destination = "signup"; // safe default if nothing matches
+  let passed = false; // true = successRedirect, false = failRedirect
 
   function runCheck() {
     if (action === "login" && pendingEmail) {
@@ -55,21 +59,16 @@
         .doc(pendingEmail)
         .get()
         .then((doc) => {
-          if (doc.exists && doc.data().password === pendingPassword) {
-            destination = "home";
-          } else {
-            destination = "signup";
-          }
+          passed = !!(doc.exists && doc.data().password === pendingPassword);
         })
         .catch((err) => {
           console.error("Auth check error:", err);
-          destination = "signup";
+          passed = false;
         });
     }
 
     if (action === "session-check") {
-      const loggedInEmail = localStorage.getItem("smartkiddo_logged_in_email");
-      destination = loggedInEmail ? "home" : "signup";
+      passed = !!localStorage.getItem("smartkiddo_logged_in_email");
     }
 
     return Promise.resolve();
@@ -82,8 +81,8 @@
     const elapsed = Date.now() - startedAt;
     const remaining = Math.max(MIN_DISPLAY_MS - elapsed, 0);
     setTimeout(() => {
-      if (destination === "home") goHome();
-      else goSignup();
+      if (passed) goSuccess();
+      else goFail();
     }, remaining);
   });
 })();
