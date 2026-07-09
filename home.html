@@ -3,6 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+
+  <!-- Auth guard: if this visitor has no active session, route through
+       the auth-check page to properly confirm it, then bounce to the
+       main page instead of letting them see this protected content. -->
+  <script>
+    if (!localStorage.getItem("smartkiddo_logged_in_email")) {
+      sessionStorage.setItem("smartkiddo_auth_action", "session-check");
+      sessionStorage.setItem("smartkiddo_auth_success_redirect", "home.html");
+      sessionStorage.setItem("smartkiddo_auth_fail_redirect", "index.html");
+      window.location.href = "auth-check.html";
+    }
+  </script>
+
   <title>SmartKiddo Verse — Utama</title>
   <meta name="theme-color" content="#0a0714" />
 
@@ -28,12 +41,24 @@
   <div class="app">
     <header class="home-topbar">
       <span class="home-brand">SmartKiddo <span class="home-brand__accent">Verse</span></span>
+      <button id="logoutBtn" class="home-logout" aria-label="Log keluar">Log Keluar 👋</button>
     </header>
 
     <main class="home-main">
       <h1 class="home-welcome">Selamat Datang! 🎉</h1>
       <p class="home-subtext">Akaun keluarga anda telah berjaya didaftarkan.</p>
     </main>
+  </div>
+
+  <!-- Logout success notification with animated green checkmark -->
+  <div id="logoutNotification" class="logout-notification" hidden>
+    <div class="logout-notification__card">
+      <svg class="logout-notification__check" viewBox="0 0 52 52">
+        <circle class="logout-notification__check-circle" cx="26" cy="26" r="23" fill="none" />
+        <path class="logout-notification__check-mark" fill="none" d="M14 27l7 7 16-16" />
+      </svg>
+      <p class="logout-notification__text">Log keluar berjaya!</p>
+    </div>
   </div>
 
   <script src="js/sound.js"></script>
