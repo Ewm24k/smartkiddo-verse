@@ -48,6 +48,13 @@
   transition: opacity 0.3s ease;
 }
 
+/* CRITICAL: without this, "display: flex" above wins over the browser's
+   own [hidden] { display: none } rule, so this would show immediately
+   regardless of the hidden attribute — same bug class as the CTA button. */
+.logout-notification[hidden] {
+  display: none !important;
+}
+
 .logout-notification--hidden {
   opacity: 0;
   pointer-events: none;
