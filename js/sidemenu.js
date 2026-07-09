@@ -38,6 +38,17 @@
     SmartKiddoSound.playHover();
   });
 
+  closeBtn.addEventListener("mouseenter", () => {
+    SmartKiddoSound.playHover();
+  });
+
+  // Hover sound on every field + button inside the login form itself
+  document.querySelectorAll(".login-form__input, .login-form__submit").forEach((el) => {
+    el.addEventListener("mouseenter", () => {
+      SmartKiddoSound.playHover();
+    });
+  });
+
   // Hover sound + explicit click sound on each side menu link — click is
   // wired separately from hover because on a real PC, moving the mouse
   // onto a link (hover) and later clicking it are two separate moments,
@@ -70,13 +81,18 @@
     }, 250);
   });
 
-  // Placeholder login handling — wire this up to your real auth backend.
+  // Login: stores the entered credentials briefly in sessionStorage,
+  // then hands off to auth-check.html, which does the actual Firestore
+  // verification and redirects to home.html or signup.html accordingly.
   loginForm.addEventListener("submit", (e) => {
     e.preventDefault();
     SmartKiddoSound.playClick();
-    const username = document.getElementById("username").value.trim();
-    // TODO: replace with a real authentication request (fetch/AJAX) to your backend.
-    console.log("Login attempt for:", username);
-    alert("Ciri log masuk akan disambungkan ke pelayan tidak lama lagi!");
+    const email = document.getElementById("loginEmail").value.trim().toLowerCase();
+    const password = document.getElementById("password").value;
+
+    sessionStorage.setItem("smartkiddo_auth_action", "login");
+    sessionStorage.setItem("smartkiddo_pending_email", email);
+    sessionStorage.setItem("smartkiddo_pending_password", password);
+    window.location.href = "auth-check.html";
   });
 })();
