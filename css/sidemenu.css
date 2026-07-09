@@ -185,6 +185,22 @@
   color: var(--color-neon-green);
 }
 
+.login-form__error {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #ff9db3;
+  background: rgba(255, 111, 165, 0.12);
+  border-radius: 8px;
+  padding: 6px 10px;
+  animation: loginErrorShake 0.4s ease-in-out;
+}
+
+@keyframes loginErrorShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
 /* Extra nav links */
 .side-menu__links {
   list-style: none;
