@@ -3,6 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+
+  <!-- Auth guard: if this visitor is already logged in, skip the signup
+       form entirely and go verify/redirect via the auth-check page.
+       Runs first, before anything else loads, to avoid any flash of
+       the signup form for someone who shouldn't see it. -->
+  <script>
+    if (localStorage.getItem("smartkiddo_logged_in_email")) {
+      sessionStorage.setItem("smartkiddo_auth_action", "session-check");
+      window.location.href = "auth-check.html";
+    }
+  </script>
+
   <title>Daftar Akaun — SmartKiddo Verse</title>
   <meta name="theme-color" content="#f4effc" />
 
