@@ -168,6 +168,14 @@
   flex: 1;
 }
 
+/* CRITICAL: without this, "display: flex" above wins over the browser's
+   own [hidden] { display: none } rule — same bug class as the CTA
+   button and logout notification. Without it, BOTH menu states would
+   show at once regardless of login state. */
+.menu-state[hidden] {
+  display: none !important;
+}
+
 .side-menu__logout {
   margin-top: auto;
   height: 46px;
