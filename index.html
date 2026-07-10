@@ -33,6 +33,7 @@
   <link rel="stylesheet" href="css/video-stage.css" />
   <link rel="stylesheet" href="css/cta-button.css" />
   <link rel="stylesheet" href="css/logout-notification.css" />
+  <link rel="stylesheet" href="css/mula-popup.css" />
 </head>
 <body>
 
@@ -163,6 +164,28 @@
       </div>
     </main>
 
+    <!-- Popup 1: checking authentication (no manual close) -->
+    <div id="checkingPopup" class="checking-popup" hidden>
+      <div class="checking-popup__card">
+        <span class="checking-popup__spinner"></span>
+        <p class="checking-popup__text">Checking Authentication...</p>
+      </div>
+    </div>
+
+    <!-- Popup 2: mula-video.mp4 prompt (shown only if not authenticated) -->
+    <div id="mulaVideoPopup" class="mula-video-popup" hidden>
+      <div class="mula-video-popup__card">
+        <video
+          id="mulaVideo"
+          class="mula-video-popup__video"
+          src="assets/videos/mula-video.mp4"
+          playsinline
+          preload="auto"
+        ></video>
+        <button id="mulaVideoPopupBtn" class="mula-video-popup__button">Daftar Masuk</button>
+      </div>
+    </div>
+
   </div>
 
   <!-- Separated JS: each file owns one concern -->
@@ -173,6 +196,14 @@
   <script src="js/loader-text.js"></script>
   <script src="js/loader.js"></script>
   <script src="js/sidemenu.js"></script>
+
+  <!-- Firebase (compat SDK) — needed for the re-authentication check -->
+  <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/firebase-init.js"></script>
+
+  <script src="js/mula-popup.js"></script>
   <script src="js/video-controller.js"></script>
 </body>
 </html>
