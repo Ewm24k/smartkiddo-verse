@@ -69,8 +69,9 @@
 .mula-video-popup__card {
   position: relative;
   margin: auto;
-  width: min(90vw, 440px);
-  aspect-ratio: 16 / 9;
+  width: min(92vw, 640px);
+  max-height: 85vh;
+  aspect-ratio: 16 / 9; /* placeholder until the real video metadata loads */
   border-radius: 20px;
   overflow: hidden;
   background: #000;
@@ -97,7 +98,14 @@
   padding: 10px 22px;
   border-radius: 999px;
   box-shadow: 0 4px 14px rgba(45, 212, 191, 0.4);
-  transition: transform 0.12s ease;
+  transition: transform 0.12s ease, box-shadow 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.mula-video-popup__button:hover,
+.mula-video-popup__button:focus-visible {
+  background: var(--color-neon-green);
+  color: #06331c;
+  box-shadow: 0 0 14px 4px var(--color-neon-green), 0 0 28px 10px rgba(57, 255, 136, 0.5);
 }
 
 .mula-video-popup__button:active {
