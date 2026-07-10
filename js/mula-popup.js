@@ -13,7 +13,17 @@ const SmartKiddoMulaPopup = (() => {
   const checkingPopup = document.getElementById("checkingPopup");
   const mulaPopup = document.getElementById("mulaVideoPopup");
   const mulaVideo = document.getElementById("mulaVideo");
+  const mulaCard = document.querySelector(".mula-video-popup__card");
   const mulaBtn = document.getElementById("mulaVideoPopupBtn");
+
+  // Once the real video dimensions are known, size the card to match
+  // its actual aspect ratio instead of the 16:9 placeholder — works
+  // correctly whether the video is landscape, portrait, or square.
+  mulaVideo.addEventListener("loadedmetadata", () => {
+    if (mulaVideo.videoWidth && mulaVideo.videoHeight) {
+      mulaCard.style.aspectRatio = `${mulaVideo.videoWidth} / ${mulaVideo.videoHeight}`;
+    }
+  });
 
   mulaBtn.addEventListener("mouseenter", () => SmartKiddoSound.playHover());
   mulaBtn.addEventListener("click", () => {
