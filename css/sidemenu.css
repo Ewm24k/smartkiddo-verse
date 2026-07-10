@@ -161,6 +161,28 @@
   transition: transform 0.15s ease, filter 0.15s ease;
 }
 
+.menu-state {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  flex: 1;
+}
+
+.side-menu__logout {
+  margin-top: auto;
+  height: 46px;
+  border-radius: 22px;
+  background: var(--color-neon-green);
+  color: #06331c;
+  font-weight: 800;
+  font-size: 15px;
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.side-menu__logout:active {
+  transform: scale(0.96);
+}
+
 .login-form__submit:active {
   transform: scale(0.96);
   filter: brightness(0.95);
