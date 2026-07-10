@@ -32,6 +32,7 @@
   <link rel="stylesheet" href="css/sidemenu.css" />
   <link rel="stylesheet" href="css/video-stage.css" />
   <link rel="stylesheet" href="css/cta-button.css" />
+  <link rel="stylesheet" href="css/logout-notification.css" />
 </head>
 <body>
 
@@ -97,27 +98,49 @@
 
       <div class="side-menu__brand">SmartKiddo <span class="brand__accent">Verse</span></div>
 
-      <form id="loginForm" class="login-form" autocomplete="off">
-        <label class="login-form__label" for="loginEmail">Emel</label>
-        <input class="login-form__input" type="email" id="loginEmail" name="loginEmail" placeholder="contoh@gmail.com" required />
+      <!-- Shown when there is no active session -->
+      <div id="menuLoggedOut" class="menu-state">
+        <form id="loginForm" class="login-form" autocomplete="off">
+          <label class="login-form__label" for="loginEmail">Emel</label>
+          <input class="login-form__input" type="email" id="loginEmail" name="loginEmail" placeholder="contoh@gmail.com" required />
 
-        <label class="login-form__label" for="password">Kata Laluan</label>
-        <input class="login-form__input" type="password" id="password" name="password" placeholder="Masukkan kata laluan" required />
-        <p id="loginError" class="login-form__error" hidden></p>
+          <label class="login-form__label" for="password">Kata Laluan</label>
+          <input class="login-form__input" type="password" id="password" name="password" placeholder="Masukkan kata laluan" required />
+          <p id="loginError" class="login-form__error" hidden></p>
 
-        <button type="submit" class="login-form__submit">Log Masuk</button>
-        <a href="#" class="login-form__forgot">Lupa kata laluan?</a>
-      </form>
+          <button type="submit" class="login-form__submit">Log Masuk</button>
+          <a href="#" class="login-form__forgot">Lupa kata laluan?</a>
+        </form>
 
-      <a href="signup.html" class="login-form__signup">Belum ada akaun? <strong>Daftar di sini</strong></a>
+        <a href="signup.html" class="login-form__signup">Belum ada akaun? <strong>Daftar di sini</strong></a>
 
-      <ul class="side-menu__links">
-        <li><a href="#">Rumah</a></li>
-        <li><a href="#">Permainan</a></li>
-        <li><a href="#">Pencapaian Saya</a></li>
-        <li><a href="#">Tentang Kami</a></li>
-      </ul>
+        <ul class="side-menu__links">
+          <li><a href="#">Tentang Kami</a></li>
+        </ul>
+      </div>
+
+      <!-- Shown when the visitor already has an active session -->
+      <div id="menuLoggedIn" class="menu-state" hidden>
+        <ul class="side-menu__links">
+          <li><a href="home.html">Rumah</a></li>
+          <li><a href="#">Permainan</a></li>
+          <li><a href="#">Pencapaian Saya</a></li>
+          <li><a href="#">Tentang Kami</a></li>
+        </ul>
+        <button id="sideMenuLogoutBtn" class="side-menu__logout">Log Keluar 👋</button>
+      </div>
     </nav>
+
+    <!-- Logout success notification (shared component) -->
+    <div id="logoutNotification" class="logout-notification" hidden>
+      <div class="logout-notification__card">
+        <svg class="logout-notification__check" viewBox="0 0 52 52">
+          <circle class="logout-notification__check-circle" cx="26" cy="26" r="23" fill="none" />
+          <path class="logout-notification__check-mark" fill="none" d="M14 27l7 7 16-16" />
+        </svg>
+        <p class="logout-notification__text">Log keluar berjaya!</p>
+      </div>
+    </div>
 
     <!-- Fullscreen video stage -->
     <main class="video-stage">
@@ -144,6 +167,7 @@
 
   <!-- Separated JS: each file owns one concern -->
   <script src="js/sound.js"></script>
+  <script src="js/logout.js"></script>
   <script src="js/orientation-popup.js"></script>
   <script src="js/tap-gate.js"></script>
   <script src="js/loader-text.js"></script>
