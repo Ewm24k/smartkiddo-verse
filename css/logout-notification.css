@@ -1,0 +1,79 @@
+/* =========================================================
+   logout-notification.css — shared "logged out" success popup
+   Used by any page that has a logout button (home.html, the
+   side menu on index.html, etc.) so this only exists once.
+   ========================================================= */
+
+.logout-notification {
+  position: fixed;
+  inset: 0;
+  z-index: 1500;
+  width: 100vw;
+  height: 100dvh;
+  background: rgba(10, 7, 20, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.3s ease;
+}
+
+/* CRITICAL: without this, "display: flex" above wins over the browser's
+   own [hidden] { display: none } rule, so this would show immediately
+   regardless of the hidden attribute — same bug class as the CTA button. */
+.logout-notification[hidden] {
+  display: none !important;
+}
+
+.logout-notification--hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.logout-notification__card {
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 32px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+}
+
+.logout-notification__check {
+  width: 72px;
+  height: 72px;
+}
+
+.logout-notification__check-circle {
+  stroke: #2fbf8f;
+  stroke-width: 3;
+  stroke-dasharray: 145;
+  stroke-dashoffset: 145;
+  animation: checkCircleDraw 0.5s ease forwards;
+}
+
+.logout-notification__check-mark {
+  stroke: #2fbf8f;
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 36;
+  stroke-dashoffset: 36;
+  animation: checkMarkDraw 0.35s ease forwards 0.45s;
+}
+
+@keyframes checkCircleDraw {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes checkMarkDraw {
+  to { stroke-dashoffset: 0; }
+}
+
+.logout-notification__text {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 18px;
+  color: #2fbf8f;
+}
