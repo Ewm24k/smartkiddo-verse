@@ -11,6 +11,16 @@
   const sideMenu = document.getElementById("sideMenu");
   const backdrop = document.getElementById("sideMenuBackdrop");
   const loginForm = document.getElementById("loginForm");
+  const menuLoggedOut = document.getElementById("menuLoggedOut");
+  const menuLoggedIn = document.getElementById("menuLoggedIn");
+  const sideMenuLogoutBtn = document.getElementById("sideMenuLogoutBtn");
+
+  // Show the right menu content based on whether a session already
+  // exists — logged-in visitors get real navigation + logout, logged-out
+  // visitors get the login form + signup link.
+  const isLoggedIn = !!localStorage.getItem("smartkiddo_logged_in_email");
+  menuLoggedOut.hidden = isLoggedIn;
+  menuLoggedIn.hidden = !isLoggedIn;
 
   function openMenu() {
     sideMenu.classList.add("is-open");
@@ -43,10 +53,16 @@
   });
 
   // Hover sound on every field + button inside the login form itself
-  document.querySelectorAll(".login-form__input, .login-form__submit").forEach((el) => {
+  document.querySelectorAll(".login-form__input, .login-form__submit, .side-menu__logout").forEach((el) => {
     el.addEventListener("mouseenter", () => {
       SmartKiddoSound.playHover();
     });
+  });
+
+  sideMenuLogoutBtn.addEventListener("click", () => {
+    SmartKiddoSound.playClick();
+    sideMenuLogoutBtn.disabled = true;
+    SmartKiddoLogout.perform("index.html");
   });
 
   // Hover sound + explicit click sound on each side menu link — click is
