@@ -1,0 +1,112 @@
+/* =========================================================
+   mula-popup.css — two popups triggered by "Mula Sekarang"
+   1. checking-popup: small, no close, just a spinner + text
+   2. mula-video-popup: normal-sized (not fullscreen) video card,
+      responsive across PC/Android/iOS, including rotation
+   ========================================================= */
+
+/* ---- Shared backdrop ---- */
+.checking-popup,
+.mula-video-popup {
+  position: fixed;
+  inset: 0;
+  z-index: 1800;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  background: rgba(10, 7, 20, 0.6);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  transition: opacity 0.3s ease;
+  overflow-y: auto; /* same scroll-safety pattern used elsewhere in the app */
+  -webkit-overflow-scrolling: touch;
+}
+
+.checking-popup[hidden],
+.mula-video-popup[hidden] {
+  display: none !important;
+}
+
+/* ---- Popup 1: checking authentication ---- */
+.checking-popup__card {
+  margin: auto;
+  width: min(80vw, 280px);
+  background: var(--color-purple-deep);
+  border-radius: 22px;
+  padding: 30px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.4);
+}
+
+.checking-popup__spinner {
+  width: 34px;
+  height: 34px;
+  border: 4px solid rgba(255, 255, 255, 0.2);
+  border-top-color: var(--color-neon-green);
+  border-radius: 50%;
+  animation: checkingSpin 0.8s linear infinite;
+}
+
+@keyframes checkingSpin {
+  to { transform: rotate(360deg); }
+}
+
+.checking-popup__text {
+  font-family: var(--font-body);
+  font-weight: 700;
+  color: var(--color-white);
+  font-size: 14px;
+  text-align: center;
+}
+
+/* ---- Popup 2: mula-video.mp4 prompt ---- */
+.mula-video-popup__card {
+  position: relative;
+  margin: auto;
+  width: min(90vw, 440px);
+  aspect-ratio: 16 / 9;
+  border-radius: 20px;
+  overflow: hidden;
+  background: #000;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+}
+
+.mula-video-popup__video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none; /* consistent with the rest of the app: no pause/skip */
+}
+
+.mula-video-popup__button {
+  position: absolute;
+  left: 50%;
+  bottom: 14px;
+  transform: translateX(-50%);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 14px;
+  color: #08302b;
+  background: var(--color-teal);
+  padding: 10px 22px;
+  border-radius: 999px;
+  box-shadow: 0 4px 14px rgba(45, 212, 191, 0.4);
+  transition: transform 0.12s ease;
+}
+
+.mula-video-popup__button:active {
+  transform: translateX(-50%) scale(0.94);
+}
+
+/* Landscape phones: keep the card comfortably within the shorter height */
+@media (max-height: 480px) {
+  .mula-video-popup__card {
+    width: min(70vh, 90vw);
+  }
+}
