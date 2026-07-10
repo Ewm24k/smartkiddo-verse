@@ -152,6 +152,6 @@
 
   startBtn.addEventListener("click", () => {
     SmartKiddoSound.playStart();
-    console.log("Mula Sekarang tapped — route to the next screen here.");
+    SmartKiddoMulaPopup.checkAuthAndShow();
   });
 })();
