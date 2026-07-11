@@ -91,15 +91,8 @@
       </div>
     </nav>
 
-    <!-- Loading text stage — shown first, fullscreen, before the video -->
-    <div id="homeLoadingStage" class="home-loading-stage">
-      <h2 class="home-loading-stage__title">SMART KIDDO</h2>
-      <h3 class="home-loading-stage__subtitle">VERSE</h3>
-      <p class="home-loading-stage__note">Page Loading. Please Wait...</p>
-    </div>
-
-    <!-- Fullscreen welcome video layer — plays once, then fades out to
-         reveal the actual home content underneath. Same fullscreen +
+    <!-- Fullscreen welcome video, with the loading text layered directly
+         on top of it (not a separate phase before it) — same fullscreen +
          rotation-safe treatment as the main page's video. -->
     <div id="homeVideoStage" class="home-video-stage">
       <video
@@ -109,6 +102,11 @@
         playsinline
         preload="auto"
       ></video>
+      <div id="homeVideoText" class="home-video-stage__text">
+        <h2 class="home-video-stage__title">SMART KIDDO</h2>
+        <h3 class="home-video-stage__subtitle">VERSE</h3>
+        <p class="home-video-stage__note">Page Loading. Please Wait...</p>
+      </div>
     </div>
 
     <!-- Actual home content — hidden behind the video, fades in once it ends -->
