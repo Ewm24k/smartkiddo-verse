@@ -1,58 +1,12 @@
 /* =========================================================
-   home.css — home page: fullscreen welcome video + fade-in content
+   home.css — home page: fullscreen welcome video with text
+   layered on top of it, then fades to reveal home content.
    Uses the same fullscreen, rotation-safe .app pattern as the
    main page (defined in base.css).
    ========================================================= */
 
 .app {
-  background: #0a0714; /* visible briefly before anything paints */
-}
-
-/* ---- Loading text stage (shown first) ---- */
-.home-loading-stage {
-  position: fixed;
-  inset: 0;
-  z-index: 50; /* above the video stage (40), below the side menu (70) */
-  width: 100vw;
-  height: 100dvh;
-  background: #0a0714;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  transition: opacity 0.6s ease;
-}
-
-.home-loading-stage--hidden {
-  opacity: 0;
-  pointer-events: none;
-}
-
-.home-loading-stage__title {
-  font-family: var(--font-display);
-  font-weight: 700;
-  color: var(--color-white);
-  font-size: clamp(28px, 8vw, 46px);
-  letter-spacing: 1px;
-  margin: 0;
-}
-
-.home-loading-stage__subtitle {
-  font-family: var(--font-display);
-  font-weight: 700;
-  color: var(--color-neon-green);
-  font-size: clamp(20px, 6vw, 32px);
-  letter-spacing: 2px;
-  margin: 0;
-}
-
-.home-loading-stage__note {
-  margin-top: 14px;
-  font-family: var(--font-body);
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.65);
-  font-size: clamp(13px, 3.2vw, 15px);
+  background: #0a0714; /* visible briefly before the video paints */
 }
 
 /* ---- Fullscreen welcome video layer ---- */
@@ -78,6 +32,50 @@
   object-fit: cover; /* fills the entire screen edge-to-edge, any orientation */
   object-position: center;
   pointer-events: none; /* cannot be tapped/clicked/paused by the user */
+}
+
+/* Text layered directly on top of the video (not a separate screen) */
+.home-video-stage__text {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
+  padding: 24px;
+  pointer-events: none;
+}
+
+.home-video-stage__title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--color-white);
+  font-size: clamp(28px, 8vw, 46px);
+  letter-spacing: 1px;
+  margin: 0;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.65);
+}
+
+.home-video-stage__subtitle {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--color-neon-green);
+  font-size: clamp(20px, 6vw, 32px);
+  letter-spacing: 2px;
+  margin: 0;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.65);
+}
+
+.home-video-stage__note {
+  margin-top: 14px;
+  font-family: var(--font-body);
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: clamp(13px, 3.2vw, 15px);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
 }
 
 /* ---- Home content (revealed after the video fades) ---- */
