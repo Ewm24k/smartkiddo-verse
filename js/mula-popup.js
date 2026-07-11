@@ -61,6 +61,7 @@ const SmartKiddoMulaPopup = (() => {
           window.location.href = "home.html";
         } else {
           mulaPopup.hidden = false;
+          SmartKiddoSound.playSignupSound();
           playMulaVideo();
         }
       }, remaining);
