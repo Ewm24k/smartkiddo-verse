@@ -41,6 +41,9 @@ const SmartKiddoSound = (() => {
   const signupSound = createWithExtensionFallback("assets/audio/signup-sound", ["mp3", "wav"]);
   signupSound.volume = 0.9;
 
+  const welcomeSound = createWithExtensionFallback("assets/audio/welcome-sound", ["mp3", "wav"]);
+  welcomeSound.volume = 0.9;
+
   function play(key, volume) {
     const base = cache[key];
     if (!base) return;
@@ -63,6 +66,11 @@ const SmartKiddoSound = (() => {
     playSignupSound: () => {
       const instance = signupSound.cloneNode();
       instance.volume = signupSound.volume;
+      instance.play().catch(() => {});
+    },
+    playWelcomeSound: () => {
+      const instance = welcomeSound.cloneNode();
+      instance.volume = welcomeSound.volume;
       instance.play().catch(() => {});
     },
   };
