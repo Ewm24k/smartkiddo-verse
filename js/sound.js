@@ -23,6 +23,24 @@ const SmartKiddoSound = (() => {
     cache[key] = audio;
   });
 
+  // For sounds that might be provided as either .mp3 or .wav — tries
+  // each extension in order and keeps whichever one actually loads.
+  function createWithExtensionFallback(basePath, extensions) {
+    const audio = new Audio();
+    let index = 0;
+    function tryNextExtension() {
+      if (index >= extensions.length) return;
+      audio.src = `${basePath}.${extensions[index]}`;
+      index++;
+    }
+    audio.addEventListener("error", tryNextExtension);
+    tryNextExtension();
+    return audio;
+  }
+
+  const signupSound = createWithExtensionFallback("assets/audio/signup-sound", ["mp3", "wav"]);
+  signupSound.volume = 0.9;
+
   function play(key, volume) {
     const base = cache[key];
     if (!base) return;
@@ -42,5 +60,10 @@ const SmartKiddoSound = (() => {
     playStart: () => play("start"),
     playLoading: () => play("loading"),
     playHover: () => play("hover", 0.4),
+    playSignupSound: () => {
+      const instance = signupSound.cloneNode();
+      instance.volume = signupSound.volume;
+      instance.play().catch(() => {});
+    },
   };
 })();
