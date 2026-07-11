@@ -31,21 +31,81 @@
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="css/base.css" />
-  <link rel="stylesheet" href="css/home.css" />
+  <link rel="stylesheet" href="css/sidemenu.css" />
   <link rel="stylesheet" href="css/logout-notification.css" />
+  <link rel="stylesheet" href="css/home.css" />
 </head>
 <body>
 
-  <!-- Placeholder home page: same fullscreen + rotation-safe rules as the
-       main page (.app pattern from base.css). Content here is intentionally
-       minimal — this gets properly designed in a later step. -->
   <div class="app">
-    <header class="home-topbar">
-      <span class="home-brand">SmartKiddo <span class="home-brand__accent">Verse</span></span>
-      <button id="logoutBtn" class="home-logout" aria-label="Log keluar">Log Keluar 👋</button>
-    </header>
 
-    <main class="home-main">
+    <!-- Top bar: hamburger + brand, overlaid on the video, same as the main page -->
+    <div class="topbar">
+      <button id="menuToggle" class="menu-toggle" aria-label="Buka menu" aria-expanded="false" aria-controls="sideMenu">
+        <span class="menu-toggle__bar"></span>
+        <span class="menu-toggle__bar"></span>
+        <span class="menu-toggle__bar"></span>
+      </button>
+      <span class="brand">SmartKiddo <span class="brand__accent">Verse</span></span>
+    </div>
+
+    <!-- Side menu (slides in from left) — same component as the main page -->
+    <div id="sideMenuBackdrop" class="side-menu-backdrop"></div>
+    <nav id="sideMenu" class="side-menu" aria-hidden="true">
+      <button id="menuClose" class="side-menu__close" aria-label="Tutup menu">&times;</button>
+
+      <div class="side-menu__brand">SmartKiddo <span class="brand__accent">Verse</span></div>
+
+      <!-- Shown when there is no active session (kept for structural
+           consistency with the main page — in practice this page's own
+           guard means only the logged-in state below is ever seen here) -->
+      <div id="menuLoggedOut" class="menu-state">
+        <form id="loginForm" class="login-form" autocomplete="off">
+          <label class="login-form__label" for="loginEmail">Emel</label>
+          <input class="login-form__input" type="email" id="loginEmail" name="loginEmail" placeholder="contoh@gmail.com" required />
+
+          <label class="login-form__label" for="password">Kata Laluan</label>
+          <input class="login-form__input" type="password" id="password" name="password" placeholder="Masukkan kata laluan" required />
+          <p id="loginError" class="login-form__error" hidden></p>
+
+          <button type="submit" class="login-form__submit">Log Masuk</button>
+          <a href="#" class="login-form__forgot">Lupa kata laluan?</a>
+        </form>
+
+        <a href="signup.html" class="login-form__signup">Belum ada akaun? <strong>Daftar di sini</strong></a>
+
+        <ul class="side-menu__links">
+          <li><a href="#">Tentang Kami</a></li>
+        </ul>
+      </div>
+
+      <!-- Shown when the visitor already has an active session -->
+      <div id="menuLoggedIn" class="menu-state" hidden>
+        <ul class="side-menu__links">
+          <li><a href="home.html">Rumah</a></li>
+          <li><a href="#">Permainan</a></li>
+          <li><a href="#">Pencapaian Saya</a></li>
+          <li><a href="#">Tentang Kami</a></li>
+        </ul>
+        <button id="sideMenuLogoutBtn" class="side-menu__logout">Log Keluar 👋</button>
+      </div>
+    </nav>
+
+    <!-- Fullscreen welcome video layer — plays once, then fades out to
+         reveal the actual home content underneath. Same fullscreen +
+         rotation-safe treatment as the main page's video. -->
+    <div id="homeVideoStage" class="home-video-stage">
+      <video
+        id="homeWelcomeVideo"
+        class="home-video-stage__video"
+        src="assets/videos/welcome-home.mp4"
+        playsinline
+        preload="auto"
+      ></video>
+    </div>
+
+    <!-- Actual home content — hidden behind the video, fades in once it ends -->
+    <main id="homeMain" class="home-main">
       <h1 class="home-welcome">Selamat Datang! 🎉</h1>
       <p class="home-subtext">Akaun keluarga anda telah berjaya didaftarkan.</p>
     </main>
@@ -64,6 +124,8 @@
 
   <script src="js/sound.js"></script>
   <script src="js/logout.js"></script>
+  <script src="js/sidemenu.js"></script>
+  <script src="js/home-video.js"></script>
   <script src="js/home.js"></script>
 </body>
 </html>
