@@ -14,7 +14,7 @@ const SmartKiddoDashboard = (() => {
       <div class="dash-content">
         <section class="hero2">
           <div class="hero2__text">
-            <h2 class="hero2__heading">SmartKiddo Verse: Your Child's Learning Journey</h2>
+            <h2 class="hero2__heading" id="hero2Heading"><span class="hero2__heading-typed"></span><span class="hero2__heading-cursor"></span></h2>
           </div>
           <div class="hero2__video">
             <video class="hero2__video-el" src="assets/videos/header-home.mp4" autoplay muted loop playsinline></video>
@@ -25,6 +25,24 @@ const SmartKiddoDashboard = (() => {
         <div id="dashRows" class="dash-rows"></div>
       </div>
     `;
+  }
+
+  function typewriteHero2Heading(container) {
+    const heading = container.querySelector("#hero2Heading");
+    const typedEl = heading.querySelector(".hero2__heading-typed");
+    const text = "SmartKiddo Verse: Your Child's Learning Journey";
+    let i = 0;
+    function typeNext() {
+      if (i <= text.length) {
+        typedEl.textContent = text.slice(0, i);
+        i++;
+        setTimeout(typeNext, 35);
+      } else {
+        // Typing done — hand off to the gentle idle loop animation.
+        heading.classList.add("is-looping");
+      }
+    }
+    typeNext();
   }
 
   function buildItemSrc(category, index) {
@@ -60,6 +78,29 @@ const SmartKiddoDashboard = (() => {
       img.addEventListener("error", () => img.remove());
       card.appendChild(img);
     }
+
+    // Center overlay shown on hover — "Masuk Kelas" for launched
+    // categories (Math, for now), "Very Soon Launching" for everything
+    // still in progress. Flip a category's "launched" flag in
+    // home-dashboard-data.js once its real content is ready.
+    const overlay = document.createElement("div");
+    overlay.className = "dash-card__overlay";
+
+    if (category.launched) {
+      const ageLabel = (category.ageLabels && category.ageLabels[index - 1]) || "";
+      overlay.innerHTML = `
+        <span class="dash-card__overlay-label">${category.title.split(" / ")[0]} ${ageLabel}</span>
+        <button type="button" class="dash-card__overlay-btn">Masuk Kelas</button>
+      `;
+      overlay.querySelector(".dash-card__overlay-btn").addEventListener("click", (e) => {
+        e.stopPropagation();
+        SmartKiddoSound.playClick();
+        console.log(`Masuk Kelas: ${category.title} — item ${index} (${ageLabel})`);
+      });
+    } else {
+      overlay.innerHTML = `<span class="dash-card__overlay-badge">Very Soon Launching</span>`;
+    }
+    card.appendChild(overlay);
 
     card.addEventListener("mouseenter", () => SmartKiddoSound.playHover());
     card.addEventListener("click", () => SmartKiddoSound.playClick());
@@ -196,6 +237,8 @@ const SmartKiddoDashboard = (() => {
     data.categories.forEach((category) => {
       rowsContainer.appendChild(createRow(category));
     });
+
+    typewriteHero2Heading(container);
   }
 
   return { init };
