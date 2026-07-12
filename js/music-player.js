@@ -10,21 +10,22 @@
    filenames, not touching any app code. If that list is empty,
    the bar stays hidden entirely — that's expected, not a bug.
 
+   Call init() only once the welcome video has finished — the
+   calling page controls that timing, not this file.
+
    Visibility behavior:
    - Floats fixed at the bottom at all times (not tied to scroll
      position at all).
    - Briefly slides away WHILE the page is actively scrolling, and
      slides back the moment scrolling stops.
    - Can also be manually hidden via the toggle button — while in
-     that state, it stays hidden regardless of scrolling, and a
-     small floating "reveal" button appears bottom-right to bring
-     it back.
+     that state, it stays hidden regardless of scrolling, and the
+     dedicated floating music icon (bottom-right) brings it back.
    ========================================================= */
 
 const SmartKiddoMusicPlayer = (() => {
   const bar = document.getElementById("musicPlayerBar");
   const playPauseBtn = document.getElementById("musicPlayPause");
-  const stopBtn = document.getElementById("musicStop");
   const toggleBtn = document.getElementById("musicToggle");
   const trackNameEl = document.getElementById("musicTrackName");
   const revealBtn = document.getElementById("musicRevealBtn");
@@ -34,6 +35,7 @@ const SmartKiddoMusicPlayer = (() => {
   const audio = new Audio();
   audio.volume = 0.55;
   let isPlaying = false;
+  let autoplayUnlocked = false;
 
   let manuallyHidden = false;
   let scrollHidden = false;
@@ -55,23 +57,18 @@ const SmartKiddoMusicPlayer = (() => {
       .play()
       .then(() => {
         isPlaying = true;
+        autoplayUnlocked = true;
         playPauseBtn.textContent = "⏸";
       })
       .catch(() => {
         // Blocked by autoplay policy — same rule as everywhere else in
-        // this app. Retried automatically on the first real interaction.
+        // this app. Retried automatically on the first real interaction
+        // (see retryAutoplayOnInteraction below), but only once.
       });
   }
 
   function pause() {
     audio.pause();
-    isPlaying = false;
-    playPauseBtn.textContent = "▶";
-  }
-
-  function stop() {
-    audio.pause();
-    audio.currentTime = 0;
     isPlaying = false;
     playPauseBtn.textContent = "▶";
   }
@@ -88,13 +85,7 @@ const SmartKiddoMusicPlayer = (() => {
     else play();
   });
 
-  stopBtn.addEventListener("mouseenter", () => SmartKiddoSound.playHover());
-  stopBtn.addEventListener("click", () => {
-    SmartKiddoSound.playClick();
-    stop();
-  });
-
-  // Manual hide (toggle button) / reveal (floating button)
+  // Manual hide (toggle button) / reveal (floating music icon)
   toggleBtn.addEventListener("mouseenter", () => SmartKiddoSound.playHover());
   toggleBtn.addEventListener("click", () => {
     SmartKiddoSound.playClick();
@@ -131,12 +122,16 @@ const SmartKiddoMusicPlayer = (() => {
     );
   }
 
+  // Only ever fires ONCE — this exists purely to unlock autoplay if the
+  // very first play() attempt was blocked. It must NOT keep listening
+  // forever, or it ends up re-triggering play() right after someone
+  // deliberately clicks pause (that was the actual pause-button bug).
   function retryAutoplayOnInteraction() {
-    if (isPlaying || !tracks.length) return;
+    if (autoplayUnlocked || !tracks.length) return;
     play();
   }
-  document.addEventListener("click", retryAutoplayOnInteraction);
-  document.addEventListener("touchstart", retryAutoplayOnInteraction, { passive: true });
+  document.addEventListener("click", retryAutoplayOnInteraction, { once: true });
+  document.addEventListener("touchstart", retryAutoplayOnInteraction, { once: true, passive: true });
 
   function init() {
     attachScrollAutoHide();
