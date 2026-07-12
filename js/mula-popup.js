@@ -58,7 +58,7 @@ const SmartKiddoMulaPopup = (() => {
       setTimeout(() => {
         checkingPopup.hidden = true;
         if (isAuthenticated) {
-          window.location.href = "home.html";
+          SmartKiddoHomeScreen.show();
         } else {
           mulaPopup.hidden = false;
           SmartKiddoSound.playSignupSound();
