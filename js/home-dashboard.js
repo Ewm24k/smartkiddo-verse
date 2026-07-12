@@ -27,22 +27,42 @@ const SmartKiddoDashboard = (() => {
     `;
   }
 
-  function typewriteHero2Heading(container) {
+  const HERO2_PHRASES = [
+    "SmartKiddo Verse: Your Child's Learning Journey",
+    "Where Learning Feels Like Play",
+    "Fun, Safe & Smart Learning for Every Child",
+  ];
+
+  function wait(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  async function runHero2TextLoop(container) {
     const heading = container.querySelector("#hero2Heading");
     const typedEl = heading.querySelector(".hero2__heading-typed");
-    const text = "SmartKiddo Verse: Your Child's Learning Journey";
-    let i = 0;
-    function typeNext() {
-      if (i <= text.length) {
+    let phraseIndex = 0;
+
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      const text = HERO2_PHRASES[phraseIndex];
+      heading.classList.remove("is-looping", "is-fading-out");
+
+      for (let i = 0; i <= text.length; i++) {
         typedEl.textContent = text.slice(0, i);
-        i++;
-        setTimeout(typeNext, 35);
-      } else {
-        // Typing done — hand off to the gentle idle loop animation.
-        heading.classList.add("is-looping");
+        await wait(35);
       }
+
+      heading.classList.add("is-looping"); // gentle idle float while it holds
+      await wait(2600);
+
+      heading.classList.add("is-fading-out");
+      await wait(450);
+
+      typedEl.textContent = "";
+      heading.classList.remove("is-fading-out", "is-looping");
+      phraseIndex = (phraseIndex + 1) % HERO2_PHRASES.length;
+      await wait(150);
     }
-    typeNext();
   }
 
   function buildItemSrc(category, index) {
@@ -238,7 +258,18 @@ const SmartKiddoDashboard = (() => {
       rowsContainer.appendChild(createRow(category));
     });
 
-    typewriteHero2Heading(container);
+    runHero2TextLoop(container);
+
+    // AI button is a placeholder for now — future feature, not wired
+    // to anything yet beyond feedback that it was tapped.
+    const aiFab = document.getElementById("aiFab");
+    if (aiFab) {
+      aiFab.addEventListener("mouseenter", () => SmartKiddoSound.playHover());
+      aiFab.addEventListener("click", () => {
+        SmartKiddoSound.playClick();
+        console.log("AI assistant: coming soon.");
+      });
+    }
   }
 
   return { init };
