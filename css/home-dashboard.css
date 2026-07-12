@@ -408,8 +408,11 @@
   display: none !important;
 }
 
-.music-player--collapsed {
-  transform: translateY(calc(100% - 34px));
+/* Both the transient "hidden while scrolling" state and the manual
+   "user hid it" state use the same slide-away visual */
+.music-player--hidden-state {
+  transform: translateY(120%);
+  pointer-events: none;
 }
 
 .music-player__btn {
@@ -448,4 +451,52 @@
   height: 30px;
   color: rgba(255, 255, 255, 0.7);
   font-size: 16px;
+}
+
+/* ---- Floating "reveal" button (shown only when manually hidden) ---- */
+.music-reveal-btn {
+  position: fixed;
+  right: calc(16px + var(--safe-right));
+  bottom: calc(16px + var(--safe-bottom));
+  z-index: 960;
+  width: 54px;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.music-reveal-btn[hidden] {
+  display: none !important;
+}
+
+.music-reveal-btn__ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid var(--color-neon-green);
+  opacity: 0.55;
+  animation: musicRevealPulse 2s ease-in-out infinite;
+}
+
+.music-reveal-btn__core {
+  position: relative;
+  z-index: 1;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--color-neon-green);
+  color: #06331c;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 16px rgba(57, 255, 136, 0.4);
+}
+
+@keyframes musicRevealPulse {
+  0%, 100% { transform: scale(1); opacity: 0.55; }
+  50% { transform: scale(1.18); opacity: 0.15; }
 }
