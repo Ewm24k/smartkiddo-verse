@@ -53,6 +53,7 @@ const SmartKiddoHomeScreen = (() => {
     revealed = true;
     homeVideoStage.classList.add("home-video-stage--hidden");
     homeMain.classList.add("is-visible");
+    SmartKiddoMusicPlayer.init();
     setTimeout(() => {
       homeVideoStage.hidden = true;
     }, 850);
@@ -69,7 +70,6 @@ const SmartKiddoHomeScreen = (() => {
     homeMain.classList.remove("is-visible");
 
     SmartKiddoDashboard.init("homeScreenMain");
-    SmartKiddoMusicPlayer.init();
 
     SmartKiddoSound.playWelcomeSound();
 
