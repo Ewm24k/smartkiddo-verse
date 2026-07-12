@@ -32,15 +32,31 @@
 
   SmartKiddoSound.playWelcomeSound();
 
-  /* ---------------- Fullscreen on first real interaction (Android) ---------------- */
+  /* ---------------- Fullscreen: try immediately, keep retrying ---------------- */
   let fullscreenAttempted = false;
   function attemptFullscreen() {
-    if (fullscreenAttempted) return;
-    fullscreenAttempted = true;
+    if (fullscreenAttempted || document.fullscreenElement) return;
     if (document.documentElement.requestFullscreen) {
-      document.documentElement.requestFullscreen().catch(() => {});
+      document.documentElement
+        .requestFullscreen()
+        .then(() => {
+          fullscreenAttempted = true;
+        })
+        .catch(() => {
+          // Blocked (no gesture yet) — keep trying on the interval below
+          // and on the first real interaction, instead of giving up.
+        });
     }
   }
+  attemptFullscreen();
+  const fullscreenRetry = setInterval(() => {
+    if (document.fullscreenElement) {
+      clearInterval(fullscreenRetry);
+      return;
+    }
+    attemptFullscreen();
+  }, 700);
+
 
   /* ---------------- Robust video playback (same pattern as main page) ---------------- */
   let unmuted = false;
