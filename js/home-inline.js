@@ -68,6 +68,9 @@ const SmartKiddoHomeScreen = (() => {
     homeMain.hidden = false;
     homeMain.classList.remove("is-visible");
 
+    SmartKiddoDashboard.init("homeScreenMain");
+    SmartKiddoMusicPlayer.init();
+
     SmartKiddoSound.playWelcomeSound();
 
     document.addEventListener("touchstart", onInteraction, { passive: true });
