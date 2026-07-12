@@ -25,6 +25,25 @@
   SmartKiddoSound.playLoading();
   SmartKiddoAuthText.runSequence();
 
+  let fullscreenAttempted = false;
+  function attemptFullscreen() {
+    if (fullscreenAttempted || document.fullscreenElement) return;
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement
+        .requestFullscreen()
+        .then(() => { fullscreenAttempted = true; })
+        .catch(() => {});
+    }
+  }
+  attemptFullscreen();
+  const fullscreenRetry = setInterval(() => {
+    if (document.fullscreenElement) {
+      clearInterval(fullscreenRetry);
+      return;
+    }
+    attemptFullscreen();
+  }, 700);
+
   const action = sessionStorage.getItem("smartkiddo_auth_action");
   const pendingEmail = (sessionStorage.getItem("smartkiddo_pending_email") || "").toLowerCase();
   const pendingPassword = sessionStorage.getItem("smartkiddo_pending_password");
