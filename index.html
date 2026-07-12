@@ -34,6 +34,7 @@
   <link rel="stylesheet" href="css/cta-button.css" />
   <link rel="stylesheet" href="css/logout-notification.css" />
   <link rel="stylesheet" href="css/mula-popup.css" />
+  <link rel="stylesheet" href="css/home.css" />
 </head>
 <body>
 
@@ -186,6 +187,30 @@
       </div>
     </div>
 
+    <!-- Home layer — merged into THIS document (not a separate page/
+         navigation), specifically so it shares the exact same fullscreen
+         state activated by the tap gate at the very start. Shown when
+         "Mula Sekarang" finds the visitor already authenticated. -->
+    <div id="homeScreenVideoStage" class="home-video-stage" hidden>
+      <video
+        id="homeScreenVideo"
+        class="home-video-stage__video"
+        src="assets/videos/welcome-home.mp4"
+        playsinline
+        preload="none"
+      ></video>
+      <div class="home-video-stage__text">
+        <h2 class="home-video-stage__title">SMART KIDDO</h2>
+        <h3 class="home-video-stage__subtitle">VERSE</h3>
+        <p class="home-video-stage__note">Page Loading. Please Wait...</p>
+      </div>
+    </div>
+
+    <main id="homeScreenMain" class="home-main" hidden>
+      <h1 class="home-welcome">Selamat Datang! 🎉</h1>
+      <p class="home-subtext">Akaun keluarga anda telah berjaya didaftarkan.</p>
+    </main>
+
   </div>
 
   <!-- Separated JS: each file owns one concern -->
@@ -203,6 +228,7 @@
   <script src="js/firebase-config.js"></script>
   <script src="js/firebase-init.js"></script>
 
+  <script src="js/home-inline.js"></script>
   <script src="js/mula-popup.js"></script>
   <script src="js/video-controller.js"></script>
 </body>
