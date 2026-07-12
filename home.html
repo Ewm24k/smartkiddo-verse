@@ -34,6 +34,7 @@
   <link rel="stylesheet" href="css/sidemenu.css" />
   <link rel="stylesheet" href="css/logout-notification.css" />
   <link rel="stylesheet" href="css/home.css" />
+  <link rel="stylesheet" href="css/home-dashboard.css" />
 </head>
 <body>
 
@@ -111,9 +112,44 @@
 
     <!-- Actual home content — hidden behind the video, fades in once it ends -->
     <main id="homeMain" class="home-main">
-      <h1 class="home-welcome">Selamat Datang! 🎉</h1>
-      <p class="home-subtext">Akaun keluarga anda telah berjaya didaftarkan.</p>
+      <div class="dash-content">
+
+        <!-- Second header: animated looping text (left) + video (right) -->
+        <section class="hero2">
+          <div class="hero2__text">
+            <h2 class="hero2__heading">SmartKiddo Verse: Your Child's Learning Journey</h2>
+          </div>
+          <div class="hero2__video">
+            <video class="hero2__video-el" src="assets/videos/header-home.mp4" autoplay muted loop playsinline></video>
+            <div class="hero2__blend" aria-hidden="true"></div>
+          </div>
+        </section>
+
+        <!-- Filter tabs (rendered by home-dashboard.js) -->
+        <nav id="dashTabs" class="dash-tabs" role="tablist"></nav>
+
+        <!-- Category carousel rows (rendered by home-dashboard.js) -->
+        <div id="dashRows" class="dash-rows"></div>
+
+      </div>
     </main>
+
+    <!-- "Lihat Semua / See All" popup -->
+    <div id="rowPopup" class="row-popup" hidden>
+      <button id="rowPopupClose" class="row-popup__close" aria-label="Tutup">&times;</button>
+      <h2 id="rowPopupTitle" class="row-popup__title"></h2>
+      <div id="rowPopupGrid" class="row-popup__grid"></div>
+    </div>
+
+    <!-- Bottom music player bar -->
+    <div id="musicPlayerBar" class="music-player" hidden>
+      <button id="musicPlayPause" class="music-player__btn" aria-label="Main/Jeda">▶</button>
+      <div class="music-player__info">
+        <span id="musicTrackName" class="music-player__track">—</span>
+      </div>
+      <button id="musicStop" class="music-player__btn" aria-label="Henti">⏹</button>
+      <button id="musicToggle" class="music-player__toggle" aria-label="Sembunyi/Tunjuk">⌄</button>
+    </div>
   </div>
 
   <!-- Logout success notification with animated green checkmark -->
@@ -131,6 +167,13 @@
   <script src="js/logout.js"></script>
   <script src="js/sidemenu.js"></script>
   <script src="js/home-video.js"></script>
+  <script src="js/home-dashboard-data.js"></script>
+  <script src="js/home-dashboard.js"></script>
+  <script src="js/music-player.js"></script>
   <script src="js/home.js"></script>
+  <script>
+    SmartKiddoDashboard.init();
+    SmartKiddoMusicPlayer.init();
+  </script>
 </body>
 </html>
