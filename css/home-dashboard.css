@@ -47,6 +47,14 @@
   animation: hero2TextLoop 3.6s ease-in-out infinite;
 }
 
+.hero2__heading {
+  transition: opacity 0.4s ease;
+}
+
+.hero2__heading.is-fading-out {
+  opacity: 0;
+}
+
 .hero2__heading-cursor {
   display: inline-block;
   width: 3px;
@@ -453,12 +461,20 @@
   font-size: 16px;
 }
 
-/* ---- Floating "reveal" button (shown only when manually hidden) ---- */
-.music-reveal-btn {
+/* ---- Two stacked floating buttons, bottom-right corner ---- */
+.corner-fabs {
   position: fixed;
   right: calc(16px + var(--safe-right));
   bottom: calc(16px + var(--safe-bottom));
   z-index: 960;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.corner-fab {
+  position: relative;
   width: 54px;
   height: 54px;
   display: flex;
@@ -466,20 +482,20 @@
   justify-content: center;
 }
 
-.music-reveal-btn[hidden] {
+.corner-fab[hidden] {
   display: none !important;
 }
 
-.music-reveal-btn__ring {
+.corner-fab__ring {
   position: absolute;
   inset: 0;
   border-radius: 50%;
   border: 2px solid var(--color-neon-green);
   opacity: 0.55;
-  animation: musicRevealPulse 2s ease-in-out infinite;
+  animation: cornerFabPulse 2s ease-in-out infinite;
 }
 
-.music-reveal-btn__core {
+.corner-fab__core {
   position: relative;
   z-index: 1;
   width: 40px;
@@ -489,14 +505,25 @@
   color: #06331c;
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 13px;
+  font-size: 15px;
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: 0 6px 16px rgba(57, 255, 136, 0.4);
 }
 
-@keyframes musicRevealPulse {
+/* AI button uses a distinct color while it's just a placeholder */
+.corner-fab--ai .corner-fab__ring {
+  border-color: #c6a8ff;
+}
+
+.corner-fab--ai .corner-fab__core {
+  background: #c6a8ff;
+  color: #2f1a5c;
+  box-shadow: 0 6px 16px rgba(198, 168, 255, 0.4);
+}
+
+@keyframes cornerFabPulse {
   0%, 100% { transform: scale(1); opacity: 0.55; }
   50% { transform: scale(1.18); opacity: 0.15; }
 }
