@@ -35,6 +35,8 @@
   <link rel="stylesheet" href="css/logout-notification.css" />
   <link rel="stylesheet" href="css/mula-popup.css" />
   <link rel="stylesheet" href="css/home.css" />
+  <link rel="stylesheet" href="css/home-dashboard.css" />
+
 </head>
 <body>
 
@@ -206,10 +208,25 @@
       </div>
     </div>
 
-    <main id="homeScreenMain" class="home-main" hidden>
-      <h1 class="home-welcome">Selamat Datang! 🎉</h1>
-      <p class="home-subtext">Akaun keluarga anda telah berjaya didaftarkan.</p>
-    </main>
+    <!-- Populated entirely by home-dashboard.js via SmartKiddoDashboard.init() -->
+    <main id="homeScreenMain" class="home-main" hidden></main>
+
+    <!-- "Lihat Semua / See All" popup (shared with the dashboard) -->
+    <div id="rowPopup" class="row-popup" hidden>
+      <button id="rowPopupClose" class="row-popup__close" aria-label="Tutup">&times;</button>
+      <h2 id="rowPopupTitle" class="row-popup__title"></h2>
+      <div id="rowPopupGrid" class="row-popup__grid"></div>
+    </div>
+
+    <!-- Bottom music player bar -->
+    <div id="musicPlayerBar" class="music-player" hidden>
+      <button id="musicPlayPause" class="music-player__btn" aria-label="Main/Jeda">▶</button>
+      <div class="music-player__info">
+        <span id="musicTrackName" class="music-player__track">—</span>
+      </div>
+      <button id="musicStop" class="music-player__btn" aria-label="Henti">⏹</button>
+      <button id="musicToggle" class="music-player__toggle" aria-label="Sembunyi/Tunjuk">⌄</button>
+    </div>
 
   </div>
 
@@ -228,6 +245,9 @@
   <script src="js/firebase-config.js"></script>
   <script src="js/firebase-init.js"></script>
 
+  <script src="js/home-dashboard-data.js"></script>
+  <script src="js/home-dashboard.js"></script>
+  <script src="js/music-player.js"></script>
   <script src="js/home-inline.js"></script>
   <script src="js/mula-popup.js"></script>
   <script src="js/video-controller.js"></script>
