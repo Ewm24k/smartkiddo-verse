@@ -113,6 +113,7 @@
     revealed = true;
     videoStage.classList.add("home-video-stage--hidden");
     homeMain.classList.add("is-visible");
+    SmartKiddoMusicPlayer.init();
     setTimeout(() => {
       if (videoStage.parentNode) videoStage.remove();
     }, 850);
