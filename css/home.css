@@ -94,6 +94,13 @@
   transition: opacity 0.8s ease;
 }
 
+/* CRITICAL: without this, "display: flex" above wins over the browser's
+   own [hidden] { display: none } rule — same recurring bug as the CTA
+   button, logout notification, and menu-state. */
+.home-main[hidden] {
+  display: none !important;
+}
+
 .home-main.is-visible {
   opacity: 1;
 }
