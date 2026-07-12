@@ -7,6 +7,25 @@
 const SmartKiddoDashboard = (() => {
   const data = SmartKiddoDashboardData;
   let activeTab = "all";
+  let initialized = false;
+
+  function buildContainerMarkup() {
+    return `
+      <div class="dash-content">
+        <section class="hero2">
+          <div class="hero2__text">
+            <h2 class="hero2__heading">SmartKiddo Verse: Your Child's Learning Journey</h2>
+          </div>
+          <div class="hero2__video">
+            <video class="hero2__video-el" src="assets/videos/header-home.mp4" autoplay muted loop playsinline></video>
+            <div class="hero2__blend" aria-hidden="true"></div>
+          </div>
+        </section>
+        <nav id="dashTabs" class="dash-tabs" role="tablist"></nav>
+        <div id="dashRows" class="dash-rows"></div>
+      </div>
+    `;
+  }
 
   function buildItemSrc(category, index) {
     return `${category.filePrefix}${index}${category.fileSuffix}`;
@@ -163,9 +182,16 @@ const SmartKiddoDashboard = (() => {
     popup.hidden = true;
   });
 
-  function init() {
-    const tabsContainer = document.getElementById("dashTabs");
-    const rowsContainer = document.getElementById("dashRows");
+  function init(containerId) {
+    if (initialized) return;
+    initialized = true;
+
+    const container = document.getElementById(containerId || "homeMain");
+    if (!container) return;
+    container.innerHTML = buildContainerMarkup();
+
+    const tabsContainer = container.querySelector("#dashTabs");
+    const rowsContainer = container.querySelector("#dashRows");
     renderTabs(tabsContainer);
     data.categories.forEach((category) => {
       rowsContainer.appendChild(createRow(category));
