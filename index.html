@@ -224,15 +224,23 @@
       <div class="music-player__info">
         <span id="musicTrackName" class="music-player__track">—</span>
       </div>
-      <button id="musicStop" class="music-player__btn" aria-label="Henti">⏹</button>
       <button id="musicToggle" class="music-player__toggle" aria-label="Sembunyi/Tunjuk">⌄</button>
     </div>
 
-    <!-- Floating reveal button — shown only when the music bar is manually hidden -->
-    <button id="musicRevealBtn" class="music-reveal-btn" hidden aria-label="Tunjuk pemain muzik">
-      <span class="music-reveal-btn__ring" aria-hidden="true"></span>
-      <span class="music-reveal-btn__core">AI</span>
-    </button>
+    <!-- Two stacked floating buttons, bottom-right corner -->
+    <div class="corner-fabs">
+      <!-- AI assistant — placeholder for a future feature -->
+      <button id="aiFab" class="corner-fab corner-fab--ai" aria-label="AI (akan datang)">
+        <span class="corner-fab__ring" aria-hidden="true"></span>
+        <span class="corner-fab__core">AI</span>
+      </button>
+
+      <!-- Music player reveal — shown only when the bar is manually hidden -->
+      <button id="musicRevealBtn" class="corner-fab corner-fab--music" hidden aria-label="Tunjuk pemain muzik">
+        <span class="corner-fab__ring" aria-hidden="true"></span>
+        <span class="corner-fab__core">🎵</span>
+      </button>
+    </div>
 
   </div>
 
