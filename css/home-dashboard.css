@@ -54,7 +54,7 @@
   position: absolute;
   inset: 0;
   z-index: 1;
-  background: rgba(0, 0, 0, 0.2); /* 20% dark overlay for text readability */
+  background: rgba(0, 0, 0, 0.35); /* darker overlay for text readability */
   pointer-events: none;
 }
 
