@@ -176,6 +176,52 @@
   display: none !important;
 }
 
+.dash-rows-extra {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.dash-rows-extra[hidden] {
+  display: none !important;
+}
+
+.dash-rows-toggle-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 2px 0 16px;
+}
+
+.dash-rows-toggle {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.15);
+  color: var(--color-white);
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.dash-rows-toggle:hover {
+  background: rgba(0, 0, 0, 0.28);
+}
+
+.dash-rows-toggle:active {
+  transform: scale(0.92);
+}
+
+.dash-rows-toggle__icon {
+  display: inline-block;
+  transition: transform 0.25s ease;
+}
+
+.dash-rows-toggle.is-expanded .dash-rows-toggle__icon {
+  transform: rotate(180deg);
+}
+
 .dash-row__header {
   display: flex;
   align-items: baseline;
