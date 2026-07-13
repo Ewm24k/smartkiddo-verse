@@ -5,6 +5,10 @@
    given path; if it's missing, the card simply shows a plain
    placeholder background instead of breaking anything.
 
+   Tabs are generated directly FROM this category list (each
+   category is its own tab, "All" is added automatically) — so
+   there's no separate tabs list to keep in sync anymore.
+
    "launched": true  → hovering a card shows a "Masuk Kelas"
                         button (the class is actually available).
    "launched": false → hovering shows "Very Soon Launching"
@@ -17,23 +21,11 @@
    ========================================================= */
 
 const SmartKiddoDashboardData = {
-  // Filter tabs shown above the rows. "tabs" on each category below
-  // must include a tab's id for that category to appear under it.
-  tabs: [
-    { id: "all", label: "All" },
-    { id: "math", label: "Math" },
-    { id: "age-2-3", label: "2-3 years old" },
-    { id: "age-4-5", label: "4-5 years old" },
-    { id: "age-6", label: "6 years old" },
-    { id: "age-7", label: "7 years old" },
-    { id: "shop", label: "Shop" },
-  ],
-
   categories: [
     {
       id: "math",
       title: "Math / Matematik",
-      tabs: ["all", "math", "age-2-3", "age-4-5", "age-6", "age-7"],
+      tabLabel: "Math",
       itemType: "video",
       itemCount: 6,
       filePrefix: "assets/videos/dashboard/m",
@@ -44,7 +36,7 @@ const SmartKiddoDashboardData = {
     {
       id: "bm",
       title: "Bahasa Melayu",
-      tabs: ["all", "age-2-3", "age-4-5", "age-6", "age-7"],
+      tabLabel: "BM",
       itemType: "video",
       itemCount: 6,
       filePrefix: "assets/videos/dashboard/bm",
@@ -54,7 +46,7 @@ const SmartKiddoDashboardData = {
     {
       id: "bi",
       title: "Bahasa Inggeris",
-      tabs: ["all", "age-2-3", "age-4-5", "age-6", "age-7"],
+      tabLabel: "BI",
       itemType: "video",
       itemCount: 6,
       filePrefix: "assets/videos/dashboard/bi",
@@ -64,7 +56,7 @@ const SmartKiddoDashboardData = {
     {
       id: "ba",
       title: "Bahasa Arab",
-      tabs: ["all", "age-4-5", "age-6", "age-7"],
+      tabLabel: "BA",
       itemType: "video",
       itemCount: 6,
       filePrefix: "assets/videos/dashboard/ba",
@@ -74,7 +66,7 @@ const SmartKiddoDashboardData = {
     {
       id: "bc",
       title: "Bahasa Mandarin",
-      tabs: ["all", "age-4-5", "age-6", "age-7"],
+      tabLabel: "BC",
       itemType: "video",
       itemCount: 6,
       filePrefix: "assets/videos/dashboard/bc",
@@ -84,7 +76,7 @@ const SmartKiddoDashboardData = {
     {
       id: "bonus",
       title: "Bonus",
-      tabs: ["all", "age-2-3", "age-4-5", "age-6", "age-7"],
+      tabLabel: "Bonus",
       itemType: "video",
       itemCount: 6,
       filePrefix: "assets/videos/dashboard/bo",
@@ -94,7 +86,7 @@ const SmartKiddoDashboardData = {
     {
       id: "videos",
       title: "Videos",
-      tabs: ["all", "age-2-3", "age-4-5", "age-6", "age-7"],
+      tabLabel: "Videos",
       itemType: "video",
       itemCount: 6,
       filePrefix: "assets/videos/dashboard/vd",
@@ -102,9 +94,19 @@ const SmartKiddoDashboardData = {
       launched: false,
     },
     {
+      id: "bedtime",
+      title: "Bedtime Story / Cerita Dodoi",
+      tabLabel: "Bedtime Story",
+      itemType: "video",
+      itemCount: 6,
+      filePrefix: "assets/videos/dashboard/bt",
+      fileSuffix: "v.mp4",
+      launched: false,
+    },
+    {
       id: "shop",
       title: "Shop",
-      tabs: ["all", "shop"],
+      tabLabel: "Shop",
       itemType: "image",
       itemCount: 6,
       filePrefix: "assets/images/dashboard/sp",
