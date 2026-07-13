@@ -128,6 +128,29 @@ const SmartKiddoDashboard = (() => {
     return card;
   }
 
+  function createRowsToggle() {
+    const wrap = document.createElement("div");
+    wrap.className = "dash-rows-toggle-wrap";
+
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "dash-rows-toggle";
+    btn.setAttribute("aria-label", "Tunjuk/sembunyi lagi kategori");
+    btn.innerHTML = `<span class="dash-rows-toggle__icon">⌄</span>`;
+
+    btn.addEventListener("mouseenter", () => SmartKiddoSound.playHover());
+    btn.addEventListener("click", () => {
+      SmartKiddoSound.playClick();
+      const extraWrap = document.getElementById("dashRowsExtra");
+      const wasExpanded = !extraWrap.hidden;
+      extraWrap.hidden = wasExpanded; // toggle
+      btn.classList.toggle("is-expanded", !wasExpanded);
+    });
+
+    wrap.appendChild(btn);
+    return wrap;
+  }
+
   function createRow(category) {
     const row = document.createElement("section");
     row.className = "dash-row";
@@ -217,6 +240,20 @@ const SmartKiddoDashboard = (() => {
           el.classList.toggle("is-active", el === btn);
         });
         document.querySelectorAll(".dash-row").forEach(applyTabVisibility);
+
+        // If the selected tab needs to show a row that's currently
+        // collapsed away, expand the section so it's actually visible.
+        const extraWrap = document.getElementById("dashRowsExtra");
+        if (extraWrap) {
+          const hasVisibleInsideExtra = Array.from(extraWrap.querySelectorAll(".dash-row")).some(
+            (r) => !r.hidden
+          );
+          if (hasVisibleInsideExtra && extraWrap.hidden) {
+            extraWrap.hidden = false;
+            const toggleBtn = document.querySelector(".dash-rows-toggle");
+            if (toggleBtn) toggleBtn.classList.add("is-expanded");
+          }
+        }
       });
       container.appendChild(btn);
     });
@@ -254,8 +291,25 @@ const SmartKiddoDashboard = (() => {
     const tabsContainer = container.querySelector("#dashTabs");
     const rowsContainer = container.querySelector("#dashRows");
     renderTabs(tabsContainer);
-    data.categories.forEach((category) => {
-      rowsContainer.appendChild(createRow(category));
+
+    data.categories.forEach((category, idx) => {
+      const row = createRow(category);
+      if (idx === 0) {
+        // First category (Math) always shows directly.
+        rowsContainer.appendChild(row);
+      } else {
+        if (idx === 1) {
+          // Right after the first row: the collapse/expand toggle,
+          // then a wrapper holding everything else, collapsed by default.
+          rowsContainer.appendChild(createRowsToggle());
+          const extraWrap = document.createElement("div");
+          extraWrap.id = "dashRowsExtra";
+          extraWrap.className = "dash-rows-extra";
+          extraWrap.hidden = true;
+          rowsContainer.appendChild(extraWrap);
+        }
+        document.getElementById("dashRowsExtra").appendChild(row);
+      }
     });
 
     runHero2TextLoop(container);
