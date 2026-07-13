@@ -71,6 +71,25 @@ const SmartKiddoDashboard = (() => {
     return `${category.filePrefix}${index}${category.fileSuffix}`;
   }
 
+  // Shared observer: only actually play a card's video while it's near
+  // the viewport, and pause it once it scrolls away. With 50+ video
+  // cards on the page, having them all try to decode/play at once is
+  // exactly what was making scrolling feel heavy — this fixes that.
+  const cardVideoObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        const video = entry.target.querySelector("video.dash-card__media");
+        if (!video) return;
+        if (entry.isIntersecting) {
+          video.play().catch(() => {});
+        } else {
+          video.pause();
+        }
+      });
+    },
+    { root: null, rootMargin: "200px", threshold: 0.2 }
+  );
+
   function createCard(category, index) {
     const card = document.createElement("div");
     card.className = "dash-card";
@@ -83,14 +102,14 @@ const SmartKiddoDashboard = (() => {
       video.loop = true;
       video.playsInline = true;
       video.preload = "none";
-      video.autoplay = true;
+      // Playback is controlled by cardVideoObserver below (only plays
+      // near the viewport) rather than the autoplay attribute, which
+      // would try to start all cards at once regardless of visibility.
       // If the file doesn't exist yet, fail quietly instead of showing
       // a broken-video icon — just leaves the placeholder background.
       video.addEventListener("error", () => video.remove());
       card.appendChild(video);
-      card.addEventListener("mouseenter", () => {
-        video.play().catch(() => {});
-      });
+      cardVideoObserver.observe(card);
     } else {
       const img = document.createElement("img");
       img.className = "dash-card__media";
@@ -140,18 +159,22 @@ const SmartKiddoDashboard = (() => {
     btn.setAttribute("aria-label", "Tunjuk/sembunyi lagi kategori");
     btn.innerHTML = `<span class="dash-rows-toggle__icon">⌄</span>`;
 
+    let isExpanded = false;
+
     btn.addEventListener("mouseenter", () => SmartKiddoSound.playHover());
     btn.addEventListener("click", () => {
       SmartKiddoSound.playClick();
       const extraWrap = document.getElementById("dashRowsExtra");
-      const wasExpanded = !extraWrap.hidden;
-      extraWrap.hidden = wasExpanded; // toggle
-      btn.classList.toggle("is-expanded", !wasExpanded);
+      if (!extraWrap) return;
+
+      isExpanded = !isExpanded;
+      extraWrap.hidden = !isExpanded;
+      btn.classList.toggle("is-expanded", isExpanded);
 
       // Collapsing: the content directly above the current scroll
       // position just shrank away, so reset to the top to avoid
       // leaving a blank leftover gap where the hidden rows used to be.
-      if (wasExpanded) {
+      if (!isExpanded) {
         const scrollEl = document.querySelector(".dash-content");
         if (scrollEl) scrollEl.scrollTo({ top: 0, behavior: "smooth" });
       }
@@ -165,7 +188,6 @@ const SmartKiddoDashboard = (() => {
     const row = document.createElement("section");
     row.className = "dash-row";
     row.dataset.category = category.id;
-    row.dataset.tabs = category.tabs.join(",");
 
     const header = document.createElement("div");
     header.className = "dash-row__header";
@@ -232,12 +254,13 @@ const SmartKiddoDashboard = (() => {
   }
 
   function applyTabVisibility(row) {
-    const tabs = row.dataset.tabs.split(",");
-    row.hidden = activeTab !== "all" && !tabs.includes(activeTab);
+    row.hidden = activeTab !== "all" && row.dataset.category !== activeTab;
   }
 
   function renderTabs(container) {
-    data.tabs.forEach((tab) => {
+    const tabList = [{ id: "all", label: "All" }, ...data.categories.map((c) => ({ id: c.id, label: c.tabLabel }))];
+
+    tabList.forEach((tab) => {
       const btn = document.createElement("button");
       btn.className = "dash-tab" + (tab.id === "all" ? " is-active" : "");
       btn.textContent = tab.label;
