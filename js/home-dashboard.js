@@ -14,6 +14,8 @@ const SmartKiddoDashboard = (() => {
       <div class="dash-content">
         <section class="hero2">
           <div class="hero2__text">
+            <video class="hero2__text-bg" src="assets/videos/main-video.mp4" autoplay muted loop playsinline></video>
+            <div class="hero2__text-dark" aria-hidden="true"></div>
             <h2 class="hero2__heading" id="hero2Heading"><span class="hero2__heading-typed"></span><span class="hero2__heading-cursor"></span></h2>
           </div>
           <div class="hero2__video">
@@ -145,6 +147,14 @@ const SmartKiddoDashboard = (() => {
       const wasExpanded = !extraWrap.hidden;
       extraWrap.hidden = wasExpanded; // toggle
       btn.classList.toggle("is-expanded", !wasExpanded);
+
+      // Collapsing: the content directly above the current scroll
+      // position just shrank away, so reset to the top to avoid
+      // leaving a blank leftover gap where the hidden rows used to be.
+      if (wasExpanded) {
+        const scrollEl = document.querySelector(".dash-content");
+        if (scrollEl) scrollEl.scrollTo({ top: 0, behavior: "smooth" });
+      }
     });
 
     wrap.appendChild(btn);
