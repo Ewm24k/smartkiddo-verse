@@ -1,0 +1,248 @@
+/* =========================================================
+   profile.css — profile page content styling
+   Uses the same fullscreen .app pattern (base.css) as every
+   other page; this file only styles what's inside it.
+   ========================================================= */
+
+.profile-main {
+  position: relative;
+  z-index: 10;
+  height: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.profile-main::-webkit-scrollbar {
+  display: none;
+}
+
+.profile-content {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: calc(90px + var(--safe-top)) 20px 60px;
+}
+
+.profile-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--color-white);
+  font-size: clamp(24px, 5vw, 32px);
+  text-align: center;
+  margin-bottom: 26px;
+}
+
+.profile-section-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--color-white);
+  font-size: 17px;
+  margin-bottom: 12px;
+}
+
+/* ---- Photo ---- */
+.profile-photo-section {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.profile-photo-wrap {
+  position: relative;
+  width: 120px;
+  height: 120px;
+}
+
+.profile-photo {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: rgba(255, 255, 255, 0.08);
+  border: 3px solid var(--color-neon-green);
+}
+
+.profile-photo-btn {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--color-neon-green);
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(57, 255, 136, 0.4);
+}
+
+/* ---- Fields ---- */
+.profile-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 30px;
+}
+
+.profile-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.profile-field label {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.profile-field input,
+.profile-field select,
+.profile-field textarea {
+  font-family: var(--font-body);
+  font-size: 16px; /* >=16px avoids iOS Safari auto-zoom on focus */
+  color: var(--color-white);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  padding: 12px 14px;
+  resize: vertical;
+}
+
+.profile-field input:focus,
+.profile-field select:focus,
+.profile-field textarea:focus {
+  outline: none;
+  border-color: var(--color-neon-green);
+  box-shadow: 0 0 0 3px rgba(57, 255, 136, 0.15);
+}
+
+/* ---- Kids nicknames ---- */
+.profile-kids-section {
+  margin-bottom: 30px;
+}
+
+.profile-kids-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.profile-kid-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.profile-kid-row label {
+  flex: 0 0 70px;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.profile-kid-row input {
+  flex: 1;
+  font-family: var(--font-body);
+  font-size: 16px;
+  color: var(--color-white);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+/* ---- Save button ---- */
+.profile-save-btn {
+  width: 100%;
+  height: 50px;
+  border-radius: 999px;
+  background: var(--color-neon-green);
+  color: #06331c;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+  box-shadow: 0 6px 18px rgba(57, 255, 136, 0.3);
+  transition: transform 0.12s ease;
+}
+
+.profile-save-btn:active {
+  transform: scale(0.97);
+}
+
+.profile-save-message {
+  text-align: center;
+  margin-top: 10px;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 13.5px;
+}
+
+.profile-save-message--success {
+  color: var(--color-neon-green);
+}
+
+.profile-save-message--error {
+  color: #ff6f8e;
+}
+
+.profile-breakline {
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  margin: 34px 0 26px;
+}
+
+/* ---- Affiliate ---- */
+.profile-affiliate-hint {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 14px;
+  line-height: 1.5;
+}
+
+.profile-affiliate-btn {
+  width: 100%;
+  height: 46px;
+  border-radius: 999px;
+  background: var(--color-teal);
+  color: #08302b;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.affiliate-link-wrap {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.affiliate-link-wrap[hidden] {
+  display: none !important;
+}
+
+.affiliate-link-input {
+  flex: 1;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--color-white);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.affiliate-copy-btn {
+  flex: 0 0 auto;
+  padding: 0 18px;
+  border-radius: 10px;
+  background: var(--color-neon-green);
+  color: #06331c;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+}
