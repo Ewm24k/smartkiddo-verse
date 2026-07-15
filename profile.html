@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+
+  <!-- Auth guard: same pattern as home.html — no active session means
+       no access to this page at all. -->
+  <script>
+    if (!localStorage.getItem("smartkiddo_logged_in_email")) {
+      sessionStorage.setItem("smartkiddo_auth_action", "session-check");
+      sessionStorage.setItem("smartkiddo_auth_success_redirect", "profile.html");
+      sessionStorage.setItem("smartkiddo_auth_fail_redirect", "index.html");
+      window.location.href = "auth-check.html";
+    }
+  </script>
+
+  <title>Profil — SmartKiddo Verse</title>
+  <meta name="theme-color" content="#0a0714" />
+
+  <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="SmartKiddo Verse" />
+  <link rel="apple-touch-icon" href="assets/icons/favicon.svg" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/sidemenu.css" />
+  <link rel="stylesheet" href="css/logout-notification.css" />
+  <link rel="stylesheet" href="css/profile.css" />
+</head>
+<body>
+
+  <div class="app">
+
+    <!-- Top bar: hamburger + brand, same as every other page -->
+    <div class="topbar">
+      <button id="menuToggle" class="menu-toggle" aria-label="Buka menu" aria-expanded="false" aria-controls="sideMenu">
+        <span class="menu-toggle__bar"></span>
+        <span class="menu-toggle__bar"></span>
+        <span class="menu-toggle__bar"></span>
+      </button>
+      <span class="brand">SmartKiddo <span class="brand__accent">Verse</span></span>
+    </div>
+
+    <!-- Side menu (slides in from left) — same component as every other page -->
+    <div id="sideMenuBackdrop" class="side-menu-backdrop"></div>
+    <nav id="sideMenu" class="side-menu" aria-hidden="true">
+      <button id="menuClose" class="side-menu__close" aria-label="Tutup menu">&times;</button>
+
+      <div class="side-menu__brand">SmartKiddo <span class="brand__accent">Verse</span></div>
+
+      <div id="menuLoggedOut" class="menu-state">
+        <form id="loginForm" class="login-form" autocomplete="off">
+          <label class="login-form__label" for="loginEmail">Emel</label>
+          <input class="login-form__input" type="email" id="loginEmail" name="loginEmail" placeholder="contoh@gmail.com" required />
+
+          <label class="login-form__label" for="password">Kata Laluan</label>
+          <input class="login-form__input" type="password" id="password" name="password" placeholder="Masukkan kata laluan" required />
+          <p id="loginError" class="login-form__error" hidden></p>
+
+          <button type="submit" class="login-form__submit">Log Masuk</button>
+          <a href="#" class="login-form__forgot">Lupa kata laluan?</a>
+        </form>
+
+        <a href="signup.html" class="login-form__signup">Belum ada akaun? <strong>Daftar di sini</strong></a>
+
+        <ul class="side-menu__links">
+          <li><a href="#">Tentang Kami</a></li>
+        </ul>
+      </div>
+
+      <div id="menuLoggedIn" class="menu-state" hidden>
+        <ul class="side-menu__links">
+          <li><a href="home.html">Rumah</a></li>
+          <li><a href="profile.html">Profil</a></li>
+          <li><a href="#">Permainan</a></li>
+          <li><a href="#">Pencapaian Saya</a></li>
+          <li><a href="#">Tentang Kami</a></li>
+        </ul>
+        <button id="sideMenuLogoutBtn" class="side-menu__logout">Log Keluar 👋</button>
+      </div>
+    </nav>
+
+    <!-- Profile content -->
+    <main id="profileMain" class="profile-main">
+      <div class="profile-content">
+        <h1 class="profile-title">Profil Keluarga</h1>
+
+        <!-- Photo -->
+        <section class="profile-photo-section">
+          <div class="profile-photo-wrap">
+            <img id="profilePhotoPreview" class="profile-photo" src="assets/icons/favicon.svg" alt="Gambar profil" />
+            <button id="profilePhotoBtn" class="profile-photo-btn" aria-label="Tukar gambar profil">📷</button>
+            <input type="file" id="profilePhotoInput" accept="image/*" hidden />
+          </div>
+        </section>
+
+        <!-- Account fields -->
+        <section class="profile-fields">
+          <div class="profile-field">
+            <label for="profileEmail">Emel</label>
+            <input type="email" id="profileEmail" placeholder="contoh@gmail.com" />
+          </div>
+
+          <div class="profile-field">
+            <label for="profileGender">Jantina</label>
+            <select id="profileGender">
+              <option value="">Pilih jantina</option>
+              <option value="Lelaki">Lelaki</option>
+              <option value="Perempuan">Perempuan</option>
+            </select>
+          </div>
+
+          <div class="profile-field">
+            <label for="profileBio">Bio</label>
+            <textarea id="profileBio" rows="3" placeholder="Ceritakan sedikit tentang keluarga anda..."></textarea>
+          </div>
+        </section>
+
+        <!-- Kids nicknames -->
+        <section class="profile-kids-section">
+          <h2 class="profile-section-title">Nama Panggilan Anak-Anak</h2>
+          <div id="profileKidsList" class="profile-kids-list"></div>
+        </section>
+
+        <button id="profileSaveBtn" class="profile-save-btn">Simpan Perubahan</button>
+        <p id="profileSaveMessage" class="profile-save-message" hidden></p>
+
+        <hr class="profile-breakline" />
+
+        <!-- Affiliate link -->
+        <section class="profile-affiliate-section">
+          <h2 class="profile-section-title">Jana Pautan Affiliate</h2>
+          <p class="profile-affiliate-hint">Kongsi pautan ini dengan rakan — apabila mereka mendaftar, ia akan dikaitkan dengan akaun anda.</p>
+          <button id="generateAffiliateBtn" class="profile-affiliate-btn">Jana Pautan</button>
+          <div id="affiliateLinkWrap" class="affiliate-link-wrap" hidden>
+            <input type="text" id="affiliateLinkInput" class="affiliate-link-input" readonly />
+            <button id="copyAffiliateBtn" class="affiliate-copy-btn">Salin</button>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- Logout success notification (shared component) -->
+  <div id="logoutNotification" class="logout-notification" hidden>
+    <div class="logout-notification__card">
+      <svg class="logout-notification__check" viewBox="0 0 52 52">
+        <circle class="logout-notification__check-circle" cx="26" cy="26" r="23" fill="none" />
+        <path class="logout-notification__check-mark" fill="none" d="M14 27l7 7 16-16" />
+      </svg>
+      <p class="logout-notification__text">Log keluar berjaya!</p>
+    </div>
+  </div>
+
+  <script src="js/sound.js"></script>
+  <script src="js/logout.js"></script>
+  <script src="js/sidemenu.js"></script>
+
+  <!-- Firebase (compat SDK) -->
+  <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/firebase-init.js"></script>
+
+  <script src="js/profile.js"></script>
+</body>
+</html>
