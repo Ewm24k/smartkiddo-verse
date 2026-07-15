@@ -389,7 +389,7 @@
     submitBtn.disabled = true;
     submitBtn.textContent = "Menghantar...";
 
-    const signupRef = db.collection("signups").doc();
+    const signupRef = db.collection("signups").doc(parentEmail);
     const emailLookupRef = db.collection("email-lookup").doc(parentEmail);
 
     db.runTransaction((transaction) => {
