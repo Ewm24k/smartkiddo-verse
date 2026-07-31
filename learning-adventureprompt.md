@@ -35,10 +35,30 @@ Identify:
   image is off by even 1px at some viewport size — feathering makes any tiny
   misalignment invisible instead of showing a visible slice between cards.
 
-### 4. OPTIMIZE file size
+### 4. OPTIMIZE file size and output structure
 - Save the background as JPEG (quality ~85-92) since it doesn't need transparency
 - Keep buttons/mascot as PNG if they need transparency, otherwise JPEG too
-- Base64-encode all cropped images
+- **Do NOT base64-encode images directly inline in the HTML.** Long inline
+  `background-image: url('data:image/...;base64,AAAA...')` strings bloat the
+  HTML file to megabytes and make the markup unreadable/undiffable. Instead,
+  use one of these two structures:
+  - **Preferred — real image files:** write every cropped image out as a
+    file into an `assets/` folder next to the HTML (e.g. `assets/bg.jpg`,
+    `assets/colors.png`) and reference them with normal relative paths:
+    `background-image: url('assets/colors.png')`.
+  - **Alternative — base64 in a separate JS file:** if the person wants the
+    base64 approach (e.g. to avoid a folder of binary files), still keep it
+    out of `index.html` itself. Put all data URIs in their own `assets.js`
+    as a single object (`const ASSETS = { bg: "data:image/jpeg;base64,...",
+    colors: "data:image/png;base64,...", ... };`), load it with
+    `<script src="assets.js"></script>`, and set each element's
+    `background-image` from `ASSETS.<key>` in a small script at the bottom
+    of the HTML. This keeps `index.html` small and readable while still
+    shipping as self-contained data URIs — deliver `index.html` +
+    `assets.js` together (zipped).
+  - Either way, the deliverable is never a single HTML file with base64
+    strings written directly into the markup/CSS — only build that if the
+    person explicitly insists on one physical file and accepts the bloat.
 
 ### 5. BUILD the HTML file for FULL-WINDOW RESPONSIVE SCALING
 
@@ -70,7 +90,7 @@ Identify:
     width: 100%; height: 100%;
     max-width: calc(100vh * <SOURCE_W> / <SOURCE_H>);
     max-height: calc(100vw * <SOURCE_H> / <SOURCE_W>);
-    background-image: url('<bg-base64>');
+    background-image: url('assets/bg.jpg');   /* real file path, not base64 */
     background-size: 100% 100%;   /* stretch to fill the locked box exactly, never crop */
     background-repeat: no-repeat;
   }
@@ -108,8 +128,9 @@ Identify:
 - Wire up onclick handlers in vanilla JS for each button (and mascot if
   interactive) to trigger real behavior (e.g. show a modal, navigate, submit
   a form).
-- Embed all images as base64 data URIs so the result is a single portable
-  .html file.
+- Keep all image references as relative paths into `assets/` (see Step 4) —
+  the HTML file itself should stay small and readable, not carry the image
+  bytes inline.
 
 ### 6. VERIFY
 - Confirm there is no visible seam/line at any button's border against the
@@ -118,6 +139,10 @@ Identify:
   (1366×768), standard desktop (1920×1080), ultrawide (2560×1080) — and
   confirm the letterbox/pillarbox approach keeps every button aligned to
   the background art with zero drift at each, including non-16:9 windows.
+- Confirm the final deliverable is either `index.html` + `assets/` (real
+  image files) or `index.html` + `assets.js` (base64 in its own file) —
+  zipped together — never a single HTML file with base64 strings written
+  directly into its own markup/CSS.
 
 ---
 
