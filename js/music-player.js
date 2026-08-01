@@ -1,26 +1,6 @@
 /* =========================================================
-   music-player.js — background music bar
-   IMPORTANT LIMITATION (read this): a static site (GitHub Pages/
-   Netlify) cannot ask the browser "list every file in this
-   folder" — that's not something plain HTML/CSS/JS can do without
-   a backend. The closest thing to "just drop files in and it
-   plays them" on a static host is this: list the filenames once
-   in assets/audio/music/playlist.json, and this script plays
-   whatever's in that list — you're editing a plain text list of
-   filenames, not touching any app code. If that list is empty,
-   the bar stays hidden entirely — that's expected, not a bug.
-
-   Call init() only once the welcome video has finished — the
-   calling page controls that timing, not this file.
-
-   Visibility behavior:
-   - Floats fixed at the bottom at all times (not tied to scroll
-     position at all).
-   - Briefly slides away WHILE the page is actively scrolling, and
-     slides back the moment scrolling stops.
-   - Can also be manually hidden via the toggle button — while in
-     that state, it stays hidden regardless of scrolling, and the
-     dedicated floating music icon (bottom-right) brings it back.
+   music-player.js — background music bar (IMPROVED VERSION)
+   Handles "no supported sources" error and provides better logging
    ========================================================= */
 
 const SmartKiddoMusicPlayer = (() => {
@@ -34,6 +14,8 @@ const SmartKiddoMusicPlayer = (() => {
   let currentIndex = 0;
   const audio = new Audio();
   audio.volume = 0.55;
+  audio.preload = "auto";
+  audio.crossOrigin = "anonymous";
   let isPlaying = false;
   let autoplayUnlocked = false;
 
@@ -46,25 +28,40 @@ const SmartKiddoMusicPlayer = (() => {
   }
 
   function loadTrack(index) {
-    if (!tracks.length) return;
+    if (!tracks.length) {
+      console.error("❌ No tracks available to load");
+      return;
+    }
     currentIndex = ((index % tracks.length) + tracks.length) % tracks.length;
-    audio.src = `assets/audio/music/${tracks[currentIndex]}`;
+    const trackPath = `assets/audio/music/${tracks[currentIndex]}`;
+    console.log(`🎵 Loading track ${currentIndex + 1}/${tracks.length}: ${tracks[currentIndex]}`);
+    console.log(`   Full path: ${trackPath}`);
+    
+    audio.src = trackPath;
     trackNameEl.textContent = tracks[currentIndex].replace(/\.(mp3|wav|ogg)$/i, "");
   }
 
   function play() {
+    if (!audio.src) {
+      console.error("❌ No audio source loaded");
+      return;
+    }
+    
+    console.log(`🎵 Attempting to play: ${audio.src}`);
     audio
       .play()
       .then(() => {
         isPlaying = true;
         autoplayUnlocked = true;
         playPauseBtn.textContent = "⏸";
+        console.log("✅ Music playing!");
       })
       .catch((err) => {
-        console.warn("Autoplay blocked:", err);
-        // Blocked by autoplay policy — same rule as everywhere else in
-        // this app. Retried automatically on the first real interaction
-        // (see retryAutoplayOnInteraction below), but only once.
+        console.warn(`⚠️ Playback failed (${err.name}):`, err.message);
+        if (err.name === "NotSupportedError") {
+          console.error("❌ Audio format not supported or file not found!");
+          console.error("   Check: assets/audio/music/" + audio.src.split("/").pop());
+        }
       });
   }
 
@@ -72,26 +69,51 @@ const SmartKiddoMusicPlayer = (() => {
     audio.pause();
     isPlaying = false;
     playPauseBtn.textContent = "▶";
+    console.log("⏸ Music paused");
   }
 
+  // Audio element event listeners
+  audio.addEventListener("loadstart", () => {
+    console.log("🎵 Loading audio...");
+  });
+
+  audio.addEventListener("canplay", () => {
+    console.log("✅ Audio ready to play");
+  });
+
   audio.addEventListener("ended", () => {
+    console.log("🎵 Track ended, loading next...");
     loadTrack(currentIndex + 1);
     play();
   });
 
+  audio.addEventListener("error", (e) => {
+    const errorMessages = {
+      1: "MEDIA_ERR_ABORTED - Loading was aborted",
+      2: "MEDIA_ERR_NETWORK - Network error",
+      3: "MEDIA_ERR_DECODE - Decoding error (corrupted file?)",
+      4: "MEDIA_ERR_SRC_NOT_SUPPORTED - Format not supported or file not found"
+    };
+    const msg = errorMessages[audio.error?.code] || "Unknown error";
+    console.error(`❌ Audio Error (Code ${audio.error?.code}):`, msg);
+    console.error(`   Tried to load: ${audio.src}`);
+  });
+
+  // Button event listeners
   playPauseBtn.addEventListener("mouseenter", () => SmartKiddoSound.playHover());
   playPauseBtn.addEventListener("click", () => {
+    console.log("🎵 Play/pause button clicked");
     SmartKiddoSound.playClick();
     if (isPlaying) pause();
     else play();
   });
 
-  // Manual hide (toggle button) / reveal (floating music icon)
   toggleBtn.addEventListener("mouseenter", () => SmartKiddoSound.playHover());
   toggleBtn.addEventListener("click", () => {
     SmartKiddoSound.playClick();
     manuallyHidden = true;
     updateBarVisibility();
+    console.log("🎵 Music bar hidden");
   });
 
   revealBtn.addEventListener("mouseenter", () => SmartKiddoSound.playHover());
@@ -99,14 +121,15 @@ const SmartKiddoMusicPlayer = (() => {
     SmartKiddoSound.playClick();
     manuallyHidden = false;
     updateBarVisibility();
+    console.log("🎵 Music bar revealed");
   });
 
-  // Auto-hide while scrolling, reappear once scrolling stops — but only
-  // when it isn't manually hidden.
+  // Scroll auto-hide
   let scrollHideTimer = null;
   function attachScrollAutoHide() {
     const scrollEl = document.querySelector(".dash-content");
     if (!scrollEl) return;
+    
     scrollEl.addEventListener(
       "scroll",
       () => {
@@ -123,47 +146,51 @@ const SmartKiddoMusicPlayer = (() => {
     );
   }
 
-  // Only ever fires ONCE — this exists purely to unlock autoplay if the
-  // very first play() attempt was blocked. It must NOT keep listening
-  // forever, or it ends up re-triggering play() right after someone
-  // deliberately clicks pause (that was the actual pause-button bug).
+  // Retry autoplay on user interaction
   function retryAutoplayOnInteraction() {
+    console.log("🎵 User interaction detected");
     if (autoplayUnlocked || !tracks.length) return;
-    console.log("Retrying autoplay after user interaction");
+    console.log("   Retrying autoplay...");
     play();
   }
 
   function init() {
+    console.log("🎵 SmartKiddoMusicPlayer.init() called");
     attachScrollAutoHide();
 
     fetch("assets/audio/music/playlist.json")
       .then((res) => {
+        console.log(`🎵 Fetching playlist.json... HTTP ${res.status}`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
       })
       .then((data) => {
         tracks = (data && data.tracks) || [];
+        console.log(`🎵 Playlist loaded with ${tracks.length} track(s):`);
+        tracks.forEach((t, i) => console.log(`   ${i + 1}. ${t}`));
+        
         if (!tracks.length) {
-          console.warn("No tracks found in playlist.json — music player hidden");
+          console.warn("⚠️ No tracks in playlist.json");
           bar.hidden = true;
           revealBtn.hidden = true;
           return;
         }
         
-        console.log(`Music player loaded ${tracks.length} tracks`);
         bar.hidden = false;
         updateBarVisibility();
         loadTrack(0);
         
-        // Attach retry listeners AFTER tracks are loaded, so !tracks.length check passes
+        // Attach retry listeners AFTER tracks loaded
         document.addEventListener("click", retryAutoplayOnInteraction, { once: true });
         document.addEventListener("touchstart", retryAutoplayOnInteraction, { once: true, passive: true });
         
-        // Try to autoplay immediately
+        // Try autoplay
+        console.log("🎵 Attempting autoplay...");
         play();
       })
       .catch((err) => {
-        console.error("Failed to load playlist.json:", err);
+        console.error("❌ Failed to load playlist.json:", err.message);
+        console.error("   Make sure assets/audio/music/playlist.json exists");
         bar.hidden = true;
         revealBtn.hidden = true;
       });
