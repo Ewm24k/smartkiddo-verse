@@ -49,7 +49,7 @@ const SmartKiddoMusicPlayer = (() => {
     if (!tracks.length) return;
     currentIndex = ((index % tracks.length) + tracks.length) % tracks.length;
     audio.src = `assets/audio/music/${tracks[currentIndex]}`;
-    trackNameEl.textContent = tracks[currentIndex].replace(/\.(mp3|wav)$/i, "");
+    trackNameEl.textContent = tracks[currentIndex].replace(/\.(mp3|wav|ogg)$/i, "");
   }
 
   function play() {
@@ -60,7 +60,8 @@ const SmartKiddoMusicPlayer = (() => {
         autoplayUnlocked = true;
         playPauseBtn.textContent = "⏸";
       })
-      .catch(() => {
+      .catch((err) => {
+        console.warn("Autoplay blocked:", err);
         // Blocked by autoplay policy — same rule as everywhere else in
         // this app. Retried automatically on the first real interaction
         // (see retryAutoplayOnInteraction below), but only once.
@@ -128,29 +129,41 @@ const SmartKiddoMusicPlayer = (() => {
   // deliberately clicks pause (that was the actual pause-button bug).
   function retryAutoplayOnInteraction() {
     if (autoplayUnlocked || !tracks.length) return;
+    console.log("Retrying autoplay after user interaction");
     play();
   }
-  document.addEventListener("click", retryAutoplayOnInteraction, { once: true });
-  document.addEventListener("touchstart", retryAutoplayOnInteraction, { once: true, passive: true });
 
   function init() {
     attachScrollAutoHide();
 
     fetch("assets/audio/music/playlist.json")
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
       .then((data) => {
         tracks = (data && data.tracks) || [];
         if (!tracks.length) {
+          console.warn("No tracks found in playlist.json — music player hidden");
           bar.hidden = true;
           revealBtn.hidden = true;
           return;
         }
+        
+        console.log(`Music player loaded ${tracks.length} tracks`);
         bar.hidden = false;
         updateBarVisibility();
         loadTrack(0);
+        
+        // Attach retry listeners AFTER tracks are loaded, so !tracks.length check passes
+        document.addEventListener("click", retryAutoplayOnInteraction, { once: true });
+        document.addEventListener("touchstart", retryAutoplayOnInteraction, { once: true, passive: true });
+        
+        // Try to autoplay immediately
         play();
       })
-      .catch(() => {
+      .catch((err) => {
+        console.error("Failed to load playlist.json:", err);
         bar.hidden = true;
         revealBtn.hidden = true;
       });
