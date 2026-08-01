@@ -5,10 +5,22 @@
    now handled via the shared side menu (js/sidemenu.js), same
    as the main page — nothing page-specific needed here for it.
    ========================================================= */
-
 (function () {
   document.querySelectorAll("button, a").forEach((el) => {
     el.addEventListener("mouseenter", () => SmartKiddoSound.playHover());
     el.addEventListener("click", () => SmartKiddoSound.playClick());
   });
 })();
+
+// Initialize music player once welcome video finishes
+const welcomeVideo = document.getElementById("homeWelcomeVideo");
+if (welcomeVideo) {
+  welcomeVideo.addEventListener("ended", () => {
+    console.log("Welcome video ended — initializing music player");
+    SmartKiddoMusicPlayer.init();
+  });
+} else {
+  // Fallback: if video element not found or already playing, init after short delay
+  console.warn("Welcome video element not found, initializing music player with delay");
+  setTimeout(() => SmartKiddoMusicPlayer.init(), 500);
+}
