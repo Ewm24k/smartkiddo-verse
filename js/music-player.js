@@ -1,5 +1,5 @@
 /* =========================================================
-   music-player.js — SIMPLE WORKING VERSION
+   music-player.js — FIXED PLAY/PAUSE ICON STATE
    ========================================================= */
 
 const SmartKiddoMusicPlayer = (() => {
@@ -14,7 +14,6 @@ const SmartKiddoMusicPlayer = (() => {
   const audio = new Audio();
   audio.volume = 0.55;
   audio.crossOrigin = "anonymous";
-  let isPlaying = false;
   let autoplayUnlocked = false;
   let manuallyHidden = false;
   let scrollHidden = false;
@@ -22,6 +21,15 @@ const SmartKiddoMusicPlayer = (() => {
   function updateBarVisibility() {
     bar.classList.toggle("music-player--hidden-state", manuallyHidden || scrollHidden);
     revealBtn.hidden = !manuallyHidden;
+  }
+
+  // Update button icon to match actual audio state
+  function updateButtonIcon() {
+    if (audio.paused) {
+      playPauseBtn.textContent = "▶";
+    } else {
+      playPauseBtn.textContent = "⏸";
+    }
   }
 
   async function loadTrack(index) {
@@ -57,22 +65,25 @@ const SmartKiddoMusicPlayer = (() => {
     audio.pause();
   }
 
+  // Update icon whenever audio state changes
+  audio.addEventListener("play", updateButtonIcon);
+  audio.addEventListener("pause", updateButtonIcon);
+
   audio.addEventListener("ended", () => {
     loadTrack(currentIndex + 1).then(() => play());
   });
 
   playPauseBtn.addEventListener("click", () => {
     SmartKiddoSound.playClick();
+    
     if (audio.paused) {
-      isPlaying = true;
       autoplayUnlocked = true;
-      playPauseBtn.textContent = "⏸";
       play();
     } else {
-      isPlaying = false;
-      playPauseBtn.textContent = "▶";
       pause();
     }
+    
+    updateButtonIcon();
   });
 
   toggleBtn.addEventListener("click", () => {
@@ -127,6 +138,7 @@ const SmartKiddoMusicPlayer = (() => {
 
       await loadTrack(0);
       play();
+      autoplayUnlocked = true;
 
     } catch (err) {
       bar.hidden = true;
