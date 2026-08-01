@@ -1,0 +1,57 @@
+# netlify.toml
+# Place this file in your project root (same directory as your HTML files)
+# This configures Netlify to send correct headers for audio files and other assets
+
+# Audio files — set correct MIME type and enable CORS
+[[headers]]
+  for = "/assets/audio/music/*"
+  [headers.values]
+    Content-Type = "audio/mpeg"
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, HEAD, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type, Range"
+    Accept-Ranges = "bytes"
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# WAV files (if you have them)
+[[headers]]
+  for = "/assets/audio/music/*.wav"
+  [headers.values]
+    Content-Type = "audio/wav"
+    Access-Control-Allow-Origin = "*"
+    Accept-Ranges = "bytes"
+
+# OGG files (if you have them)
+[[headers]]
+  for = "/assets/audio/music/*.ogg"
+  [headers.values]
+    Content-Type = "audio/ogg"
+    Access-Control-Allow-Origin = "*"
+    Accept-Ranges = "bytes"
+
+# JSON files
+[[headers]]
+  for = "/*.json"
+  [headers.values]
+    Content-Type = "application/json"
+    Access-Control-Allow-Origin = "*"
+
+[[headers]]
+  for = "/assets/**/*.json"
+  [headers.values]
+    Content-Type = "application/json"
+    Access-Control-Allow-Origin = "*"
+
+# All other assets (images, videos, etc.)
+[[headers]]
+  for = "/assets/**/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+
+# Security headers (optional but recommended)
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "SAMEORIGIN"
+    X-XSS-Protection = "1; mode=block"
