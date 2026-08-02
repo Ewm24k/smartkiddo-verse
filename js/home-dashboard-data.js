@@ -1,6 +1,20 @@
 /* =========================================================
-   home-dashboard-data.js — Only Math (Selected Ages), Bedtime,
-   Shop, and Bonus. Shop and Bonus are collapsible.
+   home-dashboard-data.js — defines every category row and its
+   items. Add/remove items here only — nothing else needs to
+   change. Each item's media file just needs to exist at the
+   given path; if it's missing, the card simply shows a plain
+   placeholder background instead of breaking anything.
+   
+   Tabs generated FROM this category list:
+   Selected Ages, Bedtime Story, Shop, Bonus
+   
+   "launched": true  → hovering a card shows a "Masuk Kelas"
+                        button (the class is actually available).
+   "launched": false → hovering shows "Very Soon Launching"
+                        instead — use this for anything not
+                        ready yet.
+   "collapsible": true → Category goes in the dropdown
+   "collapsible": false or omitted → Category shows directly
    ========================================================= */
 const SmartKiddoDashboardData = {
   categories: [
@@ -15,6 +29,7 @@ const SmartKiddoDashboardData = {
       launched: true,
       ageLabels: ["2 tahun", "3 tahun", "4 tahun", "5 tahun", "6 tahun", "6 tahun"],
       links: ["twoyears.html"],
+      collapsible: false,
     },
     {
       id: "bedtime",
@@ -25,6 +40,7 @@ const SmartKiddoDashboardData = {
       filePrefix: "assets/videos/dashboard/bt",
       fileSuffix: "v.mp4",
       launched: false,
+      collapsible: false,
     },
     {
       id: "bonus",
