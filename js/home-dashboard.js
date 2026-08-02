@@ -127,6 +127,9 @@ const SmartKiddoDashboard = (() => {
     const overlay = document.createElement("div");
     overlay.className = "dash-card__overlay";
 
+    // Retrieve the target link if specified in the data structure
+    const targetLink = (category.links && category.links[index - 1]) || null;
+
     if (category.launched) {
       const ageLabel = (category.ageLabels && category.ageLabels[index - 1]) || "";
       overlay.innerHTML = `
@@ -136,7 +139,11 @@ const SmartKiddoDashboard = (() => {
       overlay.querySelector(".dash-card__overlay-btn").addEventListener("click", (e) => {
         e.stopPropagation();
         SmartKiddoSound.playClick();
-        console.log(`Masuk Kelas: ${category.title} — item ${index} (${ageLabel})`);
+        if (targetLink) {
+          window.location.href = targetLink;
+        } else {
+          console.log(`Masuk Kelas: ${category.title} — item ${index} (${ageLabel})`);
+        }
       });
     } else {
       overlay.innerHTML = `<span class="dash-card__overlay-badge">Very Soon Launching</span>`;
@@ -144,7 +151,12 @@ const SmartKiddoDashboard = (() => {
     card.appendChild(overlay);
 
     card.addEventListener("mouseenter", () => SmartKiddoSound.playHover());
-    card.addEventListener("click", () => SmartKiddoSound.playClick());
+    card.addEventListener("click", () => {
+      SmartKiddoSound.playClick();
+      if (targetLink) {
+        window.location.href = targetLink;
+      }
+    });
 
     return card;
   }
