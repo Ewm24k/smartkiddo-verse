@@ -32,6 +32,7 @@ const SmartKiddoDashboardData = {
       fileSuffix: "v.mp4",
       launched: true,
       ageLabels: ["2 tahun", "3 tahun", "4 tahun", "5 tahun", "6 tahun", "6 tahun"],
+      links: ["twoyears.html"],
     },
     {
       id: "bm",
