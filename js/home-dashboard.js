@@ -1,14 +1,16 @@
 /* =========================================================
    home-dashboard.js — renders the dashboard from
-   home-dashboard-data.js, and wires up carousels,
+   home-dashboard-data.js, and wires up tabs, carousels,
    hover/click/scroll sounds, and the "Lihat Semua" popup.
    
-   No tabs — only Selected Ages and Bedtime visible by default.
-   Bonus and Shop in collapsible dropdown.
+   Tabs: Selected Ages, Bedtime Story, Shop, Bonus
+   Visible carousels: Selected Ages, Bedtime Story
+   Collapsible: Shop, Bonus (with icon-only toggle)
    ========================================================= */
 
 const SmartKiddoDashboard = (() => {
   const data = SmartKiddoDashboardData;
+  let activeTab = "all";
   let initialized = false;
 
   function buildContainerMarkup() {
@@ -25,6 +27,7 @@ const SmartKiddoDashboard = (() => {
             <div class="hero2__blend" aria-hidden="true"></div>
           </div>
         </section>
+        <nav id="dashTabs" class="dash-tabs" role="tablist"></nav>
         <div id="dashRows" class="dash-rows"></div>
       </div>
     `;
@@ -170,7 +173,7 @@ const SmartKiddoDashboard = (() => {
     btn.type = "button";
     btn.className = "dash-rows-toggle";
     btn.setAttribute("aria-label", "Tunjuk/sembunyi lebih banyak kategori");
-    btn.innerHTML = `<span class="dash-rows-toggle__text">Show More</span><span class="dash-rows-toggle__icon">⌄</span>`;
+    btn.innerHTML = `<span class="dash-rows-toggle__icon">⌄</span>`;
 
     let isExpanded = false;
 
@@ -183,7 +186,6 @@ const SmartKiddoDashboard = (() => {
       isExpanded = !isExpanded;
       extraWrap.hidden = !isExpanded;
       btn.classList.toggle("is-expanded", isExpanded);
-      btn.querySelector(".dash-rows-toggle__text").textContent = isExpanded ? "Show Less" : "Show More";
 
       // Collapsing: the content directly above the current scroll
       // position just shrank away, so reset to the top to avoid
@@ -263,7 +265,47 @@ const SmartKiddoDashboard = (() => {
       openSeeAll(category);
     });
 
+    applyTabVisibility(row);
     return row;
+  }
+
+  function applyTabVisibility(row) {
+    row.hidden = activeTab !== "all" && row.dataset.category !== activeTab;
+  }
+
+  function renderTabs(container) {
+    const tabList = [{ id: "all", label: "All" }, ...data.categories.map((c) => ({ id: c.id, label: c.tabLabel }))];
+
+    tabList.forEach((tab) => {
+      const btn = document.createElement("button");
+      btn.className = "dash-tab" + (tab.id === "all" ? " is-active" : "");
+      btn.textContent = tab.label;
+      btn.dataset.tab = tab.id;
+      btn.addEventListener("mouseenter", () => SmartKiddoSound.playHover());
+      btn.addEventListener("click", () => {
+        SmartKiddoSound.playClick();
+        activeTab = tab.id;
+        container.querySelectorAll(".dash-tab").forEach((el) => {
+          el.classList.toggle("is-active", el === btn);
+        });
+        document.querySelectorAll(".dash-row").forEach(applyTabVisibility);
+
+        // If the selected tab needs to show a row that's currently
+        // collapsed away, expand the section so it's actually visible.
+        const extraWrap = document.getElementById("dashRowsExtra");
+        if (extraWrap) {
+          const hasVisibleInsideExtra = Array.from(extraWrap.querySelectorAll(".dash-row")).some(
+            (r) => !r.hidden
+          );
+          if (hasVisibleInsideExtra && extraWrap.hidden) {
+            extraWrap.hidden = false;
+            const toggleBtn = document.querySelector(".dash-rows-toggle");
+            if (toggleBtn) toggleBtn.classList.add("is-expanded");
+          }
+        }
+      });
+      container.appendChild(btn);
+    });
   }
 
   /* ---------------- "Lihat Semua / See All" popup ---------------- */
@@ -295,34 +337,29 @@ const SmartKiddoDashboard = (() => {
     if (!container) return;
     container.innerHTML = buildContainerMarkup();
 
+    const tabsContainer = container.querySelector("#dashTabs");
     const rowsContainer = container.querySelector("#dashRows");
+    renderTabs(tabsContainer);
 
-    // Add visible categories (not collapsible)
     data.categories.forEach((category, idx) => {
+      const row = createRow(category);
       if (!category.collapsible) {
-        const row = createRow(category);
+        // Visible categories: Selected Ages, Bedtime Story
         rowsContainer.appendChild(row);
+      } else {
+        // Collapsible categories: Bonus, Shop
+        if (idx === 2) {
+          // After first 2 categories, add toggle and wrapper
+          rowsContainer.appendChild(createRowsToggle());
+          const extraWrap = document.createElement("div");
+          extraWrap.id = "dashRowsExtra";
+          extraWrap.className = "dash-rows-extra";
+          extraWrap.hidden = true;
+          rowsContainer.appendChild(extraWrap);
+        }
+        document.getElementById("dashRowsExtra").appendChild(row);
       }
     });
-
-    // Add collapsible section if there are collapsible categories
-    const hasCollapsible = data.categories.some(c => c.collapsible);
-    if (hasCollapsible) {
-      rowsContainer.appendChild(createRowsToggle());
-      
-      const extraWrap = document.createElement("div");
-      extraWrap.id = "dashRowsExtra";
-      extraWrap.className = "dash-rows-extra";
-      extraWrap.hidden = true;
-
-      data.categories.forEach((category) => {
-        if (category.collapsible) {
-          extraWrap.appendChild(createRow(category));
-        }
-      });
-
-      rowsContainer.appendChild(extraWrap);
-    }
 
     runHero2TextLoop(container);
 
