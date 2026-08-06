@@ -76,6 +76,43 @@
     border-radius: 12px;
   }
 
+  /* Mascot layer + idle animation */
+  #mascot {
+    position: absolute;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100% 100%;
+    pointer-events: none;
+    z-index: 5;
+    transform-origin: 50% 100%; /* pivot at its feet so it rocks in place */
+    animation: mascot-float 3.2s ease-in-out infinite;
+  }
+
+  #mascot::after {
+    content: "";
+    position: absolute;
+    left: 8%;
+    right: 8%;
+    bottom: -6%;
+    height: 10%;
+    background: radial-gradient(ellipse at center, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0) 70%);
+    animation: mascot-shadow 3.2s ease-in-out infinite;
+  }
+
+  @keyframes mascot-float {
+    0%   { transform: translateY(0)     rotate(0deg); }
+    25%  { transform: translateY(-2.5%) rotate(-3deg); }
+    50%  { transform: translateY(-5%)   rotate(0deg); }
+    75%  { transform: translateY(-2.5%) rotate(3deg); }
+    100% { transform: translateY(0)     rotate(0deg); }
+  }
+
+  @keyframes mascot-shadow {
+    0%   { transform: scale(1);    opacity: 0.55; }
+    50%  { transform: scale(0.82); opacity: 0.35; }
+    100% { transform: scale(1);    opacity: 0.55; }
+  }
+
   /* Modal */
   #modal-overlay {
     position: fixed;
@@ -187,6 +224,8 @@
     { id: 'musicmix',   left: 74.163, top: 67.694, width: 15.072, height: 19.554, name: 'Music Mix',     emoji: '🎵' },
   ];
 
+  const MASCOT = { left: 4.844, top: 4.995, width: 16.029, height: 27.843 };
+
   const stage = document.getElementById('stage');
   const modalOverlay = document.getElementById('modal-overlay');
   const modalTitle = document.getElementById('modal-title');
@@ -196,6 +235,16 @@
 
   // Set background from base64 asset
   stage.style.backgroundImage = `url('${ASSETS.bg}')`;
+
+  // Build animated mascot layer
+  const mascotEl = document.createElement('div');
+  mascotEl.id = 'mascot';
+  mascotEl.style.left = MASCOT.left + '%';
+  mascotEl.style.top = MASCOT.top + '%';
+  mascotEl.style.width = MASCOT.width + '%';
+  mascotEl.style.height = MASCOT.height + '%';
+  mascotEl.style.backgroundImage = `url('${ASSETS.mascot}')`;
+  stage.appendChild(mascotEl);
 
   // Build buttons
   BUTTONS.forEach(btn => {
