@@ -22,22 +22,24 @@
     inset: 0;
     width: 100vw;
     height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #0a0024;
     overflow: hidden;
+    background: #0a0024;
   }
 
   #stage {
-    position: relative;
-    aspect-ratio: 1672 / 941;
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
-    max-width: calc(100vh * 1672 / 941);
-    max-height: calc(100vw * 941 / 1672);
-    background-size: 100% 100%;
+  }
+
+  #bg-layer {
+    position: absolute;
+    inset: 0;
     background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
   }
 
   button.game-btn {
@@ -193,7 +195,9 @@
 <body>
 
 <div id="stage-wrapper">
-  <div id="stage"></div>
+  <div id="stage">
+    <div id="bg-layer"></div>
+  </div>
 </div>
 
 <div id="modal-overlay">
@@ -226,39 +230,75 @@
 
   const MASCOT = { left: 4.844, top: 4.995, width: 16.029, height: 27.843 };
 
+  // Intrinsic size of the source artwork — the coordinate space that every
+  // button/mascot percentage box below is defined against.
+  const SRC_W = 1672;
+  const SRC_H = 941;
+
+  const stageWrapper = document.getElementById('stage-wrapper');
   const stage = document.getElementById('stage');
+  const bgLayer = document.getElementById('bg-layer');
   const modalOverlay = document.getElementById('modal-overlay');
   const modalTitle = document.getElementById('modal-title');
   const modalText = document.getElementById('modal-text');
   const modalEmoji = document.getElementById('modal-emoji');
   const modalClose = document.getElementById('modal-close');
 
-  // Set background from base64 asset
-  stage.style.backgroundImage = `url('${ASSETS.bg}')`;
+  // Set background from base64 asset (CSS background-size:cover handles the
+  // actual image scaling/cropping to fill the screen on any device).
+  bgLayer.style.backgroundImage = `url('${ASSETS.bg}')`;
 
   // Build animated mascot layer
   const mascotEl = document.createElement('div');
   mascotEl.id = 'mascot';
-  mascotEl.style.left = MASCOT.left + '%';
-  mascotEl.style.top = MASCOT.top + '%';
-  mascotEl.style.width = MASCOT.width + '%';
-  mascotEl.style.height = MASCOT.height + '%';
   mascotEl.style.backgroundImage = `url('${ASSETS.mascot}')`;
   stage.appendChild(mascotEl);
 
   // Build buttons
+  const buttonEls = [];
   BUTTONS.forEach(btn => {
     const el = document.createElement('button');
     el.className = 'game-btn';
     el.setAttribute('aria-label', btn.name);
-    el.style.left = btn.left + '%';
-    el.style.top = btn.top + '%';
-    el.style.width = btn.width + '%';
-    el.style.height = btn.height + '%';
     el.style.backgroundImage = `url('${ASSETS[btn.id]}')`;
     el.addEventListener('click', () => openModal(btn));
     stage.appendChild(el);
+    buttonEls.push({ el, def: btn });
   });
+
+  // Position every element to exactly match how the browser renders
+  // background-size:cover for #bg-layer — i.e. the image is scaled up
+  // uniformly (never distorted) until it fully covers the viewport, then
+  // centered, cropping whatever overflows on one axis. Because we replicate
+  // that same scale + centering math in JS (in px, not %), buttons stay
+  // pixel-locked to the art underneath them at any window size or aspect
+  // ratio, edge-to-edge, with zero drift.
+  function layout() {
+    const vw = stageWrapper.clientWidth;
+    const vh = stageWrapper.clientHeight;
+    const scale = Math.max(vw / SRC_W, vh / SRC_H);
+    const dispW = SRC_W * scale;
+    const dispH = SRC_H * scale;
+    const offsetX = (vw - dispW) / 2;
+    const offsetY = (vh - dispH) / 2;
+
+    function place(el, pctBox) {
+      el.style.left = (offsetX + (pctBox.left / 100) * dispW) + 'px';
+      el.style.top = (offsetY + (pctBox.top / 100) * dispH) + 'px';
+      el.style.width = ((pctBox.width / 100) * dispW) + 'px';
+      el.style.height = ((pctBox.height / 100) * dispH) + 'px';
+    }
+
+    place(mascotEl, MASCOT);
+    buttonEls.forEach(({ el, def }) => place(el, def));
+  }
+
+  layout();
+  window.addEventListener('resize', layout);
+  window.addEventListener('orientationchange', layout);
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', layout);
+  }
 
   function openModal(btn) {
     modalEmoji.textContent = btn.emoji;
