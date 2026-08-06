@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Learning Adventure!</title>
+<script src="assets.js"></script>
 <style>
   * { box-sizing: border-box; }
   html, body {
@@ -12,8 +13,8 @@
     width: 100%;
     height: 100%;
     overflow: hidden;
-    background: #09012a;
-    font-family: 'Baloo 2', 'Comic Sans MS', 'Trebuchet MS', sans-serif;
+    background: #0a0024;
+    font-family: 'Segoe UI', Verdana, Arial, sans-serif;
   }
 
   #stage-wrapper {
@@ -24,7 +25,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #09012a;
+    background: #0a0024;
     overflow: hidden;
   }
 
@@ -35,19 +36,16 @@
     height: 100%;
     max-width: calc(100vh * 1672 / 941);
     max-height: calc(100vw * 941 / 1672);
-    background-repeat: no-repeat;
-    background-position: center;
     background-size: 100% 100%;
-    /* background-image is set from assets.js at runtime — see script at bottom */
+    background-repeat: no-repeat;
   }
 
-  button {
+  button.game-btn {
     -webkit-appearance: none;
     appearance: none;
     -webkit-tap-highlight-color: transparent;
   }
 
-  .mascot,
   .game-btn {
     position: absolute;
     border: none;
@@ -57,229 +55,180 @@
     background-color: transparent;
     background-repeat: no-repeat;
     background-position: center;
-    background-size: contain;
+    background-size: 100% 100%;
     cursor: pointer;
-    /* background-image is set from assets.js at runtime — see script at bottom */
+    transition: transform 0.12s ease, filter 0.12s ease;
   }
 
-  .mascot {
-    z-index: 5;
-    transform-origin: center bottom;
-    transition: transform 0.25s ease;
-    animation: bob 3.2s ease-in-out infinite;
-  }
-  .mascot:hover {
-    transform: scale(1.06) rotate(-2deg);
-    animation-play-state: paused;
-  }
-  .mascot:active {
-    transform: scale(0.97) rotate(2deg);
-  }
-  @keyframes bob {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-8px); }
-  }
-
-  .game-btn {
-    z-index: 3;
-    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.35));
-    transition: transform 0.15s ease, filter 0.15s ease;
-  }
   .game-btn:hover {
-    transform: scale(1.055);
-    filter: drop-shadow(0 8px 14px rgba(0,0,0,0.5)) brightness(1.08);
-  }
-  .game-btn:active {
-    transform: scale(0.94);
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4)) brightness(0.95);
-  }
-  .game-btn:focus-visible,
-  .mascot:focus-visible {
-    outline: 4px solid #fff;
-    outline-offset: 3px;
-    border-radius: 12%;
+    transform: scale(1.035);
+    filter: brightness(1.08);
   }
 
+  .game-btn:active {
+    transform: scale(0.96);
+    filter: brightness(0.95);
+  }
+
+  .game-btn:focus-visible {
+    outline: 3px solid #fff;
+    outline-offset: 3px;
+    border-radius: 12px;
+  }
+
+  /* Modal */
   #modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(5,0,25,0.72);
+    background: rgba(5, 0, 30, 0.72);
     display: none;
     align-items: center;
     justify-content: center;
-    z-index: 100;
-    backdrop-filter: blur(2px);
+    z-index: 50;
+    animation: fadeIn 0.15s ease;
   }
+
   #modal-overlay.open {
     display: flex;
-    animation: fadeIn 0.2s ease;
   }
+
+  #modal-box {
+    background: linear-gradient(160deg, #2a1a5e, #1a0f3d);
+    border: 4px solid rgba(255,255,255,0.25);
+    border-radius: 26px;
+    padding: 32px 40px;
+    max-width: min(90vw, 420px);
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    animation: popIn 0.22s cubic-bezier(.34,1.56,.64,1);
+  }
+
+  #modal-emoji {
+    font-size: 54px;
+    line-height: 1;
+    margin-bottom: 10px;
+  }
+
+  #modal-title {
+    color: #ffd23f;
+    font-size: 26px;
+    font-weight: 800;
+    margin: 0 0 8px;
+    text-shadow: 0 2px 0 rgba(0,0,0,0.4);
+  }
+
+  #modal-text {
+    color: #f0eaff;
+    font-size: 16px;
+    margin: 0 0 22px;
+    line-height: 1.4;
+  }
+
+  #modal-close {
+    background: #ff6b6b;
+    color: white;
+    border: none;
+    border-radius: 14px;
+    padding: 12px 30px;
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 5px 0 #c94848;
+    transition: transform 0.1s ease;
+  }
+
+  #modal-close:active {
+    transform: translateY(3px);
+    box-shadow: 0 2px 0 #c94848;
+  }
+
   @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
   }
-  #modal-box {
-    background: linear-gradient(160deg, #2a1155, #150836);
-    border: 4px solid #ffcf3f;
-    border-radius: 24px;
-    padding: 2.2vw 3vw;
-    text-align: center;
-    max-width: 480px;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-    transform: scale(0.85);
-    animation: pop 0.25s cubic-bezier(.34,1.56,.64,1) forwards;
-  }
-  @keyframes pop {
-    to { transform: scale(1); }
-  }
-  #modal-box h2 {
-    color: #ffe066;
-    font-size: clamp(20px, 3vw, 34px);
-    margin: 0 0 10px 0;
-    text-shadow: 2px 2px 0 rgba(0,0,0,0.4);
-  }
-  #modal-box p {
-    color: #ffffff;
-    font-size: clamp(14px, 1.6vw, 18px);
-    margin: 0 0 18px 0;
-    opacity: 0.9;
-  }
-  #modal-close {
-    background: #ffcf3f;
-    color: #2a1155;
-    border: none;
-    font-weight: 800;
-    font-size: clamp(14px, 1.6vw, 18px);
-    padding: 10px 28px;
-    border-radius: 999px;
-    cursor: pointer;
-    transition: transform 0.15s ease, background 0.15s ease;
-  }
-  #modal-close:hover {
-    transform: scale(1.06);
-    background: #ffe066;
+
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(0.85); }
+    to { opacity: 1; transform: scale(1); }
   }
 </style>
 </head>
 <body>
 
 <div id="stage-wrapper">
-  <div id="stage">
-    <button type="button" class="mascot" id="mascot" data-asset="mascot"
-      style="left:2.691%; top:3.188%; width:17.943%; height:32.412%;"
-      aria-label="Monster mascot"></button>
-
-    
-      <button type="button" class="game-btn" id="btn-colors" data-asset="colors" data-label="COLORS"
-        style="left:11.663%; top:33.475%; width:15.251%; height:30.818%;"
-        aria-label="COLORS"></button>
-
-      <button type="button" class="game-btn" id="btn-counting" data-asset="counting" data-label="COUNTING"
-        style="left:27.512%; top:33.475%; width:15.251%; height:30.818%;"
-        aria-label="COUNTING"></button>
-
-      <button type="button" class="game-btn" id="btn-numbers" data-asset="numbers" data-label="NUMBERS"
-        style="left:44.557%; top:23.911%; width:13.457%; height:18.597%;"
-        aria-label="NUMBERS"></button>
-
-      <button type="button" class="game-btn" id="btn-drawing" data-asset="drawing" data-label="DRAWING"
-        style="left:60.108%; top:23.911%; width:13.457%; height:18.597%;"
-        aria-label="DRAWING"></button>
-
-      <button type="button" class="game-btn" id="btn-shapes" data-asset="shapes" data-label="SHAPES"
-        style="left:74.761%; top:23.911%; width:14.653%; height:18.597%;"
-        aria-label="SHAPES"></button>
-
-      <button type="button" class="game-btn" id="btn-abc" data-asset="abc" data-label="ABC ADVENTURES"
-        style="left:44.557%; top:45.696%; width:13.457%; height:19.129%;"
-        aria-label="ABC ADVENTURES"></button>
-
-      <button type="button" class="game-btn" id="btn-adventures" data-asset="adventures" data-label="ADVENTURES"
-        style="left:60.108%; top:45.696%; width:13.457%; height:19.129%;"
-        aria-label="ADVENTURES"></button>
-
-      <button type="button" class="game-btn" id="btn-animalfun" data-asset="animalfun" data-label="ANIMAL FUN"
-        style="left:74.761%; top:45.696%; width:14.653%; height:19.129%;"
-        aria-label="ANIMAL FUN"></button>
-
-      <button type="button" class="game-btn" id="btn-puzzles" data-asset="puzzles" data-label="PUZZLES"
-        style="left:11.663%; top:68.013%; width:15.251%; height:19.66%;"
-        aria-label="PUZZLES"></button>
-
-      <button type="button" class="game-btn" id="btn-puzzletime" data-asset="puzzletime" data-label="PUZZLE TIME"
-        style="left:27.512%; top:68.013%; width:15.251%; height:19.66%;"
-        aria-label="PUZZLE TIME"></button>
-
-      <button type="button" class="game-btn" id="btn-storyland" data-asset="storyland" data-label="STORYLAND"
-        style="left:44.557%; top:68.013%; width:13.457%; height:19.66%;"
-        aria-label="STORYLAND"></button>
-
-      <button type="button" class="game-btn" id="btn-storyand" data-asset="storyand" data-label="STORYAND"
-        style="left:60.108%; top:68.013%; width:13.457%; height:19.66%;"
-        aria-label="STORYAND"></button>
-
-      <button type="button" class="game-btn" id="btn-musicmix" data-asset="musicmix" data-label="MUSIC MIX"
-        style="left:74.761%; top:68.013%; width:14.653%; height:19.66%;"
-        aria-label="MUSIC MIX"></button>
-  </div>
+  <div id="stage"></div>
 </div>
 
 <div id="modal-overlay">
   <div id="modal-box">
-    <h2 id="modal-title">Game</h2>
-    <p id="modal-text">Loading fun...</p>
-    <button type="button" id="modal-close">Let's go!</button>
+    <div id="modal-emoji">🎉</div>
+    <h2 id="modal-title">Category</h2>
+    <p id="modal-text">Loading fun activities...</p>
+    <button id="modal-close">Let's Go!</button>
   </div>
 </div>
 
-<!-- All image data lives in assets.js (base64 data URIs), kept separate from
-     this file so the markup/CSS/JS here stays small and readable. -->
-<script src="assets.js"></script>
-<script src="js/sound.js"></script>
-<script src="js/twoyears.js"></script>
 <script>
-  // Apply images from ASSETS (defined in assets.js) to the stage + every
-  // element with a data-asset attribute.
-  document.getElementById('stage').style.backgroundImage = `url('${ASSETS.bg}')`;
-  document.querySelectorAll('[data-asset]').forEach(el => {
-    const key = el.getAttribute('data-asset');
-    if (ASSETS[key]) el.style.backgroundImage = `url('${ASSETS[key]}')`;
-  });
+  // Button definitions: id, percentage box (left, top, width, height) in the
+  // source image's own coordinate space, display name, and a fun emoji.
+  const BUTTONS = [
+    { id: 'colors',     left: 11.663, top: 33.9,   width: 15.251, height: 31.35,  name: 'Colors',        emoji: '🎨' },
+    { id: 'counting',   left: 27.99,  top: 33.9,   width: 15.371, height: 31.35,  name: 'Counting',      emoji: '🔢' },
+    { id: 'numbers',    left: 44.737, top: 23.167, width: 13.278, height: 18.278, name: 'Numbers',       emoji: '🔢' },
+    { id: 'drawing',    left: 59.39,  top: 23.167, width: 13.577, height: 18.278, name: 'Drawing',       emoji: '✏️' },
+    { id: 'shapes',     left: 74.163, top: 23.167, width: 15.072, height: 18.278, name: 'Shapes',        emoji: '🔺' },
+    { id: 'abc',        left: 44.737, top: 42.933, width: 13.278, height: 22.104, name: 'ABC Adventures',emoji: '🔤' },
+    { id: 'adventures', left: 59.39,  top: 42.933, width: 13.577, height: 22.104, name: 'Adventures',    emoji: '🦁' },
+    { id: 'animalfun',  left: 74.163, top: 42.933, width: 15.072, height: 22.104, name: 'Animal Fun',    emoji: '🐘' },
+    { id: 'puzzles',    left: 11.663, top: 67.694, width: 15.251, height: 19.554, name: 'Puzzles',       emoji: '🧩' },
+    { id: 'puzzletime', left: 27.99,  top: 67.694, width: 15.371, height: 19.554, name: 'Puzzle Time',   emoji: '🧩' },
+    { id: 'storyland',  left: 44.737, top: 67.694, width: 13.278, height: 19.554, name: 'Storyland',     emoji: '📖' },
+    { id: 'mathingmix', left: 59.39,  top: 67.694, width: 13.577, height: 19.554, name: 'Mathing Mix',   emoji: '➕' },
+    { id: 'musicmix',   left: 74.163, top: 67.694, width: 15.072, height: 19.554, name: 'Music Mix',     emoji: '🎵' },
+  ];
 
+  const stage = document.getElementById('stage');
   const modalOverlay = document.getElementById('modal-overlay');
   const modalTitle = document.getElementById('modal-title');
   const modalText = document.getElementById('modal-text');
+  const modalEmoji = document.getElementById('modal-emoji');
   const modalClose = document.getElementById('modal-close');
 
-  function openGame(label) {
-    modalTitle.textContent = label;
-    modalText.textContent = `Get ready to start the "${label}" activity! (Hook up your game logic or route here.)`;
+  // Set background from base64 asset
+  stage.style.backgroundImage = `url('${ASSETS.bg}')`;
+
+  // Build buttons
+  BUTTONS.forEach(btn => {
+    const el = document.createElement('button');
+    el.className = 'game-btn';
+    el.setAttribute('aria-label', btn.name);
+    el.style.left = btn.left + '%';
+    el.style.top = btn.top + '%';
+    el.style.width = btn.width + '%';
+    el.style.height = btn.height + '%';
+    el.style.backgroundImage = `url('${ASSETS[btn.id]}')`;
+    el.addEventListener('click', () => openModal(btn));
+    stage.appendChild(el);
+  });
+
+  function openModal(btn) {
+    modalEmoji.textContent = btn.emoji;
+    modalTitle.textContent = btn.name;
+    modalText.textContent = `Get ready for the ${btn.name} activity!`;
     modalOverlay.classList.add('open');
-    console.log('Button clicked:', label);
+    modalClose.focus();
   }
 
-  document.querySelectorAll('.game-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      openGame(btn.dataset.label);
-    });
-  });
-
-  document.getElementById('mascot').addEventListener('click', () => {
-    openGame('Hi, I\'m your Learning Buddy!');
-  });
-
-  modalClose.addEventListener('click', () => {
+  function closeModal() {
     modalOverlay.classList.remove('open');
-  });
+  }
 
+  modalClose.addEventListener('click', closeModal);
   modalOverlay.addEventListener('click', (e) => {
-    if (e.target === modalOverlay) {
-      modalOverlay.classList.remove('open');
-    }
+    if (e.target === modalOverlay) closeModal();
   });
-
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') modalOverlay.classList.remove('open');
+    if (e.key === 'Escape') closeModal();
   });
 </script>
 
