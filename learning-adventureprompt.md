@@ -3,8 +3,9 @@
 You are given a screenshot image of a webpage UI. Your task is to turn it into a
 clickable HTML/CSS/JS webapp using REAL cropped pieces of the original image —
 not redrawn/replicated graphics. It must also resize correctly to fill the
-browser window on any PC screen size, with **zero visual drift** between the
-background art and the interactive elements layered on top of it.
+browser window on any PC or mobile screen size, with **zero visual drift**
+between the background art and the interactive elements layered on top of it,
+and with **no element's own artwork cut off** at its edges.
 
 ## Steps to follow
 
@@ -22,11 +23,35 @@ Identify:
 - Crop the mascot/character tightly, as a separate image file
 - Verify each crop visually before finalizing coordinates — iterate crop
   boundaries by viewing test crops until they're pixel-tight
-- Record each element's box in the source image's own pixel coordinates
-  (x0, y0, x1, y1) — you'll convert these to percentages later.
+
+**Do not eyeball edges — measure them, especially the bottom edge.** A guessed
+box will often slice through a button's rounded corner, drop-shadow, or 3D
+"shadow lip" along one side (bottom edges are the most common casualty,
+since shadows/depth effects usually sit below the main face of a button).
+For each element:
+- Sample a color/edge scan (e.g. compare each row/column's pixel color
+  against the known background color, using a distance threshold) along the
+  side you're unsure about, to find the *true* pixel row/column where the
+  element's artwork actually ends and the background begins — don't assume
+  the boundary matches your first guessed coordinate.
+- Extend the crop box out to that true edge, plus a small buffer (a few px),
+  so the full outline/border/shadow is captured with nothing sliced off.
+- Before finalizing, also measure where the *next* element in that direction
+  actually starts (same edge-scan method). Your extended box must stop
+  clearly short of that neighbor's true starting edge — leave a visible gap
+  between them. Never let one element's extended crop touch or overlap
+  another's.
+- Re-crop and re-view any element whose test crop shows a flat/cut edge
+  where a rounded corner, shadow, or outline should visibly continue —
+  that flat cut is the signal the box was too tight, not the true boundary.
+- Record each element's final box in the source image's own pixel
+  coordinates (x0, y0, x1, y1) — you'll convert these to percentages later.
 
 ### 3. CLEAN the background
-- Paint over/fill the area where each button was cut from the background.
+- Paint over/fill the area where each button was cut from the background
+  (use each element's *final*, edge-corrected box from Step 2, not the
+  original guess — if a box grew during Step 2, the cleaned hole must grow
+  with it).
   Sample a nearby matching color (median of pixels just outside each box works
   well), then fill a slightly padded rectangle.
 - **Feather the fill edges** (e.g. Gaussian-blur a mask and composite the solid
@@ -64,6 +89,11 @@ Identify:
 
 **Layout / alignment (critical — this is the #1 source of bugs):**
 - `html, body { margin:0; padding:0; width:100%; height:100%; overflow:hidden; }`
+
+There are two valid ways to make the stage fill the window. Pick based on
+what the person asked for (default to FIT if they didn't say):
+
+**Option A — FIT (letterbox/pillarbox, shows the entire image, may show bars):**
 - Do **NOT** put the background on a `100vw x 100vh` element with
   `background-size: cover`. Cover-cropping scales/crops the image to a
   *different* aspect ratio than the source at almost every window size,
@@ -104,6 +134,36 @@ Identify:
   (avoid a corner that happens to hit a decorative graphic) so idle bars
   blend with the scene instead of reading as plain black/white bands.
 
+**Option B — FILL (true fullscreen, edge-to-edge on any device, crops
+overflow instead of showing bars):** Use this when the person explicitly
+wants the page to fill the whole screen on any device with no bars/letterbox
+visible at all (e.g. phones, tablets, ultrawide monitors).
+- `#stage-wrapper` is `position: fixed; inset: 0; width: 100vw; height: 100vh;
+  overflow: hidden;` — the background image itself uses
+  `background-size: cover; background-position: center;` on a full-bleed
+  layer inside it, so it always fills the screen completely, cropping
+  whatever overflows on one axis.
+- Because `background-size: cover` no longer keeps the box's aspect ratio
+  equal to the image's, percentage-of-stage positioning would drift here —
+  so buttons/mascot must instead be positioned with a small JS layout
+  function that replicates the exact same cover math the browser is using,
+  then places every element in **pixels**, not percent:
+  - `scale = Math.max(viewportW / sourceW, viewportH / sourceH)`
+  - `displayedW = sourceW * scale`, `displayedH = sourceH * scale`
+  - `offsetX = (viewportW - displayedW) / 2`, `offsetY = (viewportH - displayedH) / 2`
+    (these come out negative/zero when the image is being cropped, which is expected)
+  - for each element's known percentage box (left/top/width/height as %
+    of the source image, same numbers Option A would use): 
+    `pxLeft = offsetX + (pctLeft/100) * displayedW`, and so on for top/width/height.
+- Re-run this layout function on `resize`, `orientationchange`, and (if
+  available) `window.visualViewport`'s `resize` event, so rotating a phone
+  or resizing a window keeps everything pixel-locked with zero drift at any
+  aspect ratio, including extreme portrait/ultrawide.
+- Tell the person plainly that Option B will crop some of the scene's edges
+  on aspect ratios very different from the source image (e.g. a wide scene
+  viewed on a tall phone will lose its left/right edges) — that's the
+  expected tradeoff for true edge-to-edge fill, not a bug.
+
 **Button/element chrome (critical — this is the #2 source of bugs):**
 - If interactive elements are real `<button>` tags, native browser styling
   (default white/gray background, borders, padding) will show through and
@@ -135,10 +195,20 @@ Identify:
 ### 6. VERIFY
 - Confirm there is no visible seam/line at any button's border against the
   background, and no stray white/gray box behind any button or the mascot.
+- **Confirm no element's own artwork is cut off.** For every button, check
+  each edge (not just the ones that looked suspicious during cropping) for a
+  flat cut through a rounded corner, drop-shadow, outline, or "shadow lip" —
+  compare against a neighboring button of similar style as a reference for
+  what a complete, uncut edge should look like.
+- **Confirm neighboring elements never touch or overlap**, especially after
+  any box was extended in Step 2 to fix a cutoff — there should be a visible
+  gap between every pair of adjacent buttons at every tested viewport size.
 - Describe (or check) behavior at common breakpoints — small laptop
-  (1366×768), standard desktop (1920×1080), ultrawide (2560×1080) — and
-  confirm the letterbox/pillarbox approach keeps every button aligned to
-  the background art with zero drift at each, including non-16:9 windows.
+  (1366×768), standard desktop (1920×1080), ultrawide (2560×1080), and if
+  Option B (FILL) was used, also mobile portrait (e.g. 390×844) and a tall
+  phone (e.g. 1080×2400) — and confirm the chosen layout mode (FIT or FILL)
+  keeps every button aligned to the background art with zero drift at each,
+  including non-16:9 windows and live resize/orientation changes.
 - Confirm the final deliverable is either `index.html` + `assets/` (real
   image files) or `index.html` + `assets.js` (base64 in its own file) —
   zipped together — never a single HTML file with base64 strings written
@@ -146,10 +216,17 @@ Identify:
 
 ---
 
+## Layout mode
+Fullscreen fill behavior: **[SPECIFY: "FIT" to show the entire image with
+letterbox/pillarbox bars on mismatched aspect ratios, or "FILL" to cover the
+whole screen edge-to-edge on any device, cropping overflow — default to FIT
+if not specified]**
+
 ## Button behavior
 Specify what each button should do when clicked: **[DESCRIBE DESIRED BEHAVIOR]**
 
 The user will now upload a screenshot image. Once it's uploaded, begin the
-process above immediately — inspect the image, crop the assets, clean the
-background, and build the final HTML file — without asking for further
-clarification unless the button click behavior wasn't specified above.
+process above immediately — inspect the image, crop the assets (measuring
+true edges per Step 2, not guessing), clean the background, and build the
+final HTML file — without asking for further clarification unless the button
+click behavior wasn't specified above.
