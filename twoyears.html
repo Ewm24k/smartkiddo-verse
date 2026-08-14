@@ -70,6 +70,34 @@
     animation: pulse-text 1.2s ease-in-out infinite alternate;
   }
 
+  /* Continue Fullscreen Button */
+  .continue-btn {
+    display: none;
+    margin-top: 10px;
+    padding: 14px 44px;
+    font-family: inherit;
+    font-size: clamp(20px, 4vw, 32px);
+    font-weight: 800;
+    color: #ffffff;
+    background: linear-gradient(135deg, #ff4757, #ff6b81);
+    border: 3px solid #ffffff;
+    border-radius: 999px;
+    cursor: pointer;
+    box-shadow: 0 8px 25px rgba(255, 71, 87, 0.6), 0 0 15px rgba(255, 255, 255, 0.4);
+    animation: continue-pulse 1.2s ease-in-out infinite alternate;
+    transition: transform 0.2s ease, filter 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .continue-btn:hover {
+    transform: scale(1.08);
+    filter: brightness(1.1);
+  }
+
+  .continue-btn:active {
+    transform: scale(0.95);
+  }
+
   @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
@@ -78,6 +106,11 @@
   @keyframes pulse-text {
     0% { transform: scale(0.96); opacity: 0.8; }
     100% { transform: scale(1.04); opacity: 1; }
+  }
+
+  @keyframes continue-pulse {
+    0% { transform: scale(0.98); box-shadow: 0 6px 20px rgba(255, 71, 87, 0.5); }
+    100% { transform: scale(1.06); box-shadow: 0 10px 30px rgba(255, 71, 87, 0.8), 0 0 20px rgba(255, 255, 255, 0.6); }
   }
 
   /* ---------- Full Screen Stage Wrapper ---------- */
@@ -191,49 +224,48 @@
   }
 
   /* ==========================================================================
-     ANDROID & IOS MOBILE PHONE HORIZONTAL LAYOUT ADJUSTMENTS
-     Brings options closer horizontally from right to left without vertical overlap.
+     ANDROID & IOS MOBILE PHONE CARD SCALING (BIGGER CARDS)
      ========================================================================== */
   @media screen and (max-width: 600px) {
     /* Mobile Phones in Portrait */
     .card-btn {
-      transform: scaleX(1.18) scaleY(1.02);
+      transform: scaleX(1.30) scaleY(1.15);
       transform-origin: center center;
     }
-    .card-btn:hover {
-      transform: scaleX(1.24) scaleY(1.02);
+    .card-row-1 {
+      top: calc(var(--base-top) - 2.5%) !important;
     }
-    .card-btn:active {
-      transform: scaleX(1.12) scaleY(0.98);
+    .card-row-3 {
+      top: calc(var(--base-top) + 2.5%) !important;
     }
     .card-col-4 {
-      left: calc(var(--base-left) - 2.8%) !important;
+      left: calc(var(--base-left) - 3.2%) !important;
     }
     .card-col-3 {
-      left: calc(var(--base-left) - 1.5%) !important;
+      left: calc(var(--base-left) - 1.8%) !important;
     }
     .card-col-2 {
-      left: calc(var(--base-left) - 0.6%) !important;
+      left: calc(var(--base-left) - 0.8%) !important;
     }
   }
 
   @media screen and (max-height: 500px) and (max-width: 930px) {
     /* Mobile Phones in Landscape */
     .card-btn {
-      transform: scaleX(1.14) scaleY(1.01);
+      transform: scaleX(1.22) scaleY(1.10);
       transform-origin: center center;
     }
-    .card-btn:hover {
-      transform: scaleX(1.20) scaleY(1.01);
+    .card-row-1 {
+      top: calc(var(--base-top) - 1.8%) !important;
     }
-    .card-btn:active {
-      transform: scaleX(1.08) scaleY(0.98);
+    .card-row-3 {
+      top: calc(var(--base-top) + 1.8%) !important;
     }
     .card-col-4 {
-      left: calc(var(--base-left) - 2.0%) !important;
+      left: calc(var(--base-left) - 2.5%) !important;
     }
     .card-col-3 {
-      left: calc(var(--base-left) - 1.0%) !important;
+      left: calc(var(--base-left) - 1.2%) !important;
     }
   }
 
@@ -385,8 +417,9 @@
 
   <!-- Smooth Animated Preloader Layer -->
   <div id="loader-layer">
-    <div class="loader-spinner"></div>
-    <div class="loader-text">Loading Fun...</div>
+    <div id="loader-spinner" class="loader-spinner"></div>
+    <div id="loader-text" class="loader-text">Loading Fun...</div>
+    <button id="continue-btn" class="continue-btn" aria-label="Continue to Game">CONTINUE ▶</button>
   </div>
 
   <div id="stage-wrapper">
@@ -453,6 +486,22 @@
   const bgVideo = document.getElementById('bg-video');
   const toast = document.getElementById('toast');
   const loaderLayer = document.getElementById('loader-layer');
+  const loaderSpinner = document.getElementById('loader-spinner');
+  const loaderText = document.getElementById('loader-text');
+  const continueBtn = document.getElementById('continue-btn');
+
+  /* ==========================================================================
+     FULLSCREEN REQUEST HELPER (HIDES BROWSER BAR ON ANDROID/IOS)
+     ========================================================================== */
+  function requestFullScreen() {
+    const el = document.documentElement;
+    const rfs = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
+    if (typeof rfs === 'function') {
+      try {
+        rfs.call(el).catch(() => {});
+      } catch (e) {}
+    }
+  }
 
   /* ==========================================================================
      BACK BUTTON NAVIGATION LOGIC
@@ -557,16 +606,18 @@
     });
   }
 
-  // Create card buttons dynamically with column classes
+  // Create card buttons dynamically with column & row classes
   LAYOUT.forEach((item, index) => {
     const btn = document.createElement('button');
     const colNum = (index % 4) + 1;
-    btn.className = `card-btn card-col-${colNum}`;
+    const rowNum = Math.floor(index / 4) + 1;
+    btn.className = `card-btn card-col-${colNum} card-row-${rowNum}`;
     btn.style.left = item.left + '%';
     btn.style.top = item.top + '%';
     btn.style.width = item.width + '%';
     btn.style.height = item.height + '%';
     btn.style.setProperty('--base-left', item.left + '%');
+    btn.style.setProperty('--base-top', item.top + '%');
     btn.style.backgroundImage = `url('${item.img}')`;
     btn.setAttribute('aria-label', item.label);
     
@@ -577,6 +628,8 @@
   /* ==========================================================================
      INSTANT AUTOPLAY MUSIC ENGINE WITH SEAMLESS AUTO-NEXT TRACK
      ========================================================================== */
+  let globalUnmuteAndPlay = function() {};
+
   (function initBuiltInMusicPlayer() {
     const audio = document.getElementById('bg-music-audio');
     const widget = document.getElementById('music-widget');
@@ -586,7 +639,6 @@
     const closeBtn = document.getElementById('mw-toggle-btn');
     const titleEl = document.getElementById('mw-track-title');
 
-    // Muted instant start bypassing browser restriction
     audio.muted = true;
     audio.volume = 0.5;
 
@@ -599,7 +651,6 @@
     let trackIndex = 0;
     let autoHideTimer = null;
 
-    // Load Playlist from JSON if available
     const playlistPaths = [
       "assets/2tahun/dashboard/music/playlist.json",
       "assets/audio/music/playlist.json"
@@ -613,7 +664,7 @@
             const data = await res.json();
             const list = (data && data.tracks) || (Array.isArray(data) ? data : []);
             if (list.length > 0) {
-              playlist.length = 0; // Clear fallback
+              playlist.length = 0;
               list.forEach(item => {
                 const fileName = typeof item === 'string' ? item : item.file;
                 const cleanName = fileName.replace(/\.(mp3|wav|ogg)$/i, "");
@@ -625,9 +676,7 @@
               break;
             }
           }
-        } catch (err) {
-          // Fallback silently
-        }
+        } catch (err) {}
       }
       playTrackAtIndex(0);
     }
@@ -636,7 +685,6 @@
       playBtn.textContent = audio.paused ? "▶" : "⏸";
     }
 
-    // Reliable track player with automatic load and error fallback handling
     function playTrackAtIndex(index) {
       if (!playlist.length) return;
       trackIndex = (index % playlist.length + playlist.length) % playlist.length;
@@ -644,7 +692,6 @@
       titleEl.textContent = current.name;
       audio.src = current.src;
       
-      // Load source explicitly
       audio.load();
 
       const playPromise = audio.play();
@@ -652,7 +699,6 @@
         playPromise.then(() => {
           updatePlayBtnIcon();
         }).catch(() => {
-          // Buffer readiness fallback
           const onCanPlay = () => {
             audio.play().then(updatePlayBtnIcon).catch(() => {});
           };
@@ -669,12 +715,13 @@
       updatePlayBtnIcon();
     }
 
+    globalUnmuteAndPlay = unmuteAndPlay;
+
     function pauseMusic() {
       audio.pause();
       updatePlayBtnIcon();
     }
 
-    // Hide / Show Widget Logic
     function showWidget() {
       widget.classList.remove('is-minimized');
       reopenBtn.classList.remove('is-visible');
@@ -691,10 +738,9 @@
       clearTimeout(autoHideTimer);
       autoHideTimer = setTimeout(() => {
         hideWidget();
-      }, 5000); // Auto-hide 5 seconds after revealing
+      }, 5000);
     }
 
-    // User Triggers to Reveal Player
     window.addEventListener('mousemove', (e) => {
       const bottomThreshold = window.innerHeight - 90;
       if (e.clientY >= bottomThreshold && widget.classList.contains('is-minimized')) {
@@ -707,8 +753,9 @@
       const isWidget = e.target.closest('#music-widget');
       const isReopenBtn = e.target.closest('#mw-reopen-btn');
       const isBackBtn = e.target.closest('#back-btn');
+      const isContinueBtn = e.target.closest('#continue-btn');
       
-      if (!isCardBtn && !isWidget && !isReopenBtn && !isBackBtn) {
+      if (!isCardBtn && !isWidget && !isReopenBtn && !isBackBtn && !isContinueBtn) {
         showWidget();
       }
     });
@@ -731,7 +778,6 @@
       }
     });
 
-    // Play / Pause Button Controls
     playBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       getSound()?.playClick?.();
@@ -743,7 +789,6 @@
       startAutoHideTimer();
     });
 
-    // Next Track Button Controls
     nextBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       getSound()?.playClick?.();
@@ -752,7 +797,6 @@
       startAutoHideTimer();
     });
 
-    // AUTOMATIC NEXT TRACK ON SONG FINISH
     audio.addEventListener('ended', () => {
       audio.muted = false;
       playTrackAtIndex(trackIndex + 1);
@@ -761,7 +805,6 @@
     audio.addEventListener('play', updatePlayBtnIcon);
     audio.addEventListener('pause', updatePlayBtnIcon);
 
-    // Audio error fallback handler
     audio.addEventListener('error', () => {
       if (playlist[trackIndex] && playlist[trackIndex].src.includes('assets/2tahun/dashboard/music/')) {
         playlist[trackIndex].src = `assets/audio/music/${playlist[trackIndex].name}.mp3`;
@@ -770,11 +813,9 @@
       }
     });
 
-    // Start playlist load & audio engine
     playTrackAtIndex(0);
     loadPlaylistJson();
 
-    // Universal Unmute Unlocker for Browser Autoplay Restrictions
     const unlockUnmute = () => {
       unmuteAndPlay();
       window.removeEventListener('pointerdown', unlockUnmute);
@@ -792,17 +833,36 @@
   })();
 
   /* ==========================================================================
-     SMOOTH PRELOADER ENGINE
+     PRELOADER ENGINE & CONTINUE FULLSCREEN TRIGGER
      ========================================================================== */
   let isLoaded = false;
 
-  function revealPage() {
+  function showContinueButton() {
     if (isLoaded) return;
     isLoaded = true;
 
-    // Reveal stage & fade out loader layer
-    stage.classList.add('ready');
-    loaderLayer.classList.add('hidden');
+    // Swap spinner/text to CONTINUE button
+    if (loaderSpinner) loaderSpinner.style.display = 'none';
+    if (loaderText) loaderText.style.display = 'none';
+    if (continueBtn) continueBtn.style.display = 'inline-block';
+  }
+
+  if (continueBtn) {
+    continueBtn.addEventListener('click', () => {
+      getSound()?.playClick?.();
+      
+      // Request Fullscreen to hide browser navigation bar
+      requestFullScreen();
+
+      // Unmute and start music player
+      if (typeof globalUnmuteAndPlay === 'function') {
+        globalUnmuteAndPlay();
+      }
+
+      // Reveal stage & fade out preloader
+      stage.classList.add('ready');
+      loaderLayer.classList.add('hidden');
+    });
   }
 
   function preloadAssets() {
@@ -840,7 +900,7 @@
       Promise.all([...imagePromises, videoPromise]),
       timeoutPromise
     ]).then(() => {
-      revealPage();
+      showContinueButton();
     });
   }
 
