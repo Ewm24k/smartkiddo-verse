@@ -470,7 +470,7 @@
   });
 
   /* ==========================================================================
-     INSTANT AUTOPLAY MUSIC ENGINE WITH PAUSE & AUTO-NEXT TRACK
+     INSTANT AUTOPLAY MUSIC ENGINE (MUTED INSTANT START + UNMUTE HOOK)
      ========================================================================== */
   (function initBuiltInMusicPlayer() {
     const audio = document.getElementById('bg-music-audio');
@@ -481,6 +481,8 @@
     const closeBtn = document.getElementById('mw-toggle-btn');
     const titleEl = document.getElementById('mw-track-title');
 
+    // Muted instant start bypassing browser restriction
+    audio.muted = true;
     audio.volume = 0.5;
 
     // Embedded fallback playlist
@@ -540,10 +542,9 @@
       playBtn.textContent = audio.paused ? "▶" : "⏸";
     }
 
-    // Instant Autoplay Invoker
+    // Instant Autoplay Helper
     function playMusicInstantly() {
       if (!audio.src) return;
-      audio.muted = false;
       const playPromise = audio.play();
       if (playPromise !== undefined) {
         playPromise.then(() => {
@@ -552,6 +553,14 @@
           updatePlayBtnIcon();
         });
       }
+    }
+
+    function unmuteAndPlay() {
+      audio.muted = false;
+      if (audio.paused) {
+        playMusicInstantly();
+      }
+      updatePlayBtnIcon();
     }
 
     function pauseMusic() {
@@ -620,7 +629,7 @@
       e.stopPropagation();
       getSound()?.playClick?.();
       if (audio.paused) {
-        playMusicInstantly();
+        unmuteAndPlay();
       } else {
         pauseMusic();
       }
@@ -632,7 +641,7 @@
       getSound()?.playClick?.();
       trackIndex = (trackIndex + 1) % playlist.length;
       loadCurrentTrack();
-      playMusicInstantly();
+      unmuteAndPlay();
       startAutoHideTimer();
     });
 
@@ -640,7 +649,7 @@
     audio.addEventListener('ended', () => {
       trackIndex = (trackIndex + 1) % playlist.length;
       loadCurrentTrack();
-      playMusicInstantly();
+      unmuteAndPlay();
     });
 
     audio.addEventListener('play', updatePlayBtnIcon);
@@ -659,15 +668,21 @@
     playMusicInstantly();
     loadPlaylistJson();
 
-    // Browser interaction backup trigger to ensure instant playback
-    const triggerInstantAutoplay = () => {
-      if (audio.paused) {
-        playMusicInstantly();
-      }
+    // Universal Unmute Unlocker: Unmutes audio on any user activity anywhere on screen
+    const unlockUnmute = () => {
+      unmuteAndPlay();
+      window.removeEventListener('pointerdown', unlockUnmute);
+      window.removeEventListener('touchstart', unlockUnmute);
+      window.removeEventListener('click', unlockUnmute);
+      window.removeEventListener('mousemove', unlockUnmute);
+      window.removeEventListener('keydown', unlockUnmute);
     };
-    window.addEventListener('click', triggerInstantAutoplay, { once: true });
-    window.addEventListener('touchstart', triggerInstantAutoplay, { once: true });
-    window.addEventListener('pointerdown', triggerInstantAutoplay, { once: true });
+
+    window.addEventListener('pointerdown', unlockUnmute, { passive: true });
+    window.addEventListener('touchstart', unlockUnmute, { passive: true });
+    window.addEventListener('click', unlockUnmute);
+    window.addEventListener('mousemove', unlockUnmute, { passive: true });
+    window.addEventListener('keydown', unlockUnmute, { passive: true });
   })();
 
   /* ==========================================================================
@@ -682,8 +697,6 @@
     // Reveal stage & fade out loader layer
     stage.classList.add('ready');
     loaderLayer.classList.add('hidden');
-
-    // Loading sound chime removed completely as requested
   }
 
   function preloadAssets() {
