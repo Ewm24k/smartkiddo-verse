@@ -2,7 +2,7 @@
    music-player.js — FIXED PLAY/PAUSE ICON STATE
    ========================================================= */
 
-const SmartKiddoMusicPlayer = (() => {
+window.SmartKiddoMusicPlayer = (() => {
   const bar = document.getElementById("musicPlayerBar");
   const playPauseBtn = document.getElementById("musicPlayPause");
   const toggleBtn = document.getElementById("musicToggle");
@@ -19,12 +19,14 @@ const SmartKiddoMusicPlayer = (() => {
   let scrollHidden = false;
 
   function updateBarVisibility() {
+    if (!bar) return;
     bar.classList.toggle("music-player--hidden-state", manuallyHidden || scrollHidden);
-    revealBtn.hidden = !manuallyHidden;
+    if (revealBtn) revealBtn.hidden = !manuallyHidden;
   }
 
   // Update button icon to match actual audio state
   function updateButtonIcon() {
+    if (!playPauseBtn) return;
     if (audio.paused) {
       playPauseBtn.textContent = "▶";
     } else {
@@ -37,7 +39,9 @@ const SmartKiddoMusicPlayer = (() => {
 
     currentIndex = ((index % tracks.length) + tracks.length) % tracks.length;
     const trackPath = `assets/audio/music/${tracks[currentIndex]}`;
-    trackNameEl.textContent = tracks[currentIndex].replace(/\.(mp3|wav|ogg)$/i, "");
+    if (trackNameEl) {
+      trackNameEl.textContent = tracks[currentIndex].replace(/\.(mp3|wav|ogg)$/i, "");
+    }
 
     try {
       const response = await fetch(trackPath);
@@ -65,6 +69,13 @@ const SmartKiddoMusicPlayer = (() => {
     audio.pause();
   }
 
+  // Helper to safely call sound triggers
+  function getSound() {
+    if (typeof window !== 'undefined' && window.SmartKiddoSound) return window.SmartKiddoSound;
+    if (typeof SmartKiddoSound !== 'undefined') return SmartKiddoSound;
+    return null;
+  }
+
   // Update icon whenever audio state changes
   audio.addEventListener("play", updateButtonIcon);
   audio.addEventListener("pause", updateButtonIcon);
@@ -73,30 +84,36 @@ const SmartKiddoMusicPlayer = (() => {
     loadTrack(currentIndex + 1).then(() => play());
   });
 
-  playPauseBtn.addEventListener("click", () => {
-    SmartKiddoSound.playClick();
-    
-    if (audio.paused) {
-      autoplayUnlocked = true;
-      play();
-    } else {
-      pause();
-    }
-    
-    updateButtonIcon();
-  });
+  if (playPauseBtn) {
+    playPauseBtn.addEventListener("click", () => {
+      getSound()?.playClick?.();
+      
+      if (audio.paused) {
+        autoplayUnlocked = true;
+        play();
+      } else {
+        pause();
+      }
+      
+      updateButtonIcon();
+    });
+  }
 
-  toggleBtn.addEventListener("click", () => {
-    SmartKiddoSound.playClick();
-    manuallyHidden = true;
-    updateBarVisibility();
-  });
+  if (toggleBtn) {
+    toggleBtn.addEventListener("click", () => {
+      getSound()?.playClick?.();
+      manuallyHidden = true;
+      updateBarVisibility();
+    });
+  }
 
-  revealBtn.addEventListener("click", () => {
-    SmartKiddoSound.playClick();
-    manuallyHidden = false;
-    updateBarVisibility();
-  });
+  if (revealBtn) {
+    revealBtn.addEventListener("click", () => {
+      getSound()?.playClick?.();
+      manuallyHidden = false;
+      updateBarVisibility();
+    });
+  }
 
   let scrollHideTimer = null;
   function attachScrollAutoHide() {
@@ -125,24 +142,29 @@ const SmartKiddoMusicPlayer = (() => {
     try {
       const res = await fetch("assets/audio/music/playlist.json");
       const data = await res.json();
-      tracks = (data && data.tracks) || [];
+      
+      // Accepts both { "tracks": ["song1.mp3"] } and ["song1.mp3"]
+      tracks = (data && data.tracks) || (Array.isArray(data) ? data : []);
 
       if (!tracks.length) {
-        bar.hidden = true;
-        revealBtn.hidden = true;
+        if (bar) bar.hidden = true;
+        if (revealBtn) revealBtn.hidden = true;
         return;
       }
 
-      bar.hidden = false;
+      if (bar) bar.hidden = false;
       updateBarVisibility();
 
-      await loadTrack(0);
-      play();
-      autoplayUnlocked = true;
+      const loaded = await loadTrack(0);
+      if (loaded) {
+        play();
+        autoplayUnlocked = true;
+      }
 
     } catch (err) {
-      bar.hidden = true;
-      revealBtn.hidden = true;
+      console.warn("Music player playlist initialization notice:", err);
+      if (bar) bar.hidden = true;
+      if (revealBtn) revealBtn.hidden = true;
     }
   }
 
