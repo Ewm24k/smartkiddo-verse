@@ -14,7 +14,7 @@
   html, body {
     width: 100%;
     height: 100%;
-    height: 100dvh; /* Dynamic viewport height for modern mobile web browsers */
+    height: 100dvh;
     overflow: hidden;
     background: #0a0028;
     font-family: 'Baloo 2', 'Comic Sans MS', system-ui, -apple-system, sans-serif;
@@ -91,12 +91,12 @@
     background: #0a0028;
   }
 
-  /* ---------- Full Screen Stage (Expands to fill device, no left/right gaps) ---------- */
+  /* ---------- Full Screen Stage ---------- */
   #stage {
     position: relative;
     width: 100%;
     height: 100%;
-    background-image: url('assets/3tahun/dashboard/bg.jpg'); /* Fallback image */
+    background-image: url('assets/3tahun/dashboard/bg.jpg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -117,10 +117,10 @@
     width: 100%;
     height: 100%;
     transform: translate(-50%, -50%);
-    object-fit: cover; /* Guarantees 100% full screen coverage with no left/right spaces */
+    object-fit: cover;
     object-position: center;
     z-index: 0;
-    pointer-events: none; /* Prevents user click, pause, or stop interactions */
+    pointer-events: none;
     user-select: none;
   }
 
@@ -186,34 +186,34 @@
   /* ---------- Music Player Floating Widget ---------- */
   .music-player {
     position: absolute;
-    bottom: 20px;
+    bottom: 24px;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 15;
+    z-index: 100;
     display: flex;
     align-items: center;
     gap: 12px;
-    background: rgba(25, 12, 60, 0.85);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border: 2px solid rgba(255, 255, 255, 0.25);
+    background: rgba(25, 12, 60, 0.92);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
     border-radius: 999px;
-    padding: 6px 16px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 12px rgba(255, 255, 255, 0.15);
-    transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.35s ease, visibility 0.35s ease;
+    padding: 8px 18px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 16px rgba(255, 255, 255, 0.2);
+    transition: transform 0.45s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.45s ease, visibility 0.45s ease;
   }
 
   .music-player--hidden-state {
     opacity: 0;
     visibility: hidden;
-    transform: translate(-50%, 40px);
+    transform: translate(-50%, 45px);
     pointer-events: none;
   }
 
   .music-player__toggle {
     background: transparent;
     border: none;
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(255, 255, 255, 0.75);
     font-size: 16px;
     font-weight: 700;
     cursor: pointer;
@@ -266,13 +266,13 @@
 
   .music-player__reveal {
     position: absolute;
-    bottom: 20px;
-    right: 20px;
-    z-index: 15;
-    background: rgba(25, 12, 60, 0.85);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border: 2px solid rgba(255, 255, 255, 0.25);
+    bottom: 24px;
+    right: 24px;
+    z-index: 100;
+    background: rgba(25, 12, 60, 0.92);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
     color: #ffffff;
     font-size: 18px;
     width: 44px;
@@ -282,7 +282,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
     transition: transform 0.2s ease, filter 0.2s ease;
   }
 
@@ -330,7 +330,8 @@
 
 <!-- Shared utilities loaded before page script execution -->
 <script src="js/sound.js"></script>
-<script src="js/music-player.js"></script>
+<!-- New dedicated 3Years music player script -->
+<script src="js/music-player-3years.js"></script>
 
 <script>
   // Dynamic layout percentage positions
@@ -455,11 +456,11 @@
   });
 
   /* ==========================================================================
-     INITIALIZE SHARED MUSIC PLAYER WIDGET
+     INITIALIZE NEW 3YEARS MUSIC PLAYER MODULE
      ========================================================================== */
   function initMusicPlayer() {
-    const player = (typeof window !== 'undefined' && window.SmartKiddoMusicPlayer) || 
-                   (typeof SmartKiddoMusicPlayer !== 'undefined' ? SmartKiddoMusicPlayer : null);
+    const player = (typeof window !== 'undefined' && window.SmartKiddoMusic3Years) || 
+                   (typeof SmartKiddoMusic3Years !== 'undefined' ? SmartKiddoMusic3Years : null);
     if (player && typeof player.init === 'function') {
       player.init();
     }
@@ -469,7 +470,6 @@
 
   /* ==========================================================================
      SMOOTH PRELOADER ENGINE
-     Preloads background image, all card PNGs & video buffer before reveal
      ========================================================================== */
   let isLoaded = false;
 
@@ -486,23 +486,20 @@
   }
 
   function preloadAssets() {
-    // List all graphics to preload in memory
     const imageUrls = [
       'assets/3tahun/dashboard/bg.jpg',
       ...LAYOUT.map(item => item.img)
     ];
 
-    // Preload image promises
     const imagePromises = imageUrls.map(url => {
       return new Promise((resolve) => {
         const img = new Image();
         img.src = url;
         img.onload = () => resolve(url);
-        img.onerror = () => resolve(url); // Don't block if a single image fails
+        img.onerror = () => resolve(url);
       });
     });
 
-    // Preload video readiness promise
     const videoPromise = new Promise((resolve) => {
       if (bgVideo.readyState >= 3) {
         resolve();
@@ -517,10 +514,8 @@
       }
     });
 
-    // Safety timeout promise (max 2.8 seconds so slow connections never hang)
     const timeoutPromise = new Promise((resolve) => setTimeout(resolve, 2800));
 
-    // Reveal page as soon as all assets load OR safety timeout fires
     Promise.race([
       Promise.all([...imagePromises, videoPromise]),
       timeoutPromise
@@ -529,7 +524,6 @@
     });
   }
 
-  // Start asset preloading on DOM load
   if (document.readyState === 'complete') {
     preloadAssets();
   } else {
