@@ -2,55 +2,159 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Let's Learn & Have Fun!</title>
 <style>
-  * { box-sizing: border-box; }
-  html, body {
+  * { 
+    box-sizing: border-box; 
     margin: 0;
     padding: 0;
+  }
+
+  html, body {
     width: 100%;
     height: 100%;
+    height: 100dvh;
     overflow: hidden;
     background: #0a0028;
     font-family: 'Baloo 2', 'Comic Sans MS', system-ui, -apple-system, sans-serif;
+    -webkit-user-select: none;
+    user-select: none;
   }
 
-  /* ---------- Stage: locked to the source image aspect ratio (FIT / letterbox) ---------- */
+  /* ---------- Animated Loading Layer ---------- */
+  #loader-layer {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    z-index: 9999;
+    background: #0a0028;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1), visibility 0.6s ease;
+    pointer-events: auto;
+  }
+
+  #loader-layer.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  /* Colorful Kid-Friendly Loader Spinner */
+  .loader-spinner {
+    width: 64px;
+    height: 64px;
+    border: 6px solid rgba(255, 255, 255, 0.15);
+    border-top: 6px solid #ff4757;
+    border-right: 6px solid #ffa502;
+    border-bottom: 6px solid #2ed573;
+    border-left: 6px solid #1e90ff;
+    border-radius: 50%;
+    animation: spin 0.9s linear infinite;
+  }
+
+  .loader-text {
+    color: #ffffff;
+    font-size: clamp(18px, 3.5vw, 28px);
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    animation: pulse-text 1.2s ease-in-out infinite alternate;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  @keyframes pulse-text {
+    0% { transform: scale(0.96); opacity: 0.8; }
+    100% { transform: scale(1.04); opacity: 1; }
+  }
+
+  /* ---------- Full Screen Stage Wrapper ---------- */
   #stage-wrapper {
     position: fixed;
     inset: 0;
     width: 100vw;
     height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    background: #0a0028;
+  }
+
+  /* ---------- Full Screen Stage (Expands to fill device, no left/right gaps) ---------- */
+  #stage {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-image: url('assets/2tahun/dashboard/bg.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+
+  #stage.ready {
+    opacity: 1;
+  }
+
+  /* ---------- Modern Top-Left Back Button ---------- */
+  .back-btn {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 100;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(25, 12, 60, 0.85);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.25);
+    color: #ffffff;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #0a0028; /* sampled from the scene's own deep-space corner color */
-    overflow: hidden;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 12px rgba(255, 255, 255, 0.15);
+    transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), background 0.2s ease, filter 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
   }
 
-  #stage {
-    position: relative;
-    aspect-ratio: 1672 / 941;
-    width: 100%;
-    height: 100%;
-    max-width: calc(100vh * 1672 / 941);
-    max-height: calc(100vw * 941 / 1672);
-    background-image: url('assets/2tahun/dashboard/bg.jpg'); /* fallback if the video is missing/still loading */
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-    overflow: hidden;
+  .back-btn:hover {
+    transform: scale(1.1);
+    background: rgba(255, 71, 87, 0.9);
+    filter: brightness(1.1);
   }
 
-  /* ---------- Background video ---------- */
+  .back-btn:active {
+    transform: scale(0.92);
+  }
+
+  /* ---------- Background Video Configuration ---------- */
   #bg-video {
     position: absolute;
-    inset: 0;
+    top: 50%;
+    left: 50%;
     width: 100%;
     height: 100%;
-    object-fit: fill;   /* stretches to the locked stage box, same as the old background-size:100% 100% — swap to "cover" if your clip's aspect ratio doesn't match 1672:941 and you'd rather crop than stretch */
+    transform: translate(-50%, -50%);
+    object-fit: cover;
+    object-position: center;
     z-index: 0;
     pointer-events: none;
+    user-select: none;
   }
 
   /* ---------- Card buttons ---------- */
@@ -111,25 +215,180 @@
     opacity: 1;
     transform: translate(-50%, 0);
   }
+
+  /* ==========================================================================
+     INLINE BUILT-IN MUSIC PLAYER WIDGET STYLES
+     ========================================================================== */
+  .music-widget {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 500;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: linear-gradient(135deg, rgba(30, 15, 70, 0.95), rgba(10, 0, 40, 0.95));
+    border: 2px solid #ff4757;
+    border-radius: 999px;
+    padding: 8px 18px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 16px rgba(255, 71, 87, 0.4);
+    transition: transform 0.45s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.45s ease;
+  }
+
+  /* Hidden / Minimized state */
+  .music-widget.is-minimized {
+    transform: translate(-50%, 75px);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .mw-btn {
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    color: #ffffff;
+    font-size: 14px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.15s ease, background 0.15s ease;
+  }
+
+  .mw-btn:hover {
+    background: #ff4757;
+    transform: scale(1.12);
+  }
+
+  .mw-btn:active {
+    transform: scale(0.92);
+  }
+
+  .mw-close-btn {
+    font-weight: 800;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .mw-play-btn {
+    background: #ff4757;
+    font-size: 15px;
+    box-shadow: 0 4px 12px rgba(255, 71, 87, 0.5);
+  }
+
+  .mw-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 700;
+    max-width: 170px;
+  }
+
+  .mw-icon {
+    font-size: 16px;
+  }
+
+  .mw-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    letter-spacing: 0.5px;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Floating reveal button */
+  .mw-reopen-btn {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    z-index: 500;
+    background: linear-gradient(135deg, #ff4757, #ff6b81);
+    border: 2px solid #ffffff;
+    color: #ffffff;
+    font-size: 20px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s ease;
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.8);
+  }
+
+  .mw-reopen-btn.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: scale(1);
+  }
+
+  .mw-reopen-btn:hover {
+    transform: scale(1.15);
+  }
 </style>
 </head>
 <body>
 
+  <!-- Smooth Animated Preloader Layer -->
+  <div id="loader-layer">
+    <div class="loader-spinner"></div>
+    <div class="loader-text">Loading Fun...</div>
+  </div>
+
   <div id="stage-wrapper">
     <div id="stage">
-      <!-- Background video. Replace assets/2tahun/dashboard/bg.mp4 with your clip (mp4 + webm recommended).
-           If this fails to load or is removed, the #stage background-image (assets/2tahun/dashboard/bg.jpg) shows instead. -->
-      <video id="bg-video" autoplay muted loop playsinline poster="assets/2tahun/dashboard/bg.jpg">
+      <!-- Modern Top-Left Back Button -->
+      <button id="back-btn" class="back-btn" aria-label="Go Back" title="Go Back">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+      </button>
+
+      <!-- Background video -->
+      <video id="bg-video" autoplay muted playsinline webkit-playsinline poster="assets/2tahun/dashboard/bg.jpg">
         <source src="assets/2tahun/dashboard/bg.mp4" type="video/mp4">
         <source src="assets/2tahun/dashboard/bg.webm" type="video/webm">
       </video>
+
       <div id="toast"></div>
+
+      <!-- Built-In Floating Music Player Widget (Hidden at first) -->
+      <div id="music-widget" class="music-widget is-minimized">
+        <button id="mw-toggle-btn" class="mw-btn mw-close-btn" title="Minimize Music Player">✕</button>
+        <div class="mw-info">
+          <span class="mw-icon">🎵</span>
+          <span id="mw-track-title" class="mw-title">Loading Music...</span>
+        </div>
+        <button id="mw-play-btn" class="mw-btn mw-play-btn" title="Play or Pause">▶</button>
+        <button id="mw-next-btn" class="mw-btn" title="Next Song">⏭</button>
+      </div>
+
+      <!-- Floating Music Re-Open Button (Visible at first) -->
+      <button id="mw-reopen-btn" class="mw-reopen-btn is-visible" title="Open Music Player">
+        <span>🎵</span>
+      </button>
+
+      <!-- Hidden Built-In Audio Engine -->
+      <audio id="bg-music-audio" preload="auto"></audio>
+
       <!-- Buttons injected by JS from LAYOUT data -->
     </div>
   </div>
 
+<!-- Shared UI Sound Utility -->
+<script src="js/sound.js"></script>
+
 <script>
-  // Percentage boxes measured directly from the source screenshot (1672 x 941).
+  // 2years Dashboard layout positions
   const LAYOUT = [
     { id: 1,  label: "COLORS",          img: "assets/2tahun/dashboard/card_1.png",  left: 39.3541, top: 16.7906, width: 14.5933, height: 22.848 },
     { id: 2,  label: "NUMBERS",         img: "assets/2tahun/dashboard/card_2.png",  left: 54.067,  top: 16.7906, width: 13.756,  height: 22.848 },
@@ -148,14 +407,83 @@
   const stage = document.getElementById('stage');
   const bgVideo = document.getElementById('bg-video');
   const toast = document.getElementById('toast');
+  const loaderLayer = document.getElementById('loader-layer');
 
-  // If NONE of the <source> files can be loaded, hide the <video> so the bg.jpg
-  // background-image on #stage shows through cleanly instead of a blank/broken frame.
-  // (Only checks bgVideo.error — a single failed <source> like a missing .webm
-  // fallback must not hide a perfectly good .mp4 that already loaded.)
+  /* ==========================================================================
+     BACK BUTTON NAVIGATION LOGIC
+     ========================================================================== */
+  const backBtn = document.getElementById('back-btn');
+  if (backBtn) {
+    backBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      getSound()?.playClick?.();
+      setTimeout(() => {
+        if (window.history.length > 1) {
+          window.history.back();
+        } else {
+          window.location.href = 'index.html';
+        }
+      }, 150);
+    });
+  }
+
+  /* ==========================================================================
+     STRICT NO-SOUND ENFORCEMENT FOR BACKGROUND VIDEO
+     ========================================================================== */
+  function enforceNoSound() {
+    bgVideo.muted = true;
+    bgVideo.volume = 0;
+  }
+
+  enforceNoSound();
+
+  bgVideo.addEventListener('volumechange', () => {
+    if (!bgVideo.muted || bgVideo.volume !== 0) {
+      enforceNoSound();
+    }
+  });
+
+  /* ==========================================================================
+     VIDEO CONFIGURATION & CUSTOM EARLY LOOPING
+     ========================================================================== */
+  const LOOP_BEFORE_END_SEC = 1.0; 
+
+  bgVideo.addEventListener('timeupdate', () => {
+    if (bgVideo.duration && bgVideo.duration > LOOP_BEFORE_END_SEC) {
+      const targetEndTime = bgVideo.duration - LOOP_BEFORE_END_SEC;
+      if (bgVideo.currentTime >= targetEndTime) {
+        bgVideo.currentTime = 0;
+        bgVideo.play().catch(() => {});
+      }
+    }
+  });
+
+  function tryPlayVideo() {
+    enforceNoSound();
+    const playPromise = bgVideo.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {
+        const startPlayOnInteraction = () => {
+          enforceNoSound();
+          bgVideo.play();
+          window.removeEventListener('touchstart', startPlayOnInteraction);
+          window.removeEventListener('click', startPlayOnInteraction);
+        };
+        window.addEventListener('touchstart', startPlayOnInteraction, { once: true });
+        window.addEventListener('click', startPlayOnInteraction, { once: true });
+      });
+    }
+  }
+
+  tryPlayVideo();
+
   bgVideo.addEventListener('error', () => {
     if (bgVideo.error) bgVideo.style.display = 'none';
   });
+
+  /* ==========================================================================
+     TOAST & CARD BUTTON BINDINGS (SOUND + INTERACTION)
+     ========================================================================== */
   let toastTimer = null;
 
   function showToast(label) {
@@ -165,6 +493,26 @@
     toastTimer = setTimeout(() => toast.classList.remove('show'), 1600);
   }
 
+  function getSound() {
+    if (typeof window !== 'undefined' && window.SmartKiddoSound) return window.SmartKiddoSound;
+    if (typeof SmartKiddoSound !== 'undefined') return SmartKiddoSound;
+    return null;
+  }
+
+  function bindCardActions(btn, label) {
+    // Hover Sound
+    btn.addEventListener('mouseenter', () => {
+      getSound()?.playHover?.();
+    });
+
+    // Click Sound & Toast
+    btn.addEventListener('click', () => {
+      getSound()?.playClick?.();
+      showToast(label);
+    });
+  }
+
+  // Create card buttons dynamically
   LAYOUT.forEach(item => {
     const btn = document.createElement('button');
     btn.className = 'card-btn';
@@ -174,9 +522,286 @@
     btn.style.height = item.height + '%';
     btn.style.backgroundImage = `url('${item.img}')`;
     btn.setAttribute('aria-label', item.label);
-    btn.addEventListener('click', () => showToast(item.label));
+    
+    bindCardActions(btn, item.label);
     stage.appendChild(btn);
   });
+
+  /* ==========================================================================
+     INSTANT AUTOPLAY MUSIC ENGINE (MUTED INSTANT START + UNMUTE HOOK)
+     ========================================================================== */
+  (function initBuiltInMusicPlayer() {
+    const audio = document.getElementById('bg-music-audio');
+    const widget = document.getElementById('music-widget');
+    const reopenBtn = document.getElementById('mw-reopen-btn');
+    const playBtn = document.getElementById('mw-play-btn');
+    const nextBtn = document.getElementById('mw-next-btn');
+    const closeBtn = document.getElementById('mw-toggle-btn');
+    const titleEl = document.getElementById('mw-track-title');
+
+    // Muted instant start bypassing browser restriction
+    audio.muted = true;
+    audio.volume = 0.5;
+
+    // Embedded fallback playlist for 2tahun
+    const playlist = [
+      { name: "Background Song 1", src: "assets/2tahun/dashboard/music/bgm.mp3" },
+      { name: "Background Song 2", src: "assets/audio/music/bgm.mp3" }
+    ];
+
+    let trackIndex = 0;
+    let autoHideTimer = null;
+
+    // Load Playlist from JSON if available
+    const playlistPaths = [
+      "assets/2tahun/dashboard/music/playlist.json",
+      "assets/audio/music/playlist.json"
+    ];
+
+    async function loadPlaylistJson() {
+      for (const path of playlistPaths) {
+        try {
+          const res = await fetch(path);
+          if (res.ok) {
+            const data = await res.json();
+            const list = (data && data.tracks) || (Array.isArray(data) ? data : []);
+            if (list.length > 0) {
+              playlist.length = 0; // Clear fallback
+              list.forEach(item => {
+                const fileName = typeof item === 'string' ? item : item.file;
+                const cleanName = fileName.replace(/\.(mp3|wav|ogg)$/i, "");
+                playlist.push({
+                  name: cleanName,
+                  src: `assets/2tahun/dashboard/music/${fileName}`
+                });
+              });
+              break;
+            }
+          }
+        } catch (err) {
+          // Fallback silently
+        }
+      }
+      loadCurrentTrack();
+      playMusicInstantly();
+    }
+
+    function loadCurrentTrack() {
+      if (!playlist.length) {
+        titleEl.textContent = "No Music Found";
+        return;
+      }
+      const current = playlist[trackIndex];
+      titleEl.textContent = current.name;
+      audio.src = current.src;
+    }
+
+    function updatePlayBtnIcon() {
+      playBtn.textContent = audio.paused ? "▶" : "⏸";
+    }
+
+    // Instant Autoplay Helper
+    function playMusicInstantly() {
+      if (!audio.src) return;
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise.then(() => {
+          updatePlayBtnIcon();
+        }).catch(() => {
+          updatePlayBtnIcon();
+        });
+      }
+    }
+
+    function unmuteAndPlay() {
+      audio.muted = false;
+      if (audio.paused) {
+        playMusicInstantly();
+      }
+      updatePlayBtnIcon();
+    }
+
+    function pauseMusic() {
+      audio.pause();
+      updatePlayBtnIcon();
+    }
+
+    // Hide / Show Widget Logic
+    function showWidget() {
+      widget.classList.remove('is-minimized');
+      reopenBtn.classList.remove('is-visible');
+      startAutoHideTimer();
+    }
+
+    function hideWidget() {
+      clearTimeout(autoHideTimer);
+      widget.classList.add('is-minimized');
+      reopenBtn.classList.add('is-visible');
+    }
+
+    function startAutoHideTimer() {
+      clearTimeout(autoHideTimer);
+      autoHideTimer = setTimeout(() => {
+        hideWidget();
+      }, 5000); // Auto-hide 5 seconds after revealing
+    }
+
+    // User Triggers to Reveal Player
+    window.addEventListener('mousemove', (e) => {
+      const bottomThreshold = window.innerHeight - 90;
+      if (e.clientY >= bottomThreshold && widget.classList.contains('is-minimized')) {
+        showWidget();
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      const isCardBtn = e.target.closest('.card-btn');
+      const isWidget = e.target.closest('#music-widget');
+      const isReopenBtn = e.target.closest('#mw-reopen-btn');
+      const isBackBtn = e.target.closest('#back-btn');
+      
+      if (!isCardBtn && !isWidget && !isReopenBtn && !isBackBtn) {
+        showWidget();
+      }
+    });
+
+    reopenBtn.addEventListener('click', () => {
+      getSound()?.playClick?.();
+      showWidget();
+    });
+
+    closeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      getSound()?.playClick?.();
+      hideWidget();
+    });
+
+    widget.addEventListener('mouseenter', () => clearTimeout(autoHideTimer));
+    widget.addEventListener('mouseleave', () => {
+      if (!widget.classList.contains('is-minimized')) {
+        startAutoHideTimer();
+      }
+    });
+
+    // Controls (Play / Pause & Next Song)
+    playBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      getSound()?.playClick?.();
+      if (audio.paused) {
+        unmuteAndPlay();
+      } else {
+        pauseMusic();
+      }
+      startAutoHideTimer();
+    });
+
+    nextBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      getSound()?.playClick?.();
+      trackIndex = (trackIndex + 1) % playlist.length;
+      loadCurrentTrack();
+      unmuteAndPlay();
+      startAutoHideTimer();
+    });
+
+    // Automatic Next Track on Song End
+    audio.addEventListener('ended', () => {
+      trackIndex = (trackIndex + 1) % playlist.length;
+      loadCurrentTrack();
+      unmuteAndPlay();
+    });
+
+    audio.addEventListener('play', updatePlayBtnIcon);
+    audio.addEventListener('pause', updatePlayBtnIcon);
+
+    // Error fallback handler
+    audio.addEventListener('error', () => {
+      if (playlist[trackIndex] && playlist[trackIndex].src.includes('assets/2tahun/dashboard/music/')) {
+        playlist[trackIndex].src = `assets/audio/music/${playlist[trackIndex].name}.mp3`;
+        audio.src = playlist[trackIndex].src;
+      }
+    });
+
+    // Immediate initial execution
+    loadCurrentTrack();
+    playMusicInstantly();
+    loadPlaylistJson();
+
+    // Universal Unmute Unlocker
+    const unlockUnmute = () => {
+      unmuteAndPlay();
+      window.removeEventListener('pointerdown', unlockUnmute);
+      window.removeEventListener('touchstart', unlockUnmute);
+      window.removeEventListener('click', unlockUnmute);
+      window.removeEventListener('mousemove', unlockUnmute);
+      window.removeEventListener('keydown', unlockUnmute);
+    };
+
+    window.addEventListener('pointerdown', unlockUnmute, { passive: true });
+    window.addEventListener('touchstart', unlockUnmute, { passive: true });
+    window.addEventListener('click', unlockUnmute);
+    window.addEventListener('mousemove', unlockUnmute, { passive: true });
+    window.addEventListener('keydown', unlockUnmute, { passive: true });
+  })();
+
+  /* ==========================================================================
+     SMOOTH PRELOADER ENGINE
+     ========================================================================== */
+  let isLoaded = false;
+
+  function revealPage() {
+    if (isLoaded) return;
+    isLoaded = true;
+
+    // Reveal stage & fade out loader layer
+    stage.classList.add('ready');
+    loaderLayer.classList.add('hidden');
+  }
+
+  function preloadAssets() {
+    const imageUrls = [
+      'assets/2tahun/dashboard/bg.jpg',
+      ...LAYOUT.map(item => item.img)
+    ];
+
+    const imagePromises = imageUrls.map(url => {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.src = url;
+        img.onload = () => resolve(url);
+        img.onerror = () => resolve(url);
+      });
+    });
+
+    const videoPromise = new Promise((resolve) => {
+      if (bgVideo.readyState >= 3) {
+        resolve();
+      } else {
+        const onVideoReady = () => {
+          bgVideo.removeEventListener('canplaythrough', onVideoReady);
+          bgVideo.removeEventListener('error', onVideoReady);
+          resolve();
+        };
+        bgVideo.addEventListener('canplaythrough', onVideoReady);
+        bgVideo.addEventListener('error', onVideoReady);
+      }
+    });
+
+    const timeoutPromise = new Promise((resolve) => setTimeout(resolve, 2800));
+
+    Promise.race([
+      Promise.all([...imagePromises, videoPromise]),
+      timeoutPromise
+    ]).then(() => {
+      revealPage();
+    });
+  }
+
+  if (document.readyState === 'complete') {
+    preloadAssets();
+  } else {
+    window.addEventListener('load', preloadAssets);
+  }
 </script>
 
 </body>
