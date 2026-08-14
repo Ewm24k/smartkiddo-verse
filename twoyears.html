@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Learning Adventure!</title>
-<script src="assets.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Let's Learn & Have Fun!</title>
 <style>
   * { box-sizing: border-box; }
   html, body {
@@ -13,43 +12,54 @@
     width: 100%;
     height: 100%;
     overflow: hidden;
-    background: #0a0024;
-    font-family: 'Segoe UI', Verdana, Arial, sans-serif;
+    background: #0a0028;
+    font-family: 'Baloo 2', 'Comic Sans MS', system-ui, -apple-system, sans-serif;
   }
 
+  /* ---------- Stage: locked to the source image aspect ratio (FIT / letterbox) ---------- */
   #stage-wrapper {
     position: fixed;
     inset: 0;
     width: 100vw;
     height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #0a0028; /* sampled from the scene's own deep-space corner color */
     overflow: hidden;
-    background: #0a0024;
   }
 
   #stage {
-    position: absolute;
-    top: 0;
-    left: 0;
+    position: relative;
+    aspect-ratio: 1672 / 941;
     width: 100%;
     height: 100%;
+    max-width: calc(100vh * 1672 / 941);
+    max-height: calc(100vw * 941 / 1672);
+    background-image: url('assets/2tahun/dashboard/bg.jpg'); /* fallback if the video is missing/still loading */
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    overflow: hidden;
   }
 
-  #bg-layer {
+  /* ---------- Background video ---------- */
+  #bg-video {
     position: absolute;
     inset: 0;
-    background-repeat: no-repeat;
-    background-position: center center;
-    background-size: cover;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;   /* stretches to the locked stage box, same as the old background-size:100% 100% — swap to "cover" if your clip's aspect ratio doesn't match 1672:941 and you'd rather crop than stretch */
+    z-index: 0;
+    pointer-events: none;
   }
 
-  button.game-btn {
+  /* ---------- Card buttons ---------- */
+  .card-btn {
     -webkit-appearance: none;
     appearance: none;
     -webkit-tap-highlight-color: transparent;
-  }
-
-  .game-btn {
     position: absolute;
+    z-index: 1;
     border: none;
     outline: none;
     padding: 0;
@@ -57,267 +67,115 @@
     background-color: transparent;
     background-repeat: no-repeat;
     background-position: center;
-    background-size: 100% 100%;
+    background-size: contain;
     cursor: pointer;
     transition: transform 0.12s ease, filter 0.12s ease;
   }
 
-  .game-btn:hover {
-    transform: scale(1.035);
-    filter: brightness(1.08);
+  .card-btn:hover {
+    transform: scale(1.045);
+    filter: brightness(1.08) drop-shadow(0 0 14px rgba(255,255,255,0.55));
   }
 
-  .game-btn:active {
+  .card-btn:active {
     transform: scale(0.96);
     filter: brightness(0.95);
   }
 
-  .game-btn:focus-visible {
-    outline: 3px solid #fff;
-    outline-offset: 3px;
-    border-radius: 12px;
+  .card-btn:focus-visible {
+    filter: brightness(1.1) drop-shadow(0 0 0 4px #fff);
   }
 
-  /* Mascot layer + idle animation */
-  #mascot {
+  /* ---------- Popup toast ---------- */
+  #toast {
     position: absolute;
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: 100% 100%;
-    pointer-events: none;
-    z-index: 5;
-    transform-origin: 50% 100%; /* pivot at its feet so it rocks in place */
-    animation: mascot-float 3.2s ease-in-out infinite;
-  }
-
-  #mascot::after {
-    content: "";
-    position: absolute;
-    left: 8%;
-    right: 8%;
-    bottom: -6%;
-    height: 10%;
-    background: radial-gradient(ellipse at center, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0) 70%);
-    animation: mascot-shadow 3.2s ease-in-out infinite;
-  }
-
-  @keyframes mascot-float {
-    0%   { transform: translateY(0)     rotate(0deg); }
-    25%  { transform: translateY(-2.5%) rotate(-3deg); }
-    50%  { transform: translateY(-5%)   rotate(0deg); }
-    75%  { transform: translateY(-2.5%) rotate(3deg); }
-    100% { transform: translateY(0)     rotate(0deg); }
-  }
-
-  @keyframes mascot-shadow {
-    0%   { transform: scale(1);    opacity: 0.55; }
-    50%  { transform: scale(0.82); opacity: 0.35; }
-    100% { transform: scale(1);    opacity: 0.55; }
-  }
-
-  /* Modal */
-  #modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(5, 0, 30, 0.72);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 50;
-    animation: fadeIn 0.15s ease;
-  }
-
-  #modal-overlay.open {
-    display: flex;
-  }
-
-  #modal-box {
-    background: linear-gradient(160deg, #2a1a5e, #1a0f3d);
-    border: 4px solid rgba(255,255,255,0.25);
-    border-radius: 26px;
-    padding: 32px 40px;
-    max-width: min(90vw, 420px);
-    text-align: center;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-    animation: popIn 0.22s cubic-bezier(.34,1.56,.64,1);
-  }
-
-  #modal-emoji {
-    font-size: 54px;
-    line-height: 1;
-    margin-bottom: 10px;
-  }
-
-  #modal-title {
-    color: #ffd23f;
-    font-size: 26px;
+    left: 50%;
+    top: 8%;
+    transform: translate(-50%, -20px);
+    background: linear-gradient(180deg, #ffffff, #f0e9ff);
+    color: #5b2a86;
     font-weight: 800;
-    margin: 0 0 8px;
-    text-shadow: 0 2px 0 rgba(0,0,0,0.4);
+    font-size: clamp(14px, 2.4vw, 26px);
+    padding: 0.7em 1.4em;
+    border-radius: 999px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.35), 0 0 0 4px rgba(255,255,255,0.5) inset;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    white-space: nowrap;
+    z-index: 20;
+    text-align: center;
   }
 
-  #modal-text {
-    color: #f0eaff;
-    font-size: 16px;
-    margin: 0 0 22px;
-    line-height: 1.4;
-  }
-
-  #modal-close {
-    background: #ff6b6b;
-    color: white;
-    border: none;
-    border-radius: 14px;
-    padding: 12px 30px;
-    font-size: 17px;
-    font-weight: 700;
-    cursor: pointer;
-    box-shadow: 0 5px 0 #c94848;
-    transition: transform 0.1s ease;
-  }
-
-  #modal-close:active {
-    transform: translateY(3px);
-    box-shadow: 0 2px 0 #c94848;
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-
-  @keyframes popIn {
-    from { opacity: 0; transform: scale(0.85); }
-    to { opacity: 1; transform: scale(1); }
+  #toast.show {
+    opacity: 1;
+    transform: translate(-50%, 0);
   }
 </style>
 </head>
 <body>
 
-<div id="stage-wrapper">
-  <div id="stage">
-    <div id="bg-layer"></div>
+  <div id="stage-wrapper">
+    <div id="stage">
+      <!-- Background video. Replace assets/2tahun/dashboard/bg.mp4 with your clip (mp4 + webm recommended).
+           If this fails to load or is removed, the #stage background-image (assets/2tahun/dashboard/bg.jpg) shows instead. -->
+      <video id="bg-video" autoplay muted loop playsinline poster="assets/2tahun/dashboard/bg.jpg">
+        <source src="assets/2tahun/dashboard/bg.mp4" type="video/mp4">
+        <source src="assets/2tahun/dashboard/bg.webm" type="video/webm">
+      </video>
+      <div id="toast"></div>
+      <!-- Buttons injected by JS from LAYOUT data -->
+    </div>
   </div>
-</div>
-
-<div id="modal-overlay">
-  <div id="modal-box">
-    <div id="modal-emoji">🎉</div>
-    <h2 id="modal-title">Category</h2>
-    <p id="modal-text">Loading fun activities...</p>
-    <button id="modal-close">Let's Go!</button>
-  </div>
-</div>
 
 <script>
-  // Button definitions: id, percentage box (left, top, width, height) in the
-  // source image's own coordinate space, display name, and a fun emoji.
-  const BUTTONS = [
-    { id: 'colors',     left: 11.663, top: 33.9,   width: 15.251, height: 31.35,  name: 'Colors',        emoji: '🎨' },
-    { id: 'counting',   left: 27.99,  top: 33.9,   width: 15.371, height: 31.35,  name: 'Counting',      emoji: '🔢' },
-    { id: 'numbers',    left: 44.737, top: 23.167, width: 13.278, height: 20.191, name: 'Numbers',       emoji: '🔢' },
-    { id: 'drawing',    left: 59.39,  top: 23.167, width: 13.577, height: 20.191, name: 'Drawing',       emoji: '✏️' },
-    { id: 'shapes',     left: 74.163, top: 23.167, width: 15.072, height: 20.191, name: 'Shapes',        emoji: '🔺' },
-    { id: 'abc',        left: 44.737, top: 42.933, width: 13.278, height: 22.104, name: 'ABC Adventures',emoji: '🔤' },
-    { id: 'adventures', left: 59.39,  top: 42.933, width: 13.577, height: 22.104, name: 'Adventures',    emoji: '🦁' },
-    { id: 'animalfun',  left: 74.163, top: 42.933, width: 15.072, height: 22.104, name: 'Animal Fun',    emoji: '🐘' },
-    { id: 'puzzles',    left: 11.663, top: 67.694, width: 15.251, height: 19.554, name: 'Puzzles',       emoji: '🧩' },
-    { id: 'puzzletime', left: 27.99,  top: 67.694, width: 15.371, height: 19.554, name: 'Puzzle Time',   emoji: '🧩' },
-    { id: 'storyland',  left: 44.737, top: 67.694, width: 13.278, height: 19.554, name: 'Storyland',     emoji: '📖' },
-    { id: 'mathingmix', left: 59.39,  top: 67.694, width: 13.577, height: 19.554, name: 'Mathing Mix',   emoji: '➕' },
-    { id: 'musicmix',   left: 74.163, top: 67.694, width: 15.072, height: 19.554, name: 'Music Mix',     emoji: '🎵' },
+  // Percentage boxes measured directly from the source screenshot (1672 x 941).
+  const LAYOUT = [
+    { id: 1,  label: "COLORS",          img: "assets/2tahun/dashboard/card_1.png",  left: 39.3541, top: 16.7906, width: 14.5933, height: 22.848 },
+    { id: 2,  label: "NUMBERS",         img: "assets/2tahun/dashboard/card_2.png",  left: 54.067,  top: 16.7906, width: 13.756,  height: 22.848 },
+    { id: 3,  label: "DRAWING",         img: "assets/2tahun/dashboard/card_3.png",  left: 67.9426, top: 16.7906, width: 14.8325, height: 22.848 },
+    { id: 4,  label: "SHAPES",          img: "assets/2tahun/dashboard/card_4.png",  left: 82.7751, top: 16.7906, width: 12.9187, height: 22.848 },
+    { id: 5,  label: "ABC ADVENTURES",  img: "assets/2tahun/dashboard/card_5.png",  left: 39.3541, top: 40.5951, width: 13.8756, height: 21.254 },
+    { id: 6,  label: "ANIMAL FUN",      img: "assets/2tahun/dashboard/card_6.png",  left: 53.3493, top: 40.5951, width: 14.2344, height: 21.254 },
+    { id: 7,  label: "PUZZLES",         img: "assets/2tahun/dashboard/card_7.png",  left: 67.7033, top: 40.5951, width: 13.6364, height: 21.254 },
+    { id: 8,  label: "PUZZLE TIME",     img: "assets/2tahun/dashboard/card_8.png",  left: 81.4593, top: 40.5951, width: 13.756,  height: 21.254 },
+    { id: 9,  label: "STORYLAND",       img: "assets/2tahun/dashboard/card_9.png",  left: 39.1148, top: 62.6993, width: 13.9952, height: 22.3167 },
+    { id: 10, label: "MATHING MIX",     img: "assets/2tahun/dashboard/card_10.png", left: 53.2297, top: 62.6993, width: 14.4737, height: 22.3167 },
+    { id: 11, label: "MUSIC MIX",       img: "assets/2tahun/dashboard/card_11.png", left: 67.823,  top: 62.6993, width: 13.8756, height: 22.3167 },
+    { id: 12, label: "ACHIEVEMENTS",    img: "assets/2tahun/dashboard/card_12.png", left: 81.8182, top: 62.6993, width: 14.1148, height: 22.3167 },
   ];
 
-  const MASCOT = { left: 6.289, top: 10.008, width: 13.144, height: 22.831 };
-
-  // Intrinsic size of the source artwork — the coordinate space that every
-  // button/mascot percentage box below is defined against.
-  const SRC_W = 1672;
-  const SRC_H = 941;
-
-  const stageWrapper = document.getElementById('stage-wrapper');
   const stage = document.getElementById('stage');
-  const bgLayer = document.getElementById('bg-layer');
-  const modalOverlay = document.getElementById('modal-overlay');
-  const modalTitle = document.getElementById('modal-title');
-  const modalText = document.getElementById('modal-text');
-  const modalEmoji = document.getElementById('modal-emoji');
-  const modalClose = document.getElementById('modal-close');
+  const bgVideo = document.getElementById('bg-video');
+  const toast = document.getElementById('toast');
 
-  // Set background from base64 asset (CSS background-size:cover handles the
-  // actual image scaling/cropping to fill the screen on any device).
-  bgLayer.style.backgroundImage = `url('${ASSETS.bg}')`;
-
-  // Build animated mascot layer
-  const mascotEl = document.createElement('div');
-  mascotEl.id = 'mascot';
-  mascotEl.style.backgroundImage = `url('${ASSETS.mascot}')`;
-  stage.appendChild(mascotEl);
-
-  // Build buttons
-  const buttonEls = [];
-  BUTTONS.forEach(btn => {
-    const el = document.createElement('button');
-    el.className = 'game-btn';
-    el.setAttribute('aria-label', btn.name);
-    el.style.backgroundImage = `url('${ASSETS[btn.id]}')`;
-    el.addEventListener('click', () => openModal(btn));
-    stage.appendChild(el);
-    buttonEls.push({ el, def: btn });
+  // If NONE of the <source> files can be loaded, hide the <video> so the bg.jpg
+  // background-image on #stage shows through cleanly instead of a blank/broken frame.
+  // (Only checks bgVideo.error — a single failed <source> like a missing .webm
+  // fallback must not hide a perfectly good .mp4 that already loaded.)
+  bgVideo.addEventListener('error', () => {
+    if (bgVideo.error) bgVideo.style.display = 'none';
   });
+  let toastTimer = null;
 
-  // Position every element to exactly match how the browser renders
-  // background-size:cover for #bg-layer — i.e. the image is scaled up
-  // uniformly (never distorted) until it fully covers the viewport, then
-  // centered, cropping whatever overflows on one axis. Because we replicate
-  // that same scale + centering math in JS (in px, not %), buttons stay
-  // pixel-locked to the art underneath them at any window size or aspect
-  // ratio, edge-to-edge, with zero drift.
-  function layout() {
-    const vw = stageWrapper.clientWidth;
-    const vh = stageWrapper.clientHeight;
-    const scale = Math.max(vw / SRC_W, vh / SRC_H);
-    const dispW = SRC_W * scale;
-    const dispH = SRC_H * scale;
-    const offsetX = (vw - dispW) / 2;
-    const offsetY = (vh - dispH) / 2;
-
-    function place(el, pctBox) {
-      el.style.left = (offsetX + (pctBox.left / 100) * dispW) + 'px';
-      el.style.top = (offsetY + (pctBox.top / 100) * dispH) + 'px';
-      el.style.width = ((pctBox.width / 100) * dispW) + 'px';
-      el.style.height = ((pctBox.height / 100) * dispH) + 'px';
-    }
-
-    place(mascotEl, MASCOT);
-    buttonEls.forEach(({ el, def }) => place(el, def));
+  function showToast(label) {
+    clearTimeout(toastTimer);
+    toast.textContent = label + ' coming soon!';
+    toast.classList.add('show');
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 1600);
   }
 
-  layout();
-  window.addEventListener('resize', layout);
-  window.addEventListener('orientationchange', layout);
-  if (window.visualViewport) {
-    window.visualViewport.addEventListener('resize', layout);
-  }
-
-  function openModal(btn) {
-    modalEmoji.textContent = btn.emoji;
-    modalTitle.textContent = btn.name;
-    modalText.textContent = `Get ready for the ${btn.name} activity!`;
-    modalOverlay.classList.add('open');
-    modalClose.focus();
-  }
-
-  function closeModal() {
-    modalOverlay.classList.remove('open');
-  }
-
-  modalClose.addEventListener('click', closeModal);
-  modalOverlay.addEventListener('click', (e) => {
-    if (e.target === modalOverlay) closeModal();
-  });
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeModal();
+  LAYOUT.forEach(item => {
+    const btn = document.createElement('button');
+    btn.className = 'card-btn';
+    btn.style.left = item.left + '%';
+    btn.style.top = item.top + '%';
+    btn.style.width = item.width + '%';
+    btn.style.height = item.height + '%';
+    btn.style.backgroundImage = `url('${item.img}')`;
+    btn.setAttribute('aria-label', item.label);
+    btn.addEventListener('click', () => showToast(item.label));
+    stage.appendChild(btn);
   });
 </script>
 
