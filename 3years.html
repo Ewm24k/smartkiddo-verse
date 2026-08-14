@@ -124,10 +124,7 @@
 
   <div id="stage-wrapper">
     <div id="stage">
-      <!-- 
-        Background video setup:
-        - muted, autoplay, playsinline, webkit-playsinline for seamless non-interactive background playback.
-      -->
+      <!-- Background video -->
       <video id="bg-video" autoplay muted playsinline webkit-playsinline poster="assets/3tahun/dashboard/bg.jpg">
         <source src="assets/3tahun/dashboard/bg.mp4" type="video/mp4">
         <source src="assets/3tahun/dashboard/bg.webm" type="video/webm">
@@ -136,6 +133,9 @@
       <!-- Buttons injected by JS from LAYOUT data -->
     </div>
   </div>
+
+<!-- Shared sound utility loaded before page logic -->
+<script src="js/sound.js"></script>
 
 <script>
   // Dynamic layout percentage positions
@@ -159,7 +159,7 @@
   const toast = document.getElementById('toast');
 
   /* ==========================================================================
-     STRICT NO-SOUND ENFORCEMENT
+     STRICT NO-SOUND ENFORCEMENT FOR BACKGROUND VIDEO
      ========================================================================== */
   function enforceNoSound() {
     bgVideo.muted = true;
@@ -168,7 +168,6 @@
 
   enforceNoSound();
 
-  // Re-enforce silent audio if any system or browser attempts to un-mute
   bgVideo.addEventListener('volumechange', () => {
     if (!bgVideo.muted || bgVideo.volume !== 0) {
       enforceNoSound();
@@ -178,9 +177,6 @@
   /* ==========================================================================
      VIDEO CONFIGURATION & CUSTOM EARLY LOOPING
      ========================================================================== */
-  
-  // Set how many seconds BEFORE the video end you want it to loop back to 0.
-  // Example: For an 8.0 second video, setting this to 1.0 loops at 7.0 seconds.
   const LOOP_BEFORE_END_SEC = 1.0; 
 
   bgVideo.addEventListener('timeupdate', () => {
@@ -193,13 +189,11 @@
     }
   });
 
-  // Ensure immediate autoplay on page load
   function tryPlayVideo() {
     enforceNoSound();
     const playPromise = bgVideo.play();
     if (playPromise !== undefined) {
       playPromise.catch(() => {
-        // Fallback interaction trigger for strict mobile browser autoplay restrictions
         const startPlayOnInteraction = () => {
           enforceNoSound();
           bgVideo.play();
@@ -212,16 +206,14 @@
     }
   }
 
-  // Attempt autoplay immediately
   tryPlayVideo();
 
-  // Hide video element if loading fails so background image shows cleanly
   bgVideo.addEventListener('error', () => {
     if (bgVideo.error) bgVideo.style.display = 'none';
   });
 
   /* ==========================================================================
-     TOAST & BUTTON INJECTION
+     TOAST & CARD BUTTON BINDINGS (SOUND + INTERACTION)
      ========================================================================== */
   let toastTimer = null;
 
@@ -232,6 +224,27 @@
     toastTimer = setTimeout(() => toast.classList.remove('show'), 1600);
   }
 
+  /**
+   * Binds sound interaction triggers and toast displays to card buttons cleanly
+   */
+  function bindCardActions(btn, label) {
+    // Hover Sound
+    btn.addEventListener('mouseenter', () => {
+      if (window.SmartKiddoSound && typeof window.SmartKiddoSound.playHover === 'function') {
+        window.SmartKiddoSound.playHover();
+      }
+    });
+
+    // Click Sound & Toast Notification
+    btn.addEventListener('click', () => {
+      if (window.SmartKiddoSound && typeof window.SmartKiddoSound.playClick === 'function') {
+        window.SmartKiddoSound.playClick();
+      }
+      showToast(label);
+    });
+  }
+
+  // Create card buttons dynamically
   LAYOUT.forEach(item => {
     const btn = document.createElement('button');
     btn.className = 'card-btn';
@@ -241,7 +254,10 @@
     btn.style.height = item.height + '%';
     btn.style.backgroundImage = `url('${item.img}')`;
     btn.setAttribute('aria-label', item.label);
-    btn.addEventListener('click', () => showToast(item.label));
+    
+    // Bind interaction sounds and toast logic
+    bindCardActions(btn, item.label);
+
     stage.appendChild(btn);
   });
 </script>
