@@ -91,7 +91,7 @@
     background: #0a0028;
   }
 
-  /* ---------- Full Screen Stage ---------- */
+  /* ---------- Full Screen Stage (Expands to fill device, no left/right gaps) ---------- */
   #stage {
     position: relative;
     width: 100%;
@@ -192,13 +192,10 @@
 
   /* ==========================================================================
      ANDROID & IOS MOBILE PHONE OPTIMIZATION (WIDE & CLOSE CARDS)
-     Does not affect PC or Tablet views.
      ========================================================================== */
-  
-  /* Mobile Phones in Portrait View */
   @media screen and (max-width: 600px) {
     .card-btn {
-      transform: scale(1.32); /* Expands card width/size by +32% */
+      transform: scale(1.32);
       transform-origin: center center;
     }
     .card-btn:hover {
@@ -209,10 +206,9 @@
     }
   }
 
-  /* Mobile Phones in Landscape View */
   @media screen and (max-height: 500px) and (max-width: 930px) {
     .card-btn {
-      transform: scale(1.24); /* Expands card width/size by +24% */
+      transform: scale(1.24);
       transform-origin: center center;
     }
     .card-btn:hover {
@@ -269,7 +265,6 @@
     transition: transform 0.45s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.45s ease;
   }
 
-  /* Hidden / Minimized state */
   .music-widget.is-minimized {
     transform: translate(-50%, 75px);
     opacity: 0;
@@ -334,7 +329,6 @@
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
   }
 
-  /* Floating reveal button */
   .mw-reopen-btn {
     position: absolute;
     bottom: 20px;
@@ -561,7 +555,7 @@
   });
 
   /* ==========================================================================
-     INSTANT AUTOPLAY MUSIC ENGINE (MUTED INSTANT START + UNMUTE HOOK)
+     INSTANT AUTOPLAY MUSIC ENGINE WITH SEAMLESS AUTO-NEXT TRACK
      ========================================================================== */
   (function initBuiltInMusicPlayer() {
     const audio = document.getElementById('bg-music-audio');
@@ -615,33 +609,34 @@
           // Fallback silently
         }
       }
-      loadCurrentTrack();
-      playMusicInstantly();
-    }
-
-    function loadCurrentTrack() {
-      if (!playlist.length) {
-        titleEl.textContent = "No Music Found";
-        return;
-      }
-      const current = playlist[trackIndex];
-      titleEl.textContent = current.name;
-      audio.src = current.src;
+      playTrackAtIndex(0);
     }
 
     function updatePlayBtnIcon() {
       playBtn.textContent = audio.paused ? "▶" : "⏸";
     }
 
-    // Instant Autoplay Helper
-    function playMusicInstantly() {
-      if (!audio.src) return;
+    // Reliable track player with automatic load and error fallback handling
+    function playTrackAtIndex(index) {
+      if (!playlist.length) return;
+      trackIndex = (index % playlist.length + playlist.length) % playlist.length;
+      const current = playlist[trackIndex];
+      titleEl.textContent = current.name;
+      audio.src = current.src;
+      
+      // Load source explicitly
+      audio.load();
+
       const playPromise = audio.play();
       if (playPromise !== undefined) {
         playPromise.then(() => {
           updatePlayBtnIcon();
         }).catch(() => {
-          updatePlayBtnIcon();
+          // Buffer readiness fallback
+          const onCanPlay = () => {
+            audio.play().then(updatePlayBtnIcon).catch(() => {});
+          };
+          audio.addEventListener('canplay', onCanPlay, { once: true });
         });
       }
     }
@@ -649,7 +644,7 @@
     function unmuteAndPlay() {
       audio.muted = false;
       if (audio.paused) {
-        playMusicInstantly();
+        audio.play().then(updatePlayBtnIcon).catch(() => {});
       }
       updatePlayBtnIcon();
     }
@@ -716,7 +711,7 @@
       }
     });
 
-    // Controls (Play / Pause & Next Song)
+    // Play / Pause Button Controls
     playBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       getSound()?.playClick?.();
@@ -728,39 +723,38 @@
       startAutoHideTimer();
     });
 
+    // Next Track Button Controls
     nextBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       getSound()?.playClick?.();
-      trackIndex = (trackIndex + 1) % playlist.length;
-      loadCurrentTrack();
       unmuteAndPlay();
+      playTrackAtIndex(trackIndex + 1);
       startAutoHideTimer();
     });
 
-    // Automatic Next Track on Song End
+    // AUTOMATIC NEXT TRACK ON SONG FINISH
     audio.addEventListener('ended', () => {
-      trackIndex = (trackIndex + 1) % playlist.length;
-      loadCurrentTrack();
-      unmuteAndPlay();
+      audio.muted = false;
+      playTrackAtIndex(trackIndex + 1);
     });
 
     audio.addEventListener('play', updatePlayBtnIcon);
     audio.addEventListener('pause', updatePlayBtnIcon);
 
-    // Error fallback handler
+    // Audio error fallback handler
     audio.addEventListener('error', () => {
       if (playlist[trackIndex] && playlist[trackIndex].src.includes('assets/2tahun/dashboard/music/')) {
         playlist[trackIndex].src = `assets/audio/music/${playlist[trackIndex].name}.mp3`;
         audio.src = playlist[trackIndex].src;
+        audio.play().catch(() => {});
       }
     });
 
-    // Immediate initial execution
-    loadCurrentTrack();
-    playMusicInstantly();
+    // Start playlist load & audio engine
+    playTrackAtIndex(0);
     loadPlaylistJson();
 
-    // Universal Unmute Unlocker
+    // Universal Unmute Unlocker for Browser Autoplay Restrictions
     const unlockUnmute = () => {
       unmuteAndPlay();
       window.removeEventListener('pointerdown', unlockUnmute);
