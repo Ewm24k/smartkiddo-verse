@@ -191,31 +191,49 @@
   }
 
   /* ==========================================================================
-     ANDROID & IOS MOBILE PHONE OPTIMIZATION (WIDE & CLOSE CARDS)
+     ANDROID & IOS MOBILE PHONE HORIZONTAL LAYOUT ADJUSTMENTS
+     Brings options closer horizontally from right to left without vertical overlap.
      ========================================================================== */
   @media screen and (max-width: 600px) {
+    /* Mobile Phones in Portrait */
     .card-btn {
-      transform: scale(1.32);
+      transform: scaleX(1.18) scaleY(1.02);
       transform-origin: center center;
     }
     .card-btn:hover {
-      transform: scale(1.38);
+      transform: scaleX(1.24) scaleY(1.02);
     }
     .card-btn:active {
-      transform: scale(1.24);
+      transform: scaleX(1.12) scaleY(0.98);
+    }
+    .card-col-4 {
+      left: calc(var(--base-left) - 2.8%) !important;
+    }
+    .card-col-3 {
+      left: calc(var(--base-left) - 1.5%) !important;
+    }
+    .card-col-2 {
+      left: calc(var(--base-left) - 0.6%) !important;
     }
   }
 
   @media screen and (max-height: 500px) and (max-width: 930px) {
+    /* Mobile Phones in Landscape */
     .card-btn {
-      transform: scale(1.24);
+      transform: scaleX(1.14) scaleY(1.01);
       transform-origin: center center;
     }
     .card-btn:hover {
-      transform: scale(1.30);
+      transform: scaleX(1.20) scaleY(1.01);
     }
     .card-btn:active {
-      transform: scale(1.18);
+      transform: scaleX(1.08) scaleY(0.98);
+    }
+    .card-col-4 {
+      left: calc(var(--base-left) - 2.0%) !important;
+    }
+    .card-col-3 {
+      left: calc(var(--base-left) - 1.0%) !important;
     }
   }
 
@@ -539,14 +557,16 @@
     });
   }
 
-  // Create card buttons dynamically
-  LAYOUT.forEach(item => {
+  // Create card buttons dynamically with column classes
+  LAYOUT.forEach((item, index) => {
     const btn = document.createElement('button');
-    btn.className = 'card-btn';
+    const colNum = (index % 4) + 1;
+    btn.className = `card-btn card-col-${colNum}`;
     btn.style.left = item.left + '%';
     btn.style.top = item.top + '%';
     btn.style.width = item.width + '%';
     btn.style.height = item.height + '%';
+    btn.style.setProperty('--base-left', item.left + '%');
     btn.style.backgroundImage = `url('${item.img}')`;
     btn.setAttribute('aria-label', item.label);
     
