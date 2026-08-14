@@ -5,7 +5,7 @@
    sound later (e.g. via GitHub) without touching any other file.
    ========================================================= */
 
-const SmartKiddoSound = (() => {
+window.SmartKiddoSound = (() => {
   const files = {
     click: "assets/audio/click.mp3",       // general buttons (login, etc.)
     menu: "assets/audio/menu-click.mp3",   // hamburger menu open/close
