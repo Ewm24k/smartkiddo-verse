@@ -109,6 +109,39 @@
     opacity: 1;
   }
 
+  /* ---------- Modern Top-Left Back Button ---------- */
+  .back-btn {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 100;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(25, 12, 60, 0.85);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.25);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 12px rgba(255, 255, 255, 0.15);
+    transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), background 0.2s ease, filter 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .back-btn:hover {
+    transform: scale(1.1);
+    background: rgba(255, 71, 87, 0.9);
+    filter: brightness(1.1);
+  }
+
+  .back-btn:active {
+    transform: scale(0.92);
+  }
+
   /* ---------- Background Video Configuration ---------- */
   #bg-video {
     position: absolute;
@@ -313,6 +346,13 @@
 
   <div id="stage-wrapper">
     <div id="stage">
+      <!-- Modern Top-Left Back Button -->
+      <button id="back-btn" class="back-btn" aria-label="Go Back" title="Go Back">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+      </button>
+
       <!-- Background video -->
       <video id="bg-video" autoplay muted playsinline webkit-playsinline poster="assets/3tahun/dashboard/bg.jpg">
         <source src="assets/3tahun/dashboard/bg.mp4" type="video/mp4">
@@ -368,6 +408,24 @@
   const bgVideo = document.getElementById('bg-video');
   const toast = document.getElementById('toast');
   const loaderLayer = document.getElementById('loader-layer');
+
+  /* ==========================================================================
+     BACK BUTTON NAVIGATION LOGIC
+     ========================================================================== */
+  const backBtn = document.getElementById('back-btn');
+  if (backBtn) {
+    backBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      getSound()?.playClick?.();
+      setTimeout(() => {
+        if (window.history.length > 1) {
+          window.history.back();
+        } else {
+          window.location.href = 'index.html';
+        }
+      }, 150);
+    });
+  }
 
   /* ==========================================================================
      STRICT NO-SOUND ENFORCEMENT FOR BACKGROUND VIDEO
@@ -600,8 +658,9 @@
       const isCardBtn = e.target.closest('.card-btn');
       const isWidget = e.target.closest('#music-widget');
       const isReopenBtn = e.target.closest('#mw-reopen-btn');
+      const isBackBtn = e.target.closest('#back-btn');
       
-      if (!isCardBtn && !isWidget && !isReopenBtn) {
+      if (!isCardBtn && !isWidget && !isReopenBtn && !isBackBtn) {
         showWidget();
       }
     });
@@ -668,7 +727,7 @@
     playMusicInstantly();
     loadPlaylistJson();
 
-    // Universal Unmute Unlocker: Unmutes audio on any user activity anywhere on screen
+    // Universal Unmute Unlocker
     const unlockUnmute = () => {
       unmuteAndPlay();
       window.removeEventListener('pointerdown', unlockUnmute);
