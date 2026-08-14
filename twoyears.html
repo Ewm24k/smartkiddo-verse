@@ -91,7 +91,7 @@
     background: #0a0028;
   }
 
-  /* ---------- Full Screen Stage (Expands to fill device, no left/right gaps) ---------- */
+  /* ---------- Full Screen Stage ---------- */
   #stage {
     position: relative;
     width: 100%;
@@ -188,6 +188,39 @@
 
   .card-btn:focus-visible {
     filter: brightness(1.1) drop-shadow(0 0 0 4px #fff);
+  }
+
+  /* ==========================================================================
+     ANDROID & IOS MOBILE PHONE OPTIMIZATION (WIDE & CLOSE CARDS)
+     Does not affect PC or Tablet views.
+     ========================================================================== */
+  
+  /* Mobile Phones in Portrait View */
+  @media screen and (max-width: 600px) {
+    .card-btn {
+      transform: scale(1.32); /* Expands card width/size by +32% */
+      transform-origin: center center;
+    }
+    .card-btn:hover {
+      transform: scale(1.38);
+    }
+    .card-btn:active {
+      transform: scale(1.24);
+    }
+  }
+
+  /* Mobile Phones in Landscape View */
+  @media screen and (max-height: 500px) and (max-width: 930px) {
+    .card-btn {
+      transform: scale(1.24); /* Expands card width/size by +24% */
+      transform-origin: center center;
+    }
+    .card-btn:hover {
+      transform: scale(1.30);
+    }
+    .card-btn:active {
+      transform: scale(1.18);
+    }
   }
 
   /* ---------- Popup toast ---------- */
