@@ -470,7 +470,7 @@
   });
 
   /* ==========================================================================
-     BUILT-IN MUSIC PLAYER ENGINE (AUTOPLAY, AUTO-NEXT & HOVER/CLICK SHOW TRiggers)
+     INSTANT AUTOPLAY MUSIC ENGINE WITH PAUSE & AUTO-NEXT TRACK
      ========================================================================== */
   (function initBuiltInMusicPlayer() {
     const audio = document.getElementById('bg-music-audio');
@@ -492,7 +492,7 @@
     let trackIndex = 0;
     let autoHideTimer = null;
 
-    // 1. Load Playlist from JSON if available
+    // Load Playlist from JSON if available
     const playlistPaths = [
       "assets/3tahun/dashboard/music/playlist.json",
       "assets/audio/music/playlist.json"
@@ -523,7 +523,7 @@
         }
       }
       loadCurrentTrack();
-      playMusic();
+      playMusicInstantly();
     }
 
     function loadCurrentTrack() {
@@ -540,13 +540,18 @@
       playBtn.textContent = audio.paused ? "▶" : "⏸";
     }
 
-    function playMusic() {
-      audio.play().then(() => {
-        updatePlayBtnIcon();
-      }).catch(err => {
-        console.log("Music autoplay pending user gesture:", err.message);
-        updatePlayBtnIcon();
-      });
+    // Instant Autoplay Invoker
+    function playMusicInstantly() {
+      if (!audio.src) return;
+      audio.muted = false;
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise.then(() => {
+          updatePlayBtnIcon();
+        }).catch(() => {
+          updatePlayBtnIcon();
+        });
+      }
     }
 
     function pauseMusic() {
@@ -554,7 +559,7 @@
       updatePlayBtnIcon();
     }
 
-    // 2. Hide / Show Widget Logic
+    // Hide / Show Widget Logic
     function showWidget() {
       widget.classList.remove('is-minimized');
       reopenBtn.classList.remove('is-visible');
@@ -574,9 +579,7 @@
       }, 5000); // Auto-hide 5 seconds after revealing
     }
 
-    // 3. User Triggers to Show Player Back
-    
-    // Trigger A: Hover over bottom screen (within 90px of bottom edge)
+    // User Triggers to Reveal Player
     window.addEventListener('mousemove', (e) => {
       const bottomThreshold = window.innerHeight - 90;
       if (e.clientY >= bottomThreshold && widget.classList.contains('is-minimized')) {
@@ -584,7 +587,6 @@
       }
     });
 
-    // Trigger B: Click anywhere on empty space (stage / background)
     document.addEventListener('click', (e) => {
       const isCardBtn = e.target.closest('.card-btn');
       const isWidget = e.target.closest('#music-widget');
@@ -595,20 +597,17 @@
       }
     });
 
-    // Trigger C: Re-open Floating Button Click
     reopenBtn.addEventListener('click', () => {
       getSound()?.playClick?.();
       showWidget();
     });
 
-    // Close Button Click
     closeBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       getSound()?.playClick?.();
       hideWidget();
     });
 
-    // Keep widget open while user hovers over it
     widget.addEventListener('mouseenter', () => clearTimeout(autoHideTimer));
     widget.addEventListener('mouseleave', () => {
       if (!widget.classList.contains('is-minimized')) {
@@ -616,12 +615,12 @@
       }
     });
 
-    // 4. Music Player Controls
+    // Controls (Play / Pause & Next Song)
     playBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       getSound()?.playClick?.();
       if (audio.paused) {
-        playMusic();
+        playMusicInstantly();
       } else {
         pauseMusic();
       }
@@ -633,21 +632,21 @@
       getSound()?.playClick?.();
       trackIndex = (trackIndex + 1) % playlist.length;
       loadCurrentTrack();
-      playMusic();
+      playMusicInstantly();
       startAutoHideTimer();
     });
 
-    // 5. Automatic Next Track on Song End
+    // Automatic Next Track on Song End
     audio.addEventListener('ended', () => {
       trackIndex = (trackIndex + 1) % playlist.length;
       loadCurrentTrack();
-      playMusic();
+      playMusicInstantly();
     });
 
     audio.addEventListener('play', updatePlayBtnIcon);
     audio.addEventListener('pause', updatePlayBtnIcon);
 
-    // Audio error fallback handler
+    // Error fallback handler
     audio.addEventListener('error', () => {
       if (playlist[trackIndex] && playlist[trackIndex].src.includes('assets/3tahun/dashboard/music/')) {
         playlist[trackIndex].src = `assets/audio/music/${playlist[trackIndex].name}.mp3`;
@@ -655,19 +654,20 @@
       }
     });
 
-    // Start loading playlist and auto-playing
+    // Immediate initial execution
+    loadCurrentTrack();
+    playMusicInstantly();
     loadPlaylistJson();
 
-    // Browser touch/click unlock for autoplay policies
-    const unlockAudioOnInteraction = () => {
+    // Browser interaction backup trigger to ensure instant playback
+    const triggerInstantAutoplay = () => {
       if (audio.paused) {
-        playMusic();
+        playMusicInstantly();
       }
-      window.removeEventListener('click', unlockAudioOnInteraction);
-      window.removeEventListener('touchstart', unlockAudioOnInteraction);
     };
-    window.addEventListener('click', unlockAudioOnInteraction, { once: true });
-    window.addEventListener('touchstart', unlockAudioOnInteraction, { once: true });
+    window.addEventListener('click', triggerInstantAutoplay, { once: true });
+    window.addEventListener('touchstart', triggerInstantAutoplay, { once: true });
+    window.addEventListener('pointerdown', triggerInstantAutoplay, { once: true });
   })();
 
   /* ==========================================================================
@@ -683,8 +683,7 @@
     stage.classList.add('ready');
     loaderLayer.classList.add('hidden');
 
-    // Play optional loading chime sound
-    getSound()?.playLoading?.();
+    // Loading sound chime removed completely as requested
   }
 
   function preloadAssets() {
