@@ -182,6 +182,118 @@
     opacity: 1;
     transform: translate(-50%, 0);
   }
+
+  /* ---------- Music Player Floating Widget ---------- */
+  .music-player {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 15;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(25, 12, 60, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 2px solid rgba(255, 255, 255, 0.25);
+    border-radius: 999px;
+    padding: 6px 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 12px rgba(255, 255, 255, 0.15);
+    transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.35s ease, visibility 0.35s ease;
+  }
+
+  .music-player--hidden-state {
+    opacity: 0;
+    visibility: hidden;
+    transform: translate(-50%, 40px);
+    pointer-events: none;
+  }
+
+  .music-player__toggle {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 50%;
+    transition: color 0.15s ease, transform 0.15s ease;
+  }
+
+  .music-player__toggle:hover {
+    color: #ff4757;
+    transform: scale(1.15);
+  }
+
+  .music-player__track {
+    max-width: 180px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  }
+
+  .music-player__play {
+    background: linear-gradient(135deg, #ff4757, #ff6b81);
+    border: none;
+    color: #ffffff;
+    font-size: 14px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(255, 71, 87, 0.4);
+    transition: transform 0.15s ease, filter 0.15s ease;
+  }
+
+  .music-player__play:hover {
+    transform: scale(1.1);
+    filter: brightness(1.1);
+  }
+
+  .music-player__play:active {
+    transform: scale(0.92);
+  }
+
+  .music-player__reveal {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    z-index: 15;
+    background: rgba(25, 12, 60, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 2px solid rgba(255, 255, 255, 0.25);
+    color: #ffffff;
+    font-size: 18px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+    transition: transform 0.2s ease, filter 0.2s ease;
+  }
+
+  .music-player__reveal:hover {
+    transform: scale(1.1);
+    filter: brightness(1.15);
+  }
+
+  .music-player__reveal[hidden] {
+    display: none !important;
+  }
 </style>
 </head>
 <body>
@@ -199,13 +311,26 @@
         <source src="assets/3tahun/dashboard/bg.mp4" type="video/mp4">
         <source src="assets/3tahun/dashboard/bg.webm" type="video/webm">
       </video>
+
       <div id="toast"></div>
+
+      <!-- Floating Music Player Widget -->
+      <div id="musicPlayerBar" class="music-player">
+        <button id="musicToggle" class="music-player__toggle" aria-label="Hide Music Player">✕</button>
+        <div class="music-player__track">
+          <span id="musicTrackName">Loading music...</span>
+        </div>
+        <button id="musicPlayPause" class="music-player__play" aria-label="Play or Pause Music">▶</button>
+      </div>
+      <button id="musicRevealBtn" class="music-player__reveal" aria-label="Show Music Player" hidden>🎵</button>
+
       <!-- Buttons injected by JS from LAYOUT data -->
     </div>
   </div>
 
-<!-- Shared sound utility loaded before page script execution -->
+<!-- Shared utilities loaded before page script execution -->
 <script src="js/sound.js"></script>
+<script src="js/music-player.js"></script>
 
 <script>
   // Dynamic layout percentage positions
@@ -334,6 +459,13 @@
     bindCardActions(btn, item.label);
     stage.appendChild(btn);
   });
+
+  /* ==========================================================================
+     INITIALIZE SHARED MUSIC PLAYER WIDGET
+     ========================================================================== */
+  if (window.SmartKiddoMusicPlayer && typeof window.SmartKiddoMusicPlayer.init === 'function') {
+    SmartKiddoMusicPlayer.init();
+  }
 
   /* ==========================================================================
      SMOOTH PRELOADER ENGINE
