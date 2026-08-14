@@ -421,26 +421,20 @@
   }
 
   function getSound() {
-    if (typeof window !== 'undefined' && window.SmartKiddoSound) {
-      return window.SmartKiddoSound;
-    }
-    if (typeof SmartKiddoSound !== 'undefined') {
-      return SmartKiddoSound;
-    }
+    if (typeof window !== 'undefined' && window.SmartKiddoSound) return window.SmartKiddoSound;
+    if (typeof SmartKiddoSound !== 'undefined') return SmartKiddoSound;
     return null;
   }
 
   function bindCardActions(btn, label) {
     // Hover Sound
     btn.addEventListener('mouseenter', () => {
-      const sound = getSound();
-      sound?.playHover?.();
+      getSound()?.playHover?.();
     });
 
     // Click Sound & Toast
     btn.addEventListener('click', () => {
-      const sound = getSound();
-      sound?.playClick?.();
+      getSound()?.playClick?.();
       showToast(label);
     });
   }
@@ -463,9 +457,15 @@
   /* ==========================================================================
      INITIALIZE SHARED MUSIC PLAYER WIDGET
      ========================================================================== */
-  if (window.SmartKiddoMusicPlayer && typeof window.SmartKiddoMusicPlayer.init === 'function') {
-    SmartKiddoMusicPlayer.init();
+  function initMusicPlayer() {
+    const player = (typeof window !== 'undefined' && window.SmartKiddoMusicPlayer) || 
+                   (typeof SmartKiddoMusicPlayer !== 'undefined' ? SmartKiddoMusicPlayer : null);
+    if (player && typeof player.init === 'function') {
+      player.init();
+    }
   }
+
+  initMusicPlayer();
 
   /* ==========================================================================
      SMOOTH PRELOADER ENGINE
@@ -482,8 +482,7 @@
     loaderLayer.classList.add('hidden');
 
     // Play optional loading chime sound
-    const sound = getSound();
-    sound?.playLoading?.();
+    getSound()?.playLoading?.();
   }
 
   function preloadAssets() {
