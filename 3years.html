@@ -191,7 +191,7 @@
     bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 500; /* High Z-Index Priority */
+    z-index: 500;
     display: flex;
     align-items: center;
     gap: 12px;
@@ -200,11 +200,12 @@
     border-radius: 999px;
     padding: 8px 18px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 16px rgba(255, 71, 87, 0.4);
-    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease;
+    transition: transform 0.45s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.45s ease;
   }
 
+  /* Hidden / Minimized state */
   .music-widget.is-minimized {
-    transform: translate(-50%, 60px);
+    transform: translate(-50%, 75px);
     opacity: 0;
     pointer-events: none;
   }
@@ -267,6 +268,7 @@
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
   }
 
+  /* Floating reveal button */
   .mw-reopen-btn {
     position: absolute;
     bottom: 20px;
@@ -319,8 +321,8 @@
 
       <div id="toast"></div>
 
-      <!-- Built-In Floating Music Player Widget -->
-      <div id="music-widget" class="music-widget">
+      <!-- Built-In Floating Music Player Widget (Hidden at first) -->
+      <div id="music-widget" class="music-widget is-minimized">
         <button id="mw-toggle-btn" class="mw-btn mw-close-btn" title="Minimize Music Player">✕</button>
         <div class="mw-info">
           <span class="mw-icon">🎵</span>
@@ -330,8 +332,8 @@
         <button id="mw-next-btn" class="mw-btn" title="Next Song">⏭</button>
       </div>
 
-      <!-- Floating Music Re-Open Button -->
-      <button id="mw-reopen-btn" class="mw-reopen-btn" title="Open Music Player">
+      <!-- Floating Music Re-Open Button (Visible at first) -->
+      <button id="mw-reopen-btn" class="mw-reopen-btn is-visible" title="Open Music Player">
         <span>🎵</span>
       </button>
 
@@ -468,7 +470,7 @@
   });
 
   /* ==========================================================================
-     BUILT-IN SELF-CONTAINED MUSIC PLAYER (NO EXTERNAL FILE DEPENDENCIES)
+     BUILT-IN MUSIC PLAYER ENGINE (AUTOPLAY, AUTO-NEXT & HOVER/CLICK SHOW TRiggers)
      ========================================================================== */
   (function initBuiltInMusicPlayer() {
     const audio = document.getElementById('bg-music-audio');
@@ -488,8 +490,9 @@
     ];
 
     let trackIndex = 0;
+    let autoHideTimer = null;
 
-    // Attempt loading custom playlist.json dynamically if available
+    // 1. Load Playlist from JSON if available
     const playlistPaths = [
       "assets/3tahun/dashboard/music/playlist.json",
       "assets/audio/music/playlist.json"
@@ -520,6 +523,7 @@
         }
       }
       loadCurrentTrack();
+      playMusic();
     }
 
     function loadCurrentTrack() {
@@ -540,7 +544,7 @@
       audio.play().then(() => {
         updatePlayBtnIcon();
       }).catch(err => {
-        console.log("Music autoplay note:", err.message);
+        console.log("Music autoplay pending user gesture:", err.message);
         updatePlayBtnIcon();
       });
     }
@@ -550,64 +554,120 @@
       updatePlayBtnIcon();
     }
 
-    // Controls
-    playBtn.addEventListener('click', () => {
+    // 2. Hide / Show Widget Logic
+    function showWidget() {
+      widget.classList.remove('is-minimized');
+      reopenBtn.classList.remove('is-visible');
+      startAutoHideTimer();
+    }
+
+    function hideWidget() {
+      clearTimeout(autoHideTimer);
+      widget.classList.add('is-minimized');
+      reopenBtn.classList.add('is-visible');
+    }
+
+    function startAutoHideTimer() {
+      clearTimeout(autoHideTimer);
+      autoHideTimer = setTimeout(() => {
+        hideWidget();
+      }, 5000); // Auto-hide 5 seconds after revealing
+    }
+
+    // 3. User Triggers to Show Player Back
+    
+    // Trigger A: Hover over bottom screen (within 90px of bottom edge)
+    window.addEventListener('mousemove', (e) => {
+      const bottomThreshold = window.innerHeight - 90;
+      if (e.clientY >= bottomThreshold && widget.classList.contains('is-minimized')) {
+        showWidget();
+      }
+    });
+
+    // Trigger B: Click anywhere on empty space (stage / background)
+    document.addEventListener('click', (e) => {
+      const isCardBtn = e.target.closest('.card-btn');
+      const isWidget = e.target.closest('#music-widget');
+      const isReopenBtn = e.target.closest('#mw-reopen-btn');
+      
+      if (!isCardBtn && !isWidget && !isReopenBtn) {
+        showWidget();
+      }
+    });
+
+    // Trigger C: Re-open Floating Button Click
+    reopenBtn.addEventListener('click', () => {
+      getSound()?.playClick?.();
+      showWidget();
+    });
+
+    // Close Button Click
+    closeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      getSound()?.playClick?.();
+      hideWidget();
+    });
+
+    // Keep widget open while user hovers over it
+    widget.addEventListener('mouseenter', () => clearTimeout(autoHideTimer));
+    widget.addEventListener('mouseleave', () => {
+      if (!widget.classList.contains('is-minimized')) {
+        startAutoHideTimer();
+      }
+    });
+
+    // 4. Music Player Controls
+    playBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
       getSound()?.playClick?.();
       if (audio.paused) {
         playMusic();
       } else {
         pauseMusic();
       }
+      startAutoHideTimer();
     });
 
-    nextBtn.addEventListener('click', () => {
+    nextBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
       getSound()?.playClick?.();
       trackIndex = (trackIndex + 1) % playlist.length;
       loadCurrentTrack();
       playMusic();
+      startAutoHideTimer();
     });
 
-    closeBtn.addEventListener('click', () => {
-      getSound()?.playClick?.();
-      widget.classList.add('is-minimized');
-      reopenBtn.classList.add('is-visible');
-    });
-
-    reopenBtn.addEventListener('click', () => {
-      getSound()?.playClick?.();
-      widget.classList.remove('is-minimized');
-      reopenBtn.classList.remove('is-visible');
-    });
-
-    audio.addEventListener('play', updatePlayBtnIcon);
-    audio.addEventListener('pause', updatePlayBtnIcon);
+    // 5. Automatic Next Track on Song End
     audio.addEventListener('ended', () => {
       trackIndex = (trackIndex + 1) % playlist.length;
       loadCurrentTrack();
       playMusic();
     });
 
+    audio.addEventListener('play', updatePlayBtnIcon);
+    audio.addEventListener('pause', updatePlayBtnIcon);
+
     // Audio error fallback handler
     audio.addEventListener('error', () => {
       if (playlist[trackIndex] && playlist[trackIndex].src.includes('assets/3tahun/dashboard/music/')) {
-        // Fallback to secondary audio directory if path fails
         playlist[trackIndex].src = `assets/audio/music/${playlist[trackIndex].name}.mp3`;
         audio.src = playlist[trackIndex].src;
       }
     });
 
+    // Start loading playlist and auto-playing
     loadPlaylistJson();
 
-    // Mobile user-gesture unlock trigger
-    const unlockAudioOnTouch = () => {
+    // Browser touch/click unlock for autoplay policies
+    const unlockAudioOnInteraction = () => {
       if (audio.paused) {
         playMusic();
       }
-      window.removeEventListener('click', unlockAudioOnTouch);
-      window.removeEventListener('touchstart', unlockAudioOnTouch);
+      window.removeEventListener('click', unlockAudioOnInteraction);
+      window.removeEventListener('touchstart', unlockAudioOnInteraction);
     };
-    window.addEventListener('click', unlockAudioOnTouch, { once: true });
-    window.addEventListener('touchstart', unlockAudioOnTouch, { once: true });
+    window.addEventListener('click', unlockAudioOnInteraction, { once: true });
+    window.addEventListener('touchstart', unlockAudioOnInteraction, { once: true });
   })();
 
   /* ==========================================================================
