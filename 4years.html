@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Let's Learn & Have Fun!</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #0a0028;
+    font-family: 'Baloo 2', 'Comic Sans MS', system-ui, -apple-system, sans-serif;
+  }
+
+  /* ---------- Stage: locked to the source image aspect ratio (FIT / letterbox) ---------- */
+  #stage-wrapper {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #0a0028; /* sampled from the scene's own deep-space corner color */
+    overflow: hidden;
+  }
+
+  #stage {
+    position: relative;
+    aspect-ratio: 1672 / 941;
+    width: 100%;
+    height: 100%;
+    max-width: calc(100vh * 1672 / 941);
+    max-height: calc(100vw * 941 / 1672);
+    background-image: url('assets/4tahun/dashboard/bg.jpg'); /* fallback if the video is missing/still loading */
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    overflow: hidden;
+  }
+
+  /* ---------- Background video ---------- */
+  #bg-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;   /* stretches to the locked stage box, same as the old background-size:100% 100% — swap to "cover" if your clip's aspect ratio doesn't match 1672:941 and you'd rather crop than stretch */
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* ---------- Card buttons ---------- */
+  .card-btn {
+    -webkit-appearance: none;
+    appearance: none;
+    -webkit-tap-highlight-color: transparent;
+    position: absolute;
+    z-index: 1;
+    border: none;
+    outline: none;
+    padding: 0;
+    margin: 0;
+    background-color: transparent;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    cursor: pointer;
+    transition: transform 0.12s ease, filter 0.12s ease;
+  }
+
+  .card-btn:hover {
+    transform: scale(1.045);
+    filter: brightness(1.08) drop-shadow(0 0 14px rgba(255,255,255,0.55));
+  }
+
+  .card-btn:active {
+    transform: scale(0.96);
+    filter: brightness(0.95);
+  }
+
+  .card-btn:focus-visible {
+    filter: brightness(1.1) drop-shadow(0 0 0 4px #fff);
+  }
+
+  /* ---------- Popup toast ---------- */
+  #toast {
+    position: absolute;
+    left: 50%;
+    top: 8%;
+    transform: translate(-50%, -20px);
+    background: linear-gradient(180deg, #ffffff, #f0e9ff);
+    color: #5b2a86;
+    font-weight: 800;
+    font-size: clamp(14px, 2.4vw, 26px);
+    padding: 0.7em 1.4em;
+    border-radius: 999px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.35), 0 0 0 4px rgba(255,255,255,0.5) inset;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    white-space: nowrap;
+    z-index: 20;
+    text-align: center;
+  }
+
+  #toast.show {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+</style>
+</head>
+<body>
+
+  <div id="stage-wrapper">
+    <div id="stage">
+      <!-- Background video. Replace assets/4tahun/dashboard/bg.mp4 with your clip (mp4 + webm recommended).
+           If this fails to load or is removed, the #stage background-image (assets/4tahun/dashboard/bg.jpg) shows instead. -->
+      <video id="bg-video" autoplay muted loop playsinline poster="assets/4tahun/dashboard/bg.jpg">
+        <source src="assets/4tahun/dashboard/bg.mp4" type="video/mp4">
+        <source src="assets/4tahun/dashboard/bg.webm" type="video/webm">
+      </video>
+      <div id="toast"></div>
+      <!-- Buttons injected by JS from LAYOUT data -->
+    </div>
+  </div>
+
+<script>
+  // Percentage boxes measured directly from the source screenshot (1672 x 941).
+  const LAYOUT = [
+    { id: 1,  label: "COLORS",          img: "assets/4tahun/dashboard/card_1.png",  left: 41.866,  top: 14.0276, width: 14.4737, height: 22.7418 },
+    { id: 2,  label: "NUMBERS",         img: "assets/4tahun/dashboard/card_2.png",  left: 56.8182, top: 14.0276, width: 13.9952, height: 22.7418 },
+    { id: 3,  label: "DRAWING",         img: "assets/4tahun/dashboard/card_3.png",  left: 71.2919, top: 14.0276, width: 13.3971, height: 22.7418 },
+    { id: 4,  label: "SHAPES",          img: "assets/4tahun/dashboard/card_4.png",  left: 85.1675, top: 14.0276, width: 13.1579, height: 22.7418 },
+    { id: 5,  label: "ABC ADVENTURES",  img: "assets/4tahun/dashboard/card_5.png",  left: 41.866,  top: 40.3826, width: 14.4737, height: 20.4038 },
+    { id: 6,  label: "ANIMAL FUN",      img: "assets/4tahun/dashboard/card_6.png",  left: 56.8182, top: 40.3826, width: 13.9952, height: 20.4038 },
+    { id: 7,  label: "PUZZLES",         img: "assets/4tahun/dashboard/card_7.png",  left: 71.2919, top: 40.3826, width: 13.3971, height: 20.4038 },
+    { id: 8,  label: "PUZZLE TIME",     img: "assets/4tahun/dashboard/card_8.png",  left: 85.1675, top: 40.3826, width: 13.1579, height: 20.4038 },
+    { id: 9,  label: "STORYLAND",       img: "assets/4tahun/dashboard/card_9.png",  left: 41.866,  top: 64.8247, width: 14.4737, height: 20.9352 },
+    { id: 10, label: "MATHING MIX",     img: "assets/4tahun/dashboard/card_10.png", left: 56.8182, top: 64.8247, width: 13.9952, height: 20.9352 },
+    { id: 11, label: "MUSIC MIX",       img: "assets/4tahun/dashboard/card_11.png", left: 71.2919, top: 64.8247, width: 13.3971, height: 20.9352 },
+    { id: 12, label: "ACHIEVEMENTS",    img: "assets/4tahun/dashboard/card_12.png", left: 85.1675, top: 64.8247, width: 13.1579, height: 20.9352 },
+  ];
+
+  const stage = document.getElementById('stage');
+  const bgVideo = document.getElementById('bg-video');
+  const toast = document.getElementById('toast');
+
+  // If NONE of the <source> files can be loaded, hide the <video> so the bg.jpg
+  // background-image on #stage shows through cleanly instead of a blank/broken frame.
+  // (Only checks bgVideo.error — a single failed <source> like a missing .webm
+  // fallback must not hide a perfectly good .mp4 that already loaded.)
+  bgVideo.addEventListener('error', () => {
+    if (bgVideo.error) bgVideo.style.display = 'none';
+  });
+  let toastTimer = null;
+
+  function showToast(label) {
+    clearTimeout(toastTimer);
+    toast.textContent = label + ' coming soon!';
+    toast.classList.add('show');
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 1600);
+  }
+
+  LAYOUT.forEach(item => {
+    const btn = document.createElement('button');
+    btn.className = 'card-btn';
+    btn.style.left = item.left + '%';
+    btn.style.top = item.top + '%';
+    btn.style.width = item.width + '%';
+    btn.style.height = item.height + '%';
+    btn.style.backgroundImage = `url('${item.img}')`;
+    btn.setAttribute('aria-label', item.label);
+    btn.addEventListener('click', () => showToast(item.label));
+    stage.appendChild(btn);
+  });
+</script>
+
+</body>
+</html>
