@@ -204,7 +204,6 @@
     max-height: none !important;
     object-fit: cover !important;
     object-position: center !important;
-    /* Overscans past edges to guarantee ZERO left/right empty space */
     transform: translate(-50%, -50%) scale(1.08) !important;
     z-index: 0 !important;
     pointer-events: none !important;
@@ -245,19 +244,54 @@
   }
 
   /* ==========================================================================
-     ANDROID & IOS MOBILE PHONE CARD SCALING (BIGGER CARDS)
+     ANDROID & IOS MOBILE PHONE CARD SCALING (SLIGHTLY BIGGER CARDS)
      ========================================================================== */
   @media screen and (max-width: 600px) {
     /* Mobile Phones in Portrait */
     .card-btn {
-      transform: scaleX(1.30) scaleY(1.15);
+      transform: scaleX(1.38) scaleY(1.22);
       transform-origin: center center;
     }
+    .card-btn:hover {
+      transform: scaleX(1.42) scaleY(1.25);
+    }
+    .card-btn:active {
+      transform: scaleX(1.32) scaleY(1.16);
+    }
     .card-row-1 {
-      top: calc(var(--base-top) - 2.5%) !important;
+      top: calc(var(--base-top) - 3.2%) !important;
     }
     .card-row-3 {
-      top: calc(var(--base-top) + 2.5%) !important;
+      top: calc(var(--base-top) + 3.2%) !important;
+    }
+    .card-col-4 {
+      left: calc(var(--base-left) - 4.0%) !important;
+    }
+    .card-col-3 {
+      left: calc(var(--base-left) - 2.4%) !important;
+    }
+    .card-col-2 {
+      left: calc(var(--base-left) - 1.0%) !important;
+    }
+  }
+
+  @media screen and (max-height: 500px) and (max-width: 930px) {
+    /* Mobile Phones in Landscape */
+    .card-btn {
+      transform: scaleX(1.30) scaleY(1.18);
+      transform-origin: center center;
+    }
+    .card-btn:hover {
+      transform: scaleX(1.34) scaleY(1.21);
+    }
+    .card-btn:active {
+      transform: scaleX(1.24) scaleY(1.12);
+    }
+    .card-row-1 {
+      top: calc(var(--base-top) - 2.4%) !important;
+    }
+    .card-row-3 {
+      top: calc(var(--base-top) + 2.4%) !important;
     }
     .card-col-4 {
       left: calc(var(--base-left) - 3.2%) !important;
@@ -267,29 +301,6 @@
     }
     .card-col-2 {
       left: calc(var(--base-left) - 0.8%) !important;
-    }
-  }
-
-  @media screen and (max-height: 500px) and (max-width: 930px) {
-    /* Mobile Phones in Landscape */
-    .card-btn {
-      transform: scaleX(1.22) scaleY(1.10);
-      transform-origin: center center;
-    }
-    .card-row-1 {
-      top: calc(var(--base-top) - 1.8%) !important;
-    }
-    .card-row-3 {
-      top: calc(var(--base-top) + 1.8%) !important;
-    }
-    .card-col-4 {
-      left: calc(var(--base-left) - 2.5%) !important;
-    }
-    .card-col-3 {
-      left: calc(var(--base-left) - 1.2%) !important;
-    }
-    .card-col-2 {
-      left: calc(var(--base-left) - 0.5%) !important;
     }
   }
 
