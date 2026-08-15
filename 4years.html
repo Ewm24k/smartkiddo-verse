@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Let's Learn & Have Fun!</title>
+<script src="js/sound.js"></script>
 <style>
   * { box-sizing: border-box; }
   html, body {
@@ -16,44 +17,151 @@
     font-family: 'Baloo 2', 'Comic Sans MS', system-ui, -apple-system, sans-serif;
   }
 
-  /* ---------- Stage: locked to the source image aspect ratio (FIT / letterbox) ---------- */
+  /* ---------- Preloader Layer ---------- */
+  #loader-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: radial-gradient(circle at center, #1b0a40 0%, #080018 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    transition: opacity 0.5s ease;
+  }
+
+  .loader-spinner {
+    width: 60px;
+    height: 60px;
+    border: 6px solid rgba(255, 255, 255, 0.15);
+    border-top-color: #ff3366;
+    border-right-color: #ffcc00;
+    border-bottom-color: #33ccff;
+    border-left-color: #33ff66;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .loader-text {
+    color: #ffffff;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  }
+
+  #continue-btn {
+    display: none;
+    padding: 16px 42px;
+    font-size: 24px;
+    font-weight: 800;
+    color: #ffffff;
+    background: linear-gradient(135deg, #ff007f, #7928ca);
+    border: 3px solid rgba(255, 255, 255, 0.8);
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 0 20px rgba(255, 0, 127, 0.6), 0 0 40px rgba(121, 40, 202, 0.4);
+    animation: pulse-glow 1.5s infinite ease-in-out;
+    transition: transform 0.2s, filter 0.2s;
+  }
+
+  #continue-btn:hover {
+    transform: scale(1.08);
+    filter: brightness(1.15);
+  }
+
+  #continue-btn:active {
+    transform: scale(0.95);
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% {
+      transform: scale(1);
+      box-shadow: 0 0 20px rgba(255, 0, 127, 0.6), 0 0 40px rgba(121, 40, 202, 0.4);
+    }
+    50% {
+      transform: scale(1.06);
+      box-shadow: 0 0 30px rgba(255, 0, 127, 0.9), 0 0 60px rgba(121, 40, 202, 0.7);
+    }
+  }
+
+  /* ---------- Modern Top-Left Back Button ---------- */
+  #back-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 100;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    color: #ffffff;
+    font-size: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    transition: transform 0.2s, background 0.2s;
+    outline: none;
+  }
+
+  #back-btn:hover {
+    transform: scale(1.1);
+    background: rgba(255, 255, 255, 0.35);
+  }
+
+  #back-btn:active {
+    transform: scale(0.92);
+  }
+
+  /* ---------- Full-Screen Responsive Stage ---------- */
   #stage-wrapper {
     position: fixed;
     inset: 0;
     width: 100vw;
     height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    background: #0a0028;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #0a0028; /* sampled from the scene's own deep-space corner color */
-    overflow: hidden;
   }
 
   #stage {
     position: relative;
-    aspect-ratio: 1672 / 941;
-    width: 100%;
-    height: 100%;
-    max-width: calc(100vh * 1672 / 941);
-    max-height: calc(100vw * 941 / 1672);
-    background-image: url('assets/4tahun/dashboard/bg.jpg'); /* fallback if the video is missing/still loading */
-    background-size: 100% 100%;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    background-image: url('assets/4tahun/dashboard/bg.jpg');
+    background-size: cover;
+    background-position: center;
     background-repeat: no-repeat;
     overflow: hidden;
   }
 
-  /* ---------- Background video ---------- */
+  /* ---------- Background Video ---------- */
   #bg-video {
     position: absolute;
     inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: fill;   /* stretches to the locked stage box, same as the old background-size:100% 100% — swap to "cover" if your clip's aspect ratio doesn't match 1672:941 and you'd rather crop than stretch */
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    object-fit: cover;
     z-index: 0;
     pointer-events: none;
   }
 
-  /* ---------- Card buttons ---------- */
+  /* ---------- Card Buttons ---------- */
   .card-btn {
     -webkit-appearance: none;
     appearance: none;
@@ -83,12 +191,155 @@
   }
 
   .card-btn:focus-visible {
-    filter: brightness(1.1) drop-shadow(0 0 0 4px #fff);
+    filter: brightness(1.1) drop-shadow(0 0 0 4px #ffffff);
   }
 
-  /* ---------- Popup toast ---------- */
+  /* ---------- Mobile Phone Card Scaling (Android & iOS) ---------- */
+  @media screen and (max-width: 600px), screen and (max-height: 500px) and (max-width: 930px) {
+    .card-btn {
+      transform: scaleX(1.30) scaleY(1.15);
+    }
+    .card-btn:hover {
+      transform: scaleX(1.30) scaleY(1.15) scale(1.045);
+    }
+
+    .card-row-1 {
+      top: calc(var(--base-top) - 2.5%) !important;
+    }
+    .card-row-2 {
+      top: var(--base-top) !important;
+    }
+    .card-row-3 {
+      top: calc(var(--base-top) + 2.5%) !important;
+    }
+
+    .card-col-1 {
+      left: var(--base-left) !important;
+    }
+    .card-col-2 {
+      left: calc(var(--base-left) - 1.5%) !important;
+    }
+    .card-col-3 {
+      left: calc(var(--base-left) - 3.0%) !important;
+    }
+    .card-col-4 {
+      left: calc(var(--base-left) - 4.5%) !important;
+    }
+  }
+
+  /* ---------- Floating Music Player Widget ---------- */
+  #mw-reopen-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 100;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    transition: transform 0.2s, opacity 0.3s;
+    outline: none;
+  }
+
+  #mw-reopen-btn:hover {
+    transform: scale(1.1);
+  }
+
+  #music-widget {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 101;
+    width: 260px;
+    padding: 12px 16px;
+    border-radius: 18px;
+    background: rgba(20, 10, 45, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 2px solid rgba(255, 255, 255, 0.25);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    color: #ffffff;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  #music-widget.is-minimized {
+    transform: translateY(120%) scale(0.8);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .mw-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-weight: 700;
+    font-size: 14px;
+  }
+
+  #mw-close-btn {
+    background: transparent;
+    border: none;
+    color: #aaaaaa;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 0 4px;
+  }
+
+  #mw-close-btn:hover { color: #ffffff; }
+
+  .mw-track-info {
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #ffd700;
+    text-align: center;
+    font-weight: 600;
+  }
+
+  .mw-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  .mw-controls button {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.15s, background 0.15s;
+    outline: none;
+  }
+
+  .mw-controls button:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.08);
+  }
+
+  /* ---------- Toast Popup ---------- */
   #toast {
-    position: absolute;
+    position: fixed;
     left: 50%;
     top: 8%;
     transform: translate(-50%, -20px);
@@ -103,7 +354,7 @@
     pointer-events: none;
     transition: opacity 0.25s ease, transform 0.25s ease;
     white-space: nowrap;
-    z-index: 20;
+    z-index: 200;
     text-align: center;
   }
 
@@ -115,21 +366,53 @@
 </head>
 <body>
 
+  <!-- Preloader Layer Overlay -->
+  <div id="loader-layer">
+    <div class="loader-spinner"></div>
+    <div class="loader-text">Loading Fun...</div>
+    <button id="continue-btn">CONTINUE ▶</button>
+  </div>
+
+  <!-- Top-Left Circular Glass Back Button -->
+  <button id="back-btn" aria-label="Go Back">◀</button>
+
+  <!-- Fullscreen Stage Container -->
   <div id="stage-wrapper">
     <div id="stage">
-      <!-- Background video. Replace assets/4tahun/dashboard/bg.mp4 with your clip (mp4 + webm recommended).
-           If this fails to load or is removed, the #stage background-image (assets/4tahun/dashboard/bg.jpg) shows instead. -->
-      <video id="bg-video" autoplay muted loop playsinline poster="assets/4tahun/dashboard/bg.jpg">
+      <video id="bg-video" autoplay muted playsinline webkit-playsinline poster="assets/4tahun/dashboard/bg.jpg">
         <source src="assets/4tahun/dashboard/bg.mp4" type="video/mp4">
         <source src="assets/4tahun/dashboard/bg.webm" type="video/webm">
       </video>
       <div id="toast"></div>
-      <!-- Buttons injected by JS from LAYOUT data -->
     </div>
   </div>
 
+  <!-- Floating Music Widget Controls -->
+  <button id="mw-reopen-btn" aria-label="Open Music Player">🎵</button>
+
+  <div id="music-widget" class="is-minimized">
+    <div class="mw-header">
+      <span class="mw-title">🎵 Music Box</span>
+      <button id="mw-close-btn" aria-label="Minimize">✕</button>
+    </div>
+    <div class="mw-track-info">
+      <span id="mw-track-title">Loading track...</span>
+    </div>
+    <div class="mw-controls">
+      <button id="mw-prev-btn" aria-label="Previous Track">⏮</button>
+      <button id="mw-play-btn" aria-label="Play/Pause">⏸</button>
+      <button id="mw-next-btn" aria-label="Next Track">⏭</button>
+    </div>
+    <audio id="bg-music-audio" preload="auto"></audio>
+  </div>
+
 <script>
-  // Percentage boxes measured directly from the source screenshot (1672 x 941).
+  // Safe Fallback Sound System Helper
+  function getSound() {
+    return window.SmartKiddoSound || null;
+  }
+
+  // Card Positions Measured Directly from Source Dimensions
   const LAYOUT = [
     { id: 1,  label: "COLORS",          img: "assets/4tahun/dashboard/card_1.png",  left: 41.866,  top: 14.0276, width: 14.4737, height: 22.7418 },
     { id: 2,  label: "NUMBERS",         img: "assets/4tahun/dashboard/card_2.png",  left: 56.8182, top: 14.0276, width: 13.9952, height: 22.7418 },
@@ -148,16 +431,35 @@
   const stage = document.getElementById('stage');
   const bgVideo = document.getElementById('bg-video');
   const toast = document.getElementById('toast');
+  const loaderLayer = document.getElementById('loader-layer');
+  const continueBtn = document.getElementById('continue-btn');
+  const backBtn = document.getElementById('back-btn');
 
-  // If NONE of the <source> files can be loaded, hide the <video> so the bg.jpg
-  // background-image on #stage shows through cleanly instead of a blank/broken frame.
-  // (Only checks bgVideo.error — a single failed <source> like a missing .webm
-  // fallback must not hide a perfectly good .mp4 that already loaded.)
-  bgVideo.addEventListener('error', () => {
-    if (bgVideo.error) bgVideo.style.display = 'none';
-  });
+  // Strict Background Video Rules: Volume Lock & Early Loop
+  if (bgVideo) {
+    bgVideo.muted = true;
+    bgVideo.volume = 0;
+    bgVideo.addEventListener('volumechange', () => {
+      if (!bgVideo.muted || bgVideo.volume !== 0) {
+        bgVideo.muted = true;
+        bgVideo.volume = 0;
+      }
+    });
+
+    bgVideo.addEventListener('timeupdate', () => {
+      if (bgVideo.duration && (bgVideo.duration - bgVideo.currentTime) <= 1.0) {
+        bgVideo.currentTime = 0;
+        bgVideo.play().catch(() => {});
+      }
+    });
+
+    bgVideo.addEventListener('error', () => {
+      if (bgVideo.error) bgVideo.style.display = 'none';
+    });
+  }
+
+  // Toast Notification System
   let toastTimer = null;
-
   function showToast(label) {
     clearTimeout(toastTimer);
     toast.textContent = label + ' coming soon!';
@@ -165,18 +467,267 @@
     toastTimer = setTimeout(() => toast.classList.remove('show'), 1600);
   }
 
-  LAYOUT.forEach(item => {
+  // Back Button Navigation Listener
+  backBtn.addEventListener('click', () => {
+    getSound()?.playClick?.();
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      window.location.href = 'index.html';
+    }
+  });
+
+  // Dynamically Create Cards with Mobile Scale Classes & Custom Variables
+  LAYOUT.forEach((item, index) => {
     const btn = document.createElement('button');
     btn.className = 'card-btn';
+    
+    const colIndex = (index % 4) + 1;
+    const rowIndex = Math.floor(index / 4) + 1;
+    
+    btn.classList.add(`card-col-${colIndex}`);
+    btn.classList.add(`card-row-${rowIndex}`);
+    
+    btn.style.setProperty('--base-left', item.left + '%');
+    btn.style.setProperty('--base-top', item.top + '%');
     btn.style.left = item.left + '%';
     btn.style.top = item.top + '%';
     btn.style.width = item.width + '%';
     btn.style.height = item.height + '%';
     btn.style.backgroundImage = `url('${item.img}')`;
     btn.setAttribute('aria-label', item.label);
-    btn.addEventListener('click', () => showToast(item.label));
+    
+    btn.addEventListener('mouseenter', () => {
+      getSound()?.playHover?.();
+    });
+    
+    btn.addEventListener('click', () => {
+      getSound()?.playClick?.();
+      showToast(item.label);
+    });
+    
     stage.appendChild(btn);
   });
+
+  // Asset Preloader Engine
+  let continueReady = false;
+  function showContinueBtn() {
+    if (continueReady) return;
+    continueReady = true;
+    const spinner = document.querySelector('.loader-spinner');
+    const loaderText = document.querySelector('.loader-text');
+    if (spinner) spinner.style.display = 'none';
+    if (loaderText) loaderText.style.display = 'none';
+    continueBtn.style.display = 'inline-block';
+  }
+
+  function initPreloader() {
+    const imagesToPreload = [
+      'assets/4tahun/dashboard/bg.jpg',
+      ...LAYOUT.map(i => i.img)
+    ];
+    let loaded = 0;
+    const total = imagesToPreload.length;
+
+    const checkReady = () => {
+      loaded++;
+      if (loaded >= total) {
+        showContinueBtn();
+      }
+    };
+
+    imagesToPreload.forEach(src => {
+      const img = new Image();
+      img.onload = checkReady;
+      img.onerror = checkReady;
+      img.src = src;
+    });
+
+    setTimeout(showContinueBtn, 3500);
+  }
+
+  initPreloader();
+
+  // "CONTINUE ▶" Fullscreen & Unmute Trigger
+  continueBtn.addEventListener('click', () => {
+    getSound()?.playClick?.();
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    } else if (document.documentElement.webkitRequestFullscreen) {
+      document.documentElement.webkitRequestFullscreen();
+    }
+
+    startMusicPlayback();
+
+    loaderLayer.style.opacity = '0';
+    setTimeout(() => {
+      loaderLayer.style.display = 'none';
+    }, 500);
+  });
+
+  // Autoplay Music Widget Engine
+  const musicWidget = document.getElementById('music-widget');
+  const mwReopenBtn = document.getElementById('mw-reopen-btn');
+  const mwCloseBtn = document.getElementById('mw-close-btn');
+  const mwPlayBtn = document.getElementById('mw-play-btn');
+  const mwPrevBtn = document.getElementById('mw-prev-btn');
+  const mwNextBtn = document.getElementById('mw-next-btn');
+  const trackTitleEl = document.getElementById('mw-track-title');
+  const bgAudio = document.getElementById('bg-music-audio');
+
+  let playlist = [];
+  let currentTrackIndex = 0;
+  let hideWidgetTimer = null;
+
+  async function loadPlaylist() {
+    const paths = [
+      'assets/4tahun/dashboard/music/playlist.json',
+      'assets/audio/music/playlist.json'
+    ];
+    for (const path of paths) {
+      try {
+        const res = await fetch(path);
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data) && data.length > 0) {
+            playlist = data;
+            return;
+          }
+        }
+      } catch (e) {}
+    }
+    playlist = [
+      { title: "Fun Kid Tune 1", src: "assets/audio/music/track1.mp3" },
+      { title: "Fun Kid Tune 2", src: "assets/audio/music/track2.mp3" }
+    ];
+  }
+
+  function playTrackAtIndex(index) {
+    if (!playlist || playlist.length === 0) return;
+    currentTrackIndex = (index + playlist.length) % playlist.length;
+    const track = playlist[currentTrackIndex];
+    if (trackTitleEl) {
+      trackTitleEl.textContent = track.title || `Track ${currentTrackIndex + 1}`;
+    }
+    bgAudio.src = track.src;
+    bgAudio.load();
+
+    const playPromise = () => {
+      bgAudio.play().then(() => {
+        if (mwPlayBtn) mwPlayBtn.textContent = '⏸';
+      }).catch(err => {
+        console.warn("Autoplay deferred or blocked:", err);
+      });
+    };
+
+    const onCanPlay = () => {
+      bgAudio.removeEventListener('canplay', onCanPlay);
+      playPromise();
+    };
+
+    bgAudio.addEventListener('canplay', onCanPlay);
+    playPromise();
+  }
+
+  bgAudio.addEventListener('ended', () => {
+    playTrackAtIndex(currentTrackIndex + 1);
+  });
+
+  function startMusicPlayback() {
+    bgAudio.muted = false;
+    if (bgAudio.paused) {
+      playTrackAtIndex(currentTrackIndex);
+    }
+  }
+
+  loadPlaylist().then(() => {
+    if (playlist.length > 0 && trackTitleEl) {
+      trackTitleEl.textContent = playlist[0].title || "Track 1";
+      bgAudio.src = playlist[0].src;
+    }
+  });
+
+  // Music Widget Reveal & Inactivity Timer Engine
+  function showWidget() {
+    musicWidget.classList.remove('is-minimized');
+    resetHideTimer();
+  }
+
+  function hideWidget() {
+    musicWidget.classList.add('is-minimized');
+    if (hideWidgetTimer) clearTimeout(hideWidgetTimer);
+  }
+
+  function resetHideTimer() {
+    if (hideWidgetTimer) clearTimeout(hideWidgetTimer);
+    hideWidgetTimer = setTimeout(() => {
+      hideWidget();
+    }, 5000);
+  }
+
+  window.addEventListener('mousemove', (e) => {
+    if (window.innerHeight - e.clientY <= 90) {
+      showWidget();
+    } else if (!musicWidget.classList.contains('is-minimized')) {
+      resetHideTimer();
+    }
+  });
+
+  document.getElementById('stage').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('stage') || e.target === document.getElementById('bg-video')) {
+      showWidget();
+    }
+  });
+
+  mwReopenBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    getSound()?.playClick?.();
+    if (musicWidget.classList.contains('is-minimized')) {
+      showWidget();
+    } else {
+      hideWidget();
+    }
+  });
+
+  mwCloseBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    getSound()?.playClick?.();
+    hideWidget();
+  });
+
+  mwPlayBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    getSound()?.playClick?.();
+    if (bgAudio.paused) {
+      bgAudio.play();
+      mwPlayBtn.textContent = '⏸';
+    } else {
+      bgAudio.pause();
+      mwPlayBtn.textContent = '▶';
+    }
+    resetHideTimer();
+  });
+
+  mwPrevBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    getSound()?.playClick?.();
+    playTrackAtIndex(currentTrackIndex - 1);
+    resetHideTimer();
+  });
+
+  mwNextBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    getSound()?.playClick?.();
+    playTrackAtIndex(currentTrackIndex + 1);
+    resetHideTimer();
+  });
+
+  musicWidget.addEventListener('click', (e) => {
+    e.stopPropagation();
+    resetHideTimer();
+  });
+
+  musicWidget.addEventListener('mousemove', resetHideTimer);
 </script>
 
 </body>
