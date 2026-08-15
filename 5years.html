@@ -119,8 +119,7 @@
   /* ---------- Full Screen Stage Wrapper ---------- */
   #stage-wrapper {
     position: fixed;
-    top: 0;
-    left: 0;
+    inset: 0;
     width: 100vw;
     height: 100vh;
     height: 100dvh;
@@ -134,8 +133,7 @@
   /* ---------- 100% Full Width & Full Height Stage ---------- */
   #stage {
     position: absolute;
-    top: 0;
-    left: 0;
+    inset: 0;
     width: 100vw;
     height: 100vh;
     height: 100dvh;
@@ -185,16 +183,21 @@
     transform: scale(0.92);
   }
 
-  /* ---------- 100% Full Width & Full Height Background Video ---------- */
+  /* ---------- 100% EXPANDED FULL SCREEN BACKGROUND VIDEO ---------- */
   #bg-video {
     position: absolute;
-    top: 0;
-    left: 0;
+    top: 50%;
+    left: 50%;
     width: 100vw;
     height: 100vh;
     height: 100dvh;
+    width: 100%;
+    height: 100%;
+    min-width: 100%;
+    min-height: 100%;
     object-fit: cover;
     object-position: center;
+    transform: translate(-50%, -50%);
     z-index: 0;
     pointer-events: none;
     user-select: none;
@@ -444,8 +447,8 @@
         </svg>
       </button>
 
-      <!-- Background video -->
-      <video id="bg-video" autoplay muted playsinline webkit-playsinline poster="assets/5tahun/dashboard/bg.jpg">
+      <!-- Full-Screen Video Background with Mobile Inline Compatibility Attributes -->
+      <video id="bg-video" autoplay muted playsinline webkit-playsinline x5-playsinline x5-video-player-type="h5-page" x5-video-player-fullscreen="true" poster="assets/5tahun/dashboard/bg.jpg">
         <source src="assets/5tahun/dashboard/bg.mp4" type="video/mp4">
         <source src="assets/5tahun/dashboard/bg.webm" type="video/webm">
       </video>
@@ -535,7 +538,7 @@
   }
 
   /* ==========================================================================
-     STRICT NO-SOUND ENFORCEMENT FOR BACKGROUND VIDEO
+     STRICT NO-SOUND ENFORCEMENT & FULLSCREEN STRETCH FOR BACKGROUND VIDEO
      ========================================================================== */
   function enforceNoSound() {
     bgVideo.muted = true;
@@ -549,6 +552,19 @@
       enforceNoSound();
     }
   });
+
+  // Dynamic Full-Width/Height Resize Engine for Video
+  function expandBgVideo() {
+    if (!bgVideo) return;
+    const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+    const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+    bgVideo.style.width = vw + 'px';
+    bgVideo.style.height = vh + 'px';
+  }
+
+  window.addEventListener('resize', expandBgVideo);
+  window.addEventListener('orientationchange', () => setTimeout(expandBgVideo, 250));
+  expandBgVideo();
 
   /* ==========================================================================
      VIDEO CONFIGURATION & CUSTOM EARLY LOOPING
@@ -607,12 +623,10 @@
   }
 
   function bindCardActions(btn, label) {
-    // Hover Sound
     btn.addEventListener('mouseenter', () => {
       getSound()?.playHover?.();
     });
 
-    // Click Sound & Toast
     btn.addEventListener('click', () => {
       getSound()?.playClick?.();
       showToast(label);
