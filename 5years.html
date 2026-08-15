@@ -15,10 +15,10 @@
   }
 
   html, body {
-    width: 100vw;
-    height: 100vh;
-    height: 100dvh;
-    overflow: hidden;
+    width: 100vw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    overflow: hidden !important;
     background: #0a0028;
     font-family: 'Baloo 2', 'Comic Sans MS', system-ui, -apple-system, sans-serif;
     -webkit-user-select: none;
@@ -118,15 +118,15 @@
 
   /* ---------- Full Screen Stage Wrapper ---------- */
   #stage-wrapper {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    width: 100vw;
-    height: 100vh;
-    height: 100dvh;
-    overflow: hidden;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    overflow: hidden !important;
     background: #0a0028;
     display: flex;
     align-items: center;
@@ -135,19 +135,19 @@
 
   /* ---------- 100% Full Width & Full Height Stage ---------- */
   #stage {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    width: 100vw;
-    height: 100vh;
-    height: 100dvh;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
     background-image: url('assets/5tahun/dashboard/bg.jpg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    overflow: hidden;
+    overflow: hidden !important;
     opacity: 0;
     transition: opacity 0.5s ease;
   }
@@ -189,20 +189,26 @@
     transform: scale(0.92);
   }
 
-  /* ---------- 100% EXPANDED FULL SCREEN BACKGROUND VIDEO ---------- */
+  /* ---------- FORCED FULL SCREEN & FULL WIDTH BACKGROUND VIDEO ---------- */
   #bg-video {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    min-width: 100vw;
-    min-height: 100vh;
-    min-height: 100dvh;
-    object-fit: cover;
-    object-position: center;
-    z-index: 0;
-    pointer-events: none;
-    user-select: none;
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    min-width: 100vw !important;
+    min-height: 100vh !important;
+    min-height: 100dvh !important;
+    max-width: none !important;
+    max-height: none !important;
+    object-fit: cover !important;
+    object-position: center !important;
+    /* Overscans past edges to guarantee ZERO left/right empty space */
+    transform: translate(-50%, -50%) scale(1.08) !important;
+    z-index: 0 !important;
+    pointer-events: none !important;
+    user-select: none !important;
   }
 
   /* ---------- Card buttons ---------- */
@@ -540,7 +546,7 @@
   }
 
   /* ==========================================================================
-     STRICT NO-SOUND ENFORCEMENT & MATHEMATICAL DYNAMIC FULL-SCREEN COVER FOR VIDEO
+     STRICT NO-SOUND ENFORCEMENT & DYNAMIC FORCED FULL-WIDTH VIDEO ENGINE
      ========================================================================== */
   function enforceNoSound() {
     bgVideo.muted = true;
@@ -555,13 +561,13 @@
     }
   });
 
-  // Dynamic Full-Width & Full-Height Aspect Cover Calculation
-  function fitVideoToScreen() {
+  // Dynamic Force Engine ensuring video expands past 100% width and height
+  function forceFullWidthVideo() {
     if (!bgVideo) return;
     const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
     const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
     
-    // Determine video intrinsic ratio (default fallback 16:9)
+    // Intrinsic aspect ratio check
     const videoRatio = (bgVideo.videoWidth && bgVideo.videoHeight) 
       ? (bgVideo.videoWidth / bgVideo.videoHeight) 
       : (16 / 9);
@@ -569,21 +575,21 @@
     const screenRatio = vw / vh;
     
     if (screenRatio > videoRatio) {
-      // Screen is wider than video aspect ratio -> stretch width to 100vw, calculate height
-      bgVideo.style.width = vw + 'px';
-      bgVideo.style.height = Math.ceil(vw / videoRatio) + 'px';
+      // Screen is wider than video -> fit width to 100vw + 8% overscan
+      bgVideo.style.setProperty('width', Math.ceil(vw * 1.08) + 'px', 'important');
+      bgVideo.style.setProperty('height', Math.ceil((vw * 1.08) / videoRatio) + 'px', 'important');
     } else {
-      // Screen is taller than video aspect ratio -> stretch height to 100vh, calculate width
-      bgVideo.style.height = vh + 'px';
-      bgVideo.style.width = Math.ceil(vh * videoRatio) + 'px';
+      // Screen is taller than video -> fit height to 100vh + 8% overscan
+      bgVideo.style.setProperty('height', Math.ceil(vh * 1.08) + 'px', 'important');
+      bgVideo.style.setProperty('width', Math.ceil((vh * 1.08) * videoRatio) + 'px', 'important');
     }
   }
 
-  window.addEventListener('resize', fitVideoToScreen);
-  window.addEventListener('orientationchange', () => setTimeout(fitVideoToScreen, 200));
-  bgVideo.addEventListener('loadedmetadata', fitVideoToScreen);
-  bgVideo.addEventListener('canplay', fitVideoToScreen);
-  fitVideoToScreen();
+  window.addEventListener('resize', forceFullWidthVideo);
+  window.addEventListener('orientationchange', () => setTimeout(forceFullWidthVideo, 200));
+  bgVideo.addEventListener('loadedmetadata', forceFullWidthVideo);
+  bgVideo.addEventListener('canplay', forceFullWidthVideo);
+  forceFullWidthVideo();
 
   /* ==========================================================================
      VIDEO CONFIGURATION & CUSTOM EARLY LOOPING
@@ -902,7 +908,7 @@
         globalUnmuteAndPlay();
       }
 
-      fitVideoToScreen();
+      forceFullWidthVideo();
 
       stage.classList.add('ready');
       loaderLayer.classList.add('hidden');
