@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Let's Learn & Have Fun!</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet">
 <style>
   * { 
     box-sizing: border-box; 
@@ -274,6 +277,9 @@
     .card-col-3 {
       left: calc(var(--base-left) - 1.2%) !important;
     }
+    .card-col-2 {
+      left: calc(var(--base-left) - 0.5%) !important;
+    }
   }
 
   /* ---------- Popup toast ---------- */
@@ -303,7 +309,7 @@
   }
 
   /* ==========================================================================
-     INLINE BUILT-IN MUSIC PLAYER WIDGET STYLES (EXACT 3YEARS.HTML SPEC)
+     INLINE BUILT-IN MUSIC PLAYER WIDGET STYLES
      ========================================================================== */
   .music-widget {
     position: absolute;
@@ -422,7 +428,7 @@
 </head>
 <body>
 
-  <!-- Smooth Animated Preloader Layer -->
+  <!-- Animated Preloader Layer -->
   <div id="loader-layer">
     <div id="loader-spinner" class="loader-spinner"></div>
     <div id="loader-text" class="loader-text">Loading Fun...</div>
@@ -446,7 +452,7 @@
 
       <div id="toast"></div>
 
-      <!-- Built-In Floating Music Player Widget (Hidden at first) -->
+      <!-- Built-In Floating Music Player Widget -->
       <div id="music-widget" class="music-widget is-minimized">
         <button id="mw-toggle-btn" class="mw-btn mw-close-btn" title="Minimize Music Player">✕</button>
         <div class="mw-info">
@@ -457,7 +463,7 @@
         <button id="mw-next-btn" class="mw-btn" title="Next Song">⏭</button>
       </div>
 
-      <!-- Floating Music Re-Open Button (Visible at first) -->
+      <!-- Floating Music Re-Open Button -->
       <button id="mw-reopen-btn" class="mw-reopen-btn is-visible" title="Open Music Player">
         <span>🎵</span>
       </button>
@@ -465,7 +471,7 @@
       <!-- Hidden Built-In Audio Engine -->
       <audio id="bg-music-audio" preload="auto"></audio>
 
-      <!-- Buttons injected by JS from LAYOUT data -->
+      <!-- Card buttons injected by JS from LAYOUT data -->
     </div>
   </div>
 
@@ -484,7 +490,7 @@
     { id: 7,  label: "PUZZLES",         img: "assets/5tahun/dashboard/card_7.png",  left: 69.6615, top: 38.4766, width: 13.6068, height: 19.1406 },
     { id: 8,  label: "PUZZLE TIME",     img: "assets/5tahun/dashboard/card_8.png",  left: 83.6589, top: 38.4766, width: 13.2161, height: 19.1406 },
     { id: 9,  label: "STORYLAND",       img: "assets/5tahun/dashboard/card_9.png",  left: 39.7135, top: 58.2031, width: 13.9323, height: 20.5078 },
-    { id: 10, label: "MATHING MIX",     img: "assets/5tahun/dashboard/card_10.png", left: 54.6875, top: 58.2031, width: 13.9323, height: 20.5078 },
+    { id: 10, label: "MATCHING MIX",    img: "assets/5tahun/dashboard/card_10.png", left: 54.6875, top: 58.2031, width: 13.9323, height: 20.5078 },
     { id: 11, label: "MUSIC MIX",       img: "assets/5tahun/dashboard/card_11.png", left: 69.5312, top: 58.2031, width: 13.737,  height: 20.5078 },
     { id: 12, label: "ACHIEVEMENTS",    img: "assets/5tahun/dashboard/card_12.png", left: 83.5286, top: 58.2031, width: 13.4766, height: 20.5078 },
   ];
@@ -498,7 +504,7 @@
   const continueBtn = document.getElementById('continue-btn');
 
   /* ==========================================================================
-     FULLSCREEN REQUEST HELPER (HIDES BROWSER BAR ON ANDROID/IOS)
+     FULLSCREEN REQUEST HELPER
      ========================================================================== */
   function requestFullScreen() {
     const el = document.documentElement;
@@ -633,7 +639,7 @@
   });
 
   /* ==========================================================================
-     INSTANT AUTOPLAY MUSIC ENGINE WITH SEAMLESS AUTO-NEXT TRACK (3YEARS SPEC)
+     INSTANT AUTOPLAY MUSIC ENGINE WITH SEAMLESS AUTO-NEXT TRACK
      ========================================================================== */
   let globalUnmuteAndPlay = function() {};
 
@@ -848,7 +854,6 @@
     if (isLoaded) return;
     isLoaded = true;
 
-    // Swap spinner/text to CONTINUE button
     if (loaderSpinner) loaderSpinner.style.display = 'none';
     if (loaderText) loaderText.style.display = 'none';
     if (continueBtn) continueBtn.style.display = 'inline-block';
@@ -858,15 +863,12 @@
     continueBtn.addEventListener('click', () => {
       getSound()?.playClick?.();
       
-      // Request Fullscreen to hide browser navigation bar
       requestFullScreen();
 
-      // Unmute and start music player
       if (typeof globalUnmuteAndPlay === 'function') {
         globalUnmuteAndPlay();
       }
 
-      // Reveal stage & fade out preloader
       stage.classList.add('ready');
       loaderLayer.classList.add('hidden');
     });
