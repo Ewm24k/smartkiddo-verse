@@ -13,105 +13,84 @@
   <script src="js/sound.js"></script>
 
   <style>
-    /* ABSOLUTE FORCE RESET - DESTROY ALL SAFE-AREA PADDING & MARGINS */
-    *, *::before, *::after {
-      box-sizing: border-box !important;
-      margin: 0 !important;
-      padding: 0 !important;
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
       user-select: none;
       -webkit-user-select: none;
       -webkit-touch-callout: none;
     }
 
     html, body {
-      position: fixed !important;
-      top: 0 !important;
-      left: 0 !important;
-      right: 0 !important;
-      bottom: 0 !important;
-      width: 100vw !important;
-      height: 100vh !important;
-      height: 100dvh !important;
-      margin: 0 !important;
-      padding: 0 !important;
-      padding-left: 0 !important;
-      padding-right: 0 !important;
-      padding-top: 0 !important;
-      padding-bottom: 0 !important;
-      overflow: hidden !important;
-      background-color: #05041a !important;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+      background-color: #05041a;
       font-family: 'Baloo 2', 'Fredoka', 'Comic Sans MS', system-ui, sans-serif;
     }
 
-    /* 1. STAGE WRAPPER CONTAINER */
+    /* 1. FULL-SCREEN & DYNAMIC AUTO-FIT RESPONSIVENESS */
     #stage-wrapper {
-      position: fixed !important;
-      top: 0 !important;
-      left: 0 !important;
-      right: 0 !important;
-      bottom: 0 !important;
-      width: 100vw !important;
-      height: 100vh !important;
-      height: 100dvh !important;
-      overflow: hidden !important;
-      background: #05041a !important;
-      z-index: 0;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+      background: #05041a;
     }
 
-    /* BACKGROUND IMAGE FALLBACK (OVERSIZED HORIZONTAL BLEED TO GUARANTEE NO SIDE GAPS) */
     #stage {
-      position: absolute !important;
-      top: -20px !important;
-      left: -20px !important;
-      width: calc(100vw + 40px) !important;
-      height: calc(100vh + 40px) !important;
-      height: calc(100dvh + 40px) !important;
-      min-width: 105vw !important;
-      min-height: 105vh !important;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
       background-image: url('assets/harga/dashboard/bg.jpg');
-      background-size: cover !important;
-      background-position: center center !important;
-      background-repeat: no-repeat !important;
+      background-size: 100% 100%; /* Force background to auto-fit screen perfectly without top/bottom offset or cropping */
+      background-position: center;
+      background-repeat: no-repeat;
       z-index: 1;
       overflow: hidden;
     }
 
-    /* 4. BACKGROUND VIDEO (OVERSIZED HORIZONTAL & VERTICAL BLEED - 100% IMPOSSIBLE FOR SIDE GAPS) */
+    /* 4. BACKGROUND VIDEO RULES */
     #bg-video {
-      position: absolute !important;
-      top: -20px !important;
-      left: -20px !important;
-      width: calc(100vw + 40px) !important;
-      height: calc(100vh + 40px) !important;
-      height: calc(100dvh + 40px) !important;
-      min-width: 106vw !important;
-      min-height: 106vh !important;
-      object-fit: cover !important; /* Bleeds past viewport bounds on all 4 sides */
-      pointer-events: none !important;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      object-fit: fill; /* Force video to auto-fit screen perfectly without top/bottom offset */
+      pointer-events: none;
       z-index: 2;
     }
 
-    /* INTERACTIVE CONTENT LAYER */
     #content-layer {
-      position: absolute !important;
-      top: 0 !important;
-      left: 0 !important;
-      width: 100vw !important;
-      height: 100vh !important;
-      height: 100dvh !important;
-      z-index: 10;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      z-index: 3;
       pointer-events: auto;
     }
 
     /* 2. PRELOADER LAYER & CONTINUE TRIGGER */
     #loader-layer {
-      position: fixed !important;
-      top: 0 !important;
-      left: 0 !important;
-      width: 100vw !important;
-      height: 100vh !important;
-      height: 100dvh !important;
-      background: rgba(5, 4, 26, 0.96) !important;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      background: rgba(5, 4, 26, 0.95);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       z-index: 9999;
@@ -184,22 +163,22 @@
 
     /* 3. MODERN TOP-LEFT BACK BUTTON */
     #back-btn {
-      position: absolute !important;
-      top: 20px !important;
-      left: 20px !important;
-      width: 52px !important;
-      height: 52px !important;
-      border-radius: 50% !important;
-      background: rgba(255, 255, 255, 0.25) !important;
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.25);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      border: 2px solid rgba(255, 255, 255, 0.6) !important;
-      color: #ffffff !important;
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      font-size: 24px !important;
-      cursor: pointer !important;
+      border: 2px solid rgba(255, 255, 255, 0.6);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      cursor: pointer;
       z-index: 100;
       box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
       transition: transform 0.2s ease, background 0.2s ease;
@@ -207,71 +186,35 @@
 
     #back-btn:hover {
       transform: scale(1.1);
-      background: rgba(255, 255, 255, 0.4) !important;
+      background: rgba(255, 255, 255, 0.4);
     }
 
     #back-btn:active {
       transform: scale(0.92);
     }
 
-    /* CLOSE BUTTON */
+    /* CLOSE BUTTON FROM SOURCE */
     #close-btn {
       -webkit-appearance: none;
       appearance: none;
       -webkit-tap-highlight-color: transparent;
-      position: absolute !important;
-      border: none !important;
-      outline: none !important;
-      background: transparent !important;
-      cursor: pointer !important;
-      border-radius: 50% !important;
+      position: absolute;
+      border: none;
+      outline: none;
+      background: transparent;
+      cursor: pointer;
+      border-radius: 50%;
       z-index: 90;
       transition: transform 0.12s ease, filter 0.12s ease;
     }
     #close-btn:hover { transform: scale(1.08); filter: brightness(1.2); }
     #close-btn:active { transform: scale(0.92); }
 
-    /* HIGH-END CREATIVE SUBSCRIPTION CARD BACKDROPS */
-    .plan-card-panel {
-      position: absolute;
-      border-radius: 32px;
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      z-index: 5;
-      pointer-events: none;
-      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
-      overflow: visible;
-    }
-
-    /* FLOATING RIBBON BADGES */
-    .plan-badge {
-      position: absolute;
-      top: -14px;
-      left: 50%;
-      transform: translateX(-50%);
-      padding: 4px 16px;
-      border-radius: 20px;
-      font-size: clamp(9px, 0.75vw, 12px);
-      font-weight: 800;
-      color: #ffffff;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.6);
-      white-space: nowrap;
-      z-index: 15;
-      animation: floatBadge 3s ease-in-out infinite alternate;
-    }
-
-    @keyframes floatBadge {
-      0% { transform: translateX(-50%) translateY(0px); }
-      100% { transform: translateX(-50%) translateY(-4px); }
-    }
-
-    /* PLAN CARD OVERLAY ELEMENTS */
+    /* PLAN CARD OVERLAY ELEMENTS (Slightly adjusted smaller with responsive scale) */
     .plan-el {
       position: absolute;
       pointer-events: none;
-      z-index: 12;
+      z-index: 10;
     }
 
     .plan-name {
@@ -279,124 +222,67 @@
       line-height: 1;
       text-align: center;
       white-space: nowrap;
-      text-shadow: 0 4px 12px rgba(0,0,0,0.7);
-      font-size: clamp(12px, 1.5vw, 23px);
-      letter-spacing: 0.5px;
+      text-shadow: 0 0 10px currentColor, 0 2px 4px rgba(0,0,0,0.6);
+      font-size: clamp(12px, 1.55vw, 24px);
     }
 
     .plan-sub {
-      font-weight: 800;
+      font-weight: 700;
       text-align: center;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.02em;
       white-space: nowrap;
-      font-size: clamp(9px, 0.8vw, 12.5px);
-      background: rgba(0, 0, 0, 0.4);
-      padding: 3px 12px;
-      border-radius: 20px;
-      border: 1.5px solid rgba(255, 255, 255, 0.25);
-      box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.2), 0 4px 10px rgba(0,0,0,0.3);
+      font-size: clamp(9px, 0.8vw, 13px);
     }
 
     .plan-price {
-      color: #ffffff;
+      color: #fff;
       text-align: center;
       font-weight: 800;
       white-space: nowrap;
-      background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, rgba(0,0,0,0.4) 100%);
-      padding: 5px 16px;
-      border-radius: 24px;
-      border: 1.5px solid rgba(255, 255, 255, 0.3);
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.4);
+      text-shadow: 0 2px 4px rgba(0,0,0,0.6);
     }
-    .plan-price .amount {
-      font-size: clamp(13px, 1.4vw, 22px);
-      text-shadow: 0 2px 8px rgba(0,0,0,0.8);
-    }
-    .plan-price .period {
-      font-size: clamp(8px, 0.78vw, 12px);
-      font-weight: 700;
-      opacity: 0.9;
-      margin-left: 0.3em;
-    }
+    .plan-price .amount { font-size: clamp(12px, 1.4vw, 22px); }
+    .plan-price .period { font-size: clamp(8px, 0.8vw, 12px); font-weight: 600; opacity: 0.85; margin-left: 0.3em; }
 
-    /* NEON FEATURE GLASS CAPSULES */
     .plan-feature {
       position: absolute;
       display: flex;
       align-items: center;
-      gap: 0.5vw;
+      gap: 0.4vw;
       pointer-events: none;
-      z-index: 12;
-      background: rgba(10, 15, 30, 0.65);
-      border: 1.5px solid rgba(255, 255, 255, 0.2);
-      border-radius: 20px;
-      padding: 4px 12px 4px 8px;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
-      transition: transform 0.2s ease, border-color 0.2s ease;
+      z-index: 10;
     }
     .plan-feature img {
-      width: clamp(11px, 1.4vw, 21px);
-      height: clamp(11px, 1.4vw, 21px);
+      width: clamp(10px, 1.5vw, 22px);
+      height: clamp(10px, 1.5vw, 22px);
       flex: none;
-      filter: drop-shadow(0 2px 6px rgba(0,0,0,0.6));
     }
     .plan-feature span {
-      color: #ffffff;
-      font-size: clamp(8px, 0.78vw, 11.5px);
-      font-weight: 700;
-      text-shadow: 0 1px 4px rgba(0,0,0,0.9);
+      color: #fff;
+      font-size: clamp(8px, 0.8vw, 12px);
+      font-weight: 600;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.8);
       white-space: nowrap;
     }
 
-    /* HIGH GLOSS SHIMMER BUTTONS */
+    /* PLAN BUTTONS */
     .plan-btn {
       -webkit-appearance: none;
       appearance: none;
       -webkit-tap-highlight-color: transparent;
       position: absolute;
-      border: 2px solid rgba(255, 255, 255, 0.8);
+      border: none;
       outline: none;
       border-radius: 999px;
       font-weight: 800;
-      font-size: clamp(10px, 0.9vw, 15px);
+      font-size: clamp(10px, 0.95vw, 16px);
       cursor: pointer;
-      box-shadow: 0 8px 22px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,255,255,0.7);
-      transition: transform 0.2s ease, filter 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.4), inset 0 1px 2px rgba(255,255,255,0.5);
+      transition: transform 0.12s ease, filter 0.12s ease;
       z-index: 15;
-      overflow: hidden;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
     }
-
-    .plan-btn::after {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -60%;
-      width: 50%;
-      height: 200%;
-      background: linear-gradient(60deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0) 100%);
-      transform: rotate(25deg);
-      animation: shimmerSweep 3.5s infinite;
-    }
-
-    @keyframes shimmerSweep {
-      0% { left: -60%; }
-      30% { left: 140%; }
-      100% { left: 140%; }
-    }
-
-    .plan-btn:hover {
-      transform: scale(1.05);
-      filter: brightness(1.15);
-      box-shadow: 0 12px 28px rgba(0,0,0,0.6), inset 0 2px 6px rgba(255,255,255,0.9);
-    }
-    .plan-btn:active {
-      transform: scale(0.95);
-      filter: brightness(0.92);
-    }
+    .plan-btn:hover { transform: scale(1.035); filter: brightness(1.08); }
+    .plan-btn:active { transform: scale(0.96); filter: brightness(0.95); }
 
     /* 7. ANDROID & IOS MOBILE PHONE CARD SCALING */
     @media screen and (max-width: 600px), screen and (max-height: 500px) and (max-width: 930px) {
@@ -408,9 +294,15 @@
       .plan-feature img { width: clamp(10px, 1.8vw, 18px); height: clamp(10px, 1.8vw, 18px); }
       .plan-btn { font-size: clamp(9px, 1.2vw, 14px); }
 
-      .card-col-2 { left: calc(var(--base-left) - 1.5%) !important; }
-      .card-col-3 { left: calc(var(--base-left) - 3%) !important; }
-      .card-col-4 { left: calc(var(--base-left) - 4.5%) !important; }
+      .card-col-2 {
+        left: calc(var(--base-left) - 1.5%) !important;
+      }
+      .card-col-3 {
+        left: calc(var(--base-left) - 3%) !important;
+      }
+      .card-col-4 {
+        left: calc(var(--base-left) - 4.5%) !important;
+      }
     }
 
     /* TOAST NOTIFICATION */
@@ -419,7 +311,7 @@
       bottom: 35px;
       left: 50%;
       transform: translateX(-50%) translateY(100px);
-      background: rgba(15, 23, 42, 0.94);
+      background: rgba(15, 23, 42, 0.92);
       color: #FFEB3B;
       padding: 12px 32px;
       border-radius: 40px;
@@ -470,7 +362,7 @@
       bottom: 20px;
       left: 50%;
       transform: translateX(-50%) translateY(0);
-      background: rgba(15, 23, 42, 0.9);
+      background: rgba(15, 23, 42, 0.88);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border: 2px solid rgba(255, 255, 255, 0.3);
@@ -534,22 +426,22 @@
 
   <!-- MAIN STAGE WRAPPER -->
   <div id="stage-wrapper">
-    <!-- STAGE IMAGE FALLBACK (Z-INDEX 1) -->
-    <div id="stage"></div>
-
-    <!-- BACKGROUND VIDEO LAYER (Z-INDEX 2 - OVERSIZED BLEED FIT TO GUARANTEE NO SIDE GAPS) -->
+    <!-- BACKGROUND VIDEO -->
     <video id="bg-video" autoplay muted playsinline webkit-playsinline loop preload="auto">
       <source src="assets/harga/dashboard/bg.mp4" type="video/mp4">
       <source src="assets/harga/dashboard/bg.webm" type="video/webm">
     </video>
 
-    <!-- CONTENT LAYER (Z-INDEX 10) -->
-    <div id="content-layer">
-      <!-- MODERN BACK BUTTON -->
-      <button id="back-btn" title="Go Back">◀</button>
+    <!-- STAGE CONTAINER -->
+    <div id="stage">
+      <!-- CONTENT LAYER -->
+      <div id="content-layer">
+        <!-- MODERN BACK BUTTON -->
+        <button id="back-btn" title="Go Back">◀</button>
 
-      <!-- CLOSE BUTTON -->
-      <button id="close-btn" aria-label="Close"></button>
+        <!-- CLOSE BUTTON -->
+        <button id="close-btn" aria-label="Close"></button>
+      </div>
     </div>
   </div>
 
@@ -589,9 +481,6 @@
         price: 'RM0', period: '/month',
         btnLabel: 'Always Free',
         btnGradient: 'linear-gradient(180deg,#FFDD6B,#F5A623)', btnTextColor: '#3A2600',
-        panelBg: 'radial-gradient(circle at 50% 0%, rgba(255, 200, 69, 0.28) 0%, rgba(15, 23, 42, 0.75) 100%)',
-        panelBorder: '2.5px solid rgba(255, 216, 115, 0.65)',
-        glowShadow: '0 18px 45px rgba(245, 166, 35, 0.35), inset 0 2px 4px rgba(255, 255, 255, 0.4)',
         checkIcon: 'assets/harga/dashboard/check_orange.png',
         features: ['Limited games & activities', 'Basic learning videos', 'Coloring pages', 'Daily learning goal (1)', 'Progress tracking'],
         nameBox: {left:135, top:430, width:275, height:40},
@@ -608,9 +497,6 @@
         price: 'RM19.90', period: '/month',
         btnLabel: 'Choose Plan',
         btnGradient: 'linear-gradient(180deg,#FF7C9C,#E8365F)', btnTextColor: '#FFFFFF',
-        panelBg: 'radial-gradient(circle at 50% 0%, rgba(255, 92, 138, 0.28) 0%, rgba(15, 23, 42, 0.75) 100%)',
-        panelBorder: '2.5px solid rgba(255, 143, 174, 0.65)',
-        glowShadow: '0 18px 45px rgba(255, 92, 138, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.4)',
         checkIcon: 'assets/harga/dashboard/check_red.png',
         features: ['All in Little Spark', 'Unlimited games & activities', 'Interactive stories', 'Daily learning goal (3)', 'Progress tracking', 'Certificate of achievement'],
         nameBox: {left:525, top:430, width:110, height:40},
@@ -627,11 +513,6 @@
         price: 'RM34.90', period: '/month',
         btnLabel: 'Choose Plan',
         btnGradient: 'linear-gradient(180deg,#5FC6F7,#1E88E5)', btnTextColor: '#FFFFFF',
-        panelBg: 'radial-gradient(circle at 50% 0%, rgba(95, 232, 255, 0.32) 0%, rgba(15, 23, 42, 0.8) 100%)',
-        panelBorder: '2.5px solid rgba(160, 240, 255, 0.85)',
-        glowShadow: '0 20px 50px rgba(95, 232, 255, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.5)',
-        badgeText: '⚡ MOST POPULAR ⚡',
-        badgeBg: 'linear-gradient(135deg, #00E5FF, #2979FF)',
         checkIcon: 'assets/harga/dashboard/check_blue.png',
         features: ['All in Ruby', 'Advanced learning games', 'Personalized learning path', 'Daily learning goal (5)', 'Printable worksheets', 'Priority support'],
         nameBox: {left:835, top:440, width:175, height:40},
@@ -639,6 +520,7 @@
         priceBox: {left:805, top:524, width:235, height:34},
         btnBox: {left:770, top:566, width:305, height:44},
         featIconLeft: 798, featTextLeft: 813, featTop: 620, featIconSize: 30, featLineHeight: 37.5,
+        ribbon: true,
       },
       {
         id: 'diamond',
@@ -648,11 +530,6 @@
         price: 'RM59.90', period: '/month',
         btnLabel: 'Choose Plan',
         btnGradient: 'linear-gradient(180deg,#C9A3F5,#8E44AD)', btnTextColor: '#FFFFFF',
-        panelBg: 'radial-gradient(circle at 50% 0%, rgba(217, 175, 255, 0.32) 0%, rgba(15, 23, 42, 0.8) 100%)',
-        panelBorder: '2.5px solid rgba(235, 212, 255, 0.85)',
-        glowShadow: '0 20px 50px rgba(217, 175, 255, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.5)',
-        badgeText: '👑 BEST VALUE 👑',
-        badgeBg: 'linear-gradient(135deg, #E040FB, #7C4DFF)',
         checkIcon: 'assets/harga/dashboard/check_purple.png',
         features: ['All in Sapphire', '1-on-1 learning insights', 'Premium stories & content', 'Daily learning goal (Unlimited)', 'Early access to new features', 'Priority support'],
         nameBox: {left:1130, top:430, width:190, height:40},
@@ -676,32 +553,8 @@
       el.style.height = pct(box.height, SRC_H) + '%';
     }
 
-    // JS DYNAMIC HARDWARE STRETCH ENGINE (LAYER 4 GUARANTEE)
-    function forceFitVideo() {
-      const v = document.getElementById('bg-video');
-      const stage = document.getElementById('stage');
-      const realW = Math.max(window.innerWidth || 0, document.documentElement.clientWidth || 0, screen.width || 0);
-      const realH = Math.max(window.innerHeight || 0, document.documentElement.clientHeight || 0, screen.height || 0);
-
-      const targetW = (realW + 60) + 'px';
-      const targetH = (realH + 60) + 'px';
-
-      if (v) {
-        v.style.width = targetW;
-        v.style.height = targetH;
-        v.style.left = '-30px';
-        v.style.top = '-30px';
-      }
-      if (stage) {
-        stage.style.width = targetW;
-        stage.style.height = targetH;
-        stage.style.left = '-30px';
-        stage.style.top = '-30px';
-      }
-    }
-
     document.addEventListener('DOMContentLoaded', () => {
-      const stageWrapper = document.getElementById('stage-wrapper');
+      const stage = document.getElementById('stage');
       const contentLayer = document.getElementById('content-layer');
       const toast = document.getElementById('toast');
       const bgVideo = document.getElementById('bg-video');
@@ -737,47 +590,10 @@
             bgVideo.currentTime = 0.0;
           }
         });
-
-        bgVideo.addEventListener('error', () => {
-          bgVideo.style.display = 'none';
-        });
       }
 
-      window.addEventListener('resize', forceFitVideo);
-      window.addEventListener('orientationchange', forceFitVideo);
-      forceFitVideo();
-
-      // RENDER CREATIVE SUBSCRIPTION PLAN CARDS WITH VIBRANT GLASS BACKDROPS
+      // RENDER PLAN CARDS
       PLANS.forEach(plan => {
-        // High-end Glassmorphism Card Backdrop Panel
-        const panel = document.createElement('div');
-        panel.className = `plan-card-panel ${plan.colClass}`;
-        const panelLeft = pct(plan.btnBox.left - 12, SRC_W);
-        const panelTop = pct(plan.nameBox.top - 20, SRC_H);
-        const panelWidth = pct(plan.btnBox.width + 24, SRC_W);
-        const panelHeight = pct(455, SRC_H);
-
-        panel.style.setProperty('--base-left', panelLeft + '%');
-        panel.style.setProperty('--base-top', panelTop + '%');
-        panel.style.left = panelLeft + '%';
-        panel.style.top = panelTop + '%';
-        panel.style.width = panelWidth + '%';
-        panel.style.height = panelHeight + '%';
-        panel.style.background = plan.panelBg;
-        panel.style.border = plan.panelBorder;
-        panel.style.boxShadow = plan.glowShadow;
-
-        // Floating Popular / Value Ribbon Badge
-        if (plan.badgeText) {
-          const badge = document.createElement('div');
-          badge.className = 'plan-badge';
-          badge.textContent = plan.badgeText;
-          badge.style.background = plan.badgeBg;
-          panel.appendChild(badge);
-        }
-
-        contentLayer.appendChild(panel);
-
         // Name
         const nameEl = document.createElement('div');
         nameEl.className = `plan-el plan-name ${plan.colClass}`;
@@ -827,17 +643,20 @@
         });
         contentLayer.appendChild(btn);
 
-        // Feature list items with capsule design
+        // Feature list
         plan.features.forEach((feat, i) => {
           const row = document.createElement('div');
           row.className = `plan-feature ${plan.colClass}`;
-          const leftPct = pct(plan.featTextLeft - 22, SRC_W);
+          const leftPct = pct(plan.featTextLeft, SRC_W);
           const topPct = pct(plan.featTop + i * plan.featLineHeight, SRC_H);
           row.style.setProperty('--base-left', leftPct + '%');
           row.style.setProperty('--base-top', topPct + '%');
           row.style.left = leftPct + '%';
           row.style.top = topPct + '%';
           row.innerHTML = `<img src="${plan.checkIcon}" alt=""><span>${feat}</span>`;
+          
+          const iconOffsetPct = pct(plan.featTextLeft - plan.featIconLeft, SRC_W);
+          row.querySelector('img').style.marginLeft = '-' + iconOffsetPct + '%';
           contentLayer.appendChild(row);
         });
       });
@@ -897,13 +716,6 @@
           document.documentElement.requestFullscreen().catch(() => {});
         } else if (document.documentElement.webkitRequestFullscreen) {
           document.documentElement.webkitRequestFullscreen();
-        }
-
-        forceFitVideo();
-
-        // Start Background Video Playback
-        if (bgVideo) {
-          bgVideo.play().catch(() => {});
         }
 
         // Start Music
@@ -1049,7 +861,7 @@
       });
 
       document.addEventListener('click', (e) => {
-        if (e.target === stageWrapper || e.target === contentLayer) {
+        if (e.target === stage || e.target === contentLayer) {
           showWidget();
         }
       });
