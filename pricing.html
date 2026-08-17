@@ -41,8 +41,10 @@
       height: 100dvh;
       overflow: hidden;
       background: #05041a;
+      z-index: 0;
     }
 
+    /* BACKGROUND IMAGE FALLBACK LAYER */
     #stage {
       position: absolute;
       top: 0;
@@ -51,14 +53,14 @@
       height: 100vh;
       height: 100dvh;
       background-image: url('assets/harga/dashboard/bg.jpg');
-      background-size: 100% 100%; /* Force background to auto-fit screen perfectly without top/bottom offset or cropping */
+      background-size: 100% 100%;
       background-position: center;
       background-repeat: no-repeat;
       z-index: 1;
       overflow: hidden;
     }
 
-    /* 4. BACKGROUND VIDEO RULES */
+    /* 4. BACKGROUND VIDEO LAYER (FIT SCREEN PERFECTLY) */
     #bg-video {
       position: absolute;
       top: 0;
@@ -66,11 +68,12 @@
       width: 100vw;
       height: 100vh;
       height: 100dvh;
-      object-fit: fill; /* Force video to auto-fit screen perfectly without top/bottom offset */
+      object-fit: fill; /* Force video to auto-fit screen perfectly */
       pointer-events: none;
-      z-index: 2;
+      z-index: 2; /* Sits over image fallback, UNDER content layer */
     }
 
+    /* INTERACTIVE CONTENT LAYER (SITS ABOVE VIDEO) */
     #content-layer {
       position: absolute;
       top: 0;
@@ -78,7 +81,7 @@
       width: 100vw;
       height: 100vh;
       height: 100dvh;
-      z-index: 3;
+      z-index: 10; /* Higher than background video so content is NEVER hidden */
       pointer-events: auto;
     }
 
@@ -210,7 +213,7 @@
     #close-btn:hover { transform: scale(1.08); filter: brightness(1.2); }
     #close-btn:active { transform: scale(0.92); }
 
-    /* PLAN CARD OVERLAY ELEMENTS (Slightly adjusted smaller with responsive scale) */
+    /* PLAN CARD OVERLAY ELEMENTS */
     .plan-el {
       position: absolute;
       pointer-events: none;
@@ -426,22 +429,22 @@
 
   <!-- MAIN STAGE WRAPPER -->
   <div id="stage-wrapper">
-    <!-- BACKGROUND VIDEO -->
+    <!-- STAGE IMAGE FALLBACK (Z-INDEX 1) -->
+    <div id="stage"></div>
+
+    <!-- BACKGROUND VIDEO LAYER (Z-INDEX 2) -->
     <video id="bg-video" autoplay muted playsinline webkit-playsinline loop preload="auto">
       <source src="assets/harga/dashboard/bg.mp4" type="video/mp4">
       <source src="assets/harga/dashboard/bg.webm" type="video/webm">
     </video>
 
-    <!-- STAGE CONTAINER -->
-    <div id="stage">
-      <!-- CONTENT LAYER -->
-      <div id="content-layer">
-        <!-- MODERN BACK BUTTON -->
-        <button id="back-btn" title="Go Back">◀</button>
+    <!-- CONTENT LAYER (Z-INDEX 10) -->
+    <div id="content-layer">
+      <!-- MODERN BACK BUTTON -->
+      <button id="back-btn" title="Go Back">◀</button>
 
-        <!-- CLOSE BUTTON -->
-        <button id="close-btn" aria-label="Close"></button>
-      </div>
+      <!-- CLOSE BUTTON -->
+      <button id="close-btn" aria-label="Close"></button>
     </div>
   </div>
 
@@ -554,7 +557,7 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      const stage = document.getElementById('stage');
+      const stageWrapper = document.getElementById('stage-wrapper');
       const contentLayer = document.getElementById('content-layer');
       const toast = document.getElementById('toast');
       const bgVideo = document.getElementById('bg-video');
@@ -589,6 +592,11 @@
           if (bgVideo.duration && bgVideo.currentTime >= bgVideo.duration - 1.0) {
             bgVideo.currentTime = 0.0;
           }
+        });
+
+        // Graceful error fallback if video is missing or unplayable
+        bgVideo.addEventListener('error', () => {
+          bgVideo.style.display = 'none';
         });
       }
 
@@ -716,6 +724,11 @@
           document.documentElement.requestFullscreen().catch(() => {});
         } else if (document.documentElement.webkitRequestFullscreen) {
           document.documentElement.webkitRequestFullscreen();
+        }
+
+        // Start Background Video Playback explicitly
+        if (bgVideo) {
+          bgVideo.play().catch(() => {});
         }
 
         // Start Music
@@ -861,7 +874,7 @@
       });
 
       document.addEventListener('click', (e) => {
-        if (e.target === stage || e.target === contentLayer) {
+        if (e.target === stageWrapper || e.target === contentLayer) {
           showWidget();
         }
       });
