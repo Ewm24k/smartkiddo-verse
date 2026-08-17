@@ -23,19 +23,25 @@
     }
 
     html, body {
-      width: 100vw;
-      height: 100vh;
-      height: 100dvh;
+      width: 100%;
+      height: 100%;
+      min-width: 100vw;
+      min-height: 100vh;
+      min-height: 100dvh;
       overflow: hidden;
       background-color: #05041a;
       font-family: 'Baloo 2', 'Fredoka', 'Comic Sans MS', system-ui, sans-serif;
     }
 
-    /* 1. FULL-SCREEN & DYNAMIC AUTO-FIT RESPONSIVENESS */
+    /* 1. FULL-SCREEN & FULL-WIDTH RESPONSIVENESS (ZERO LEFT/RIGHT/TOP/BOTTOM GAP) */
     #stage-wrapper {
       position: fixed;
       top: 0;
       left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      height: 100%;
       width: 100vw;
       height: 100vh;
       height: 100dvh;
@@ -44,44 +50,58 @@
       z-index: 0;
     }
 
-    /* BACKGROUND IMAGE FALLBACK LAYER */
+    /* STAGE BACKGROUND IMAGE FALLBACK LAYER */
     #stage {
       position: absolute;
       top: 0;
       left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      height: 100%;
       width: 100vw;
       height: 100vh;
       height: 100dvh;
       background-image: url('assets/harga/dashboard/bg.jpg');
-      background-size: 100% 100%;
-      background-position: center;
+      background-size: cover;
+      background-position: center center;
       background-repeat: no-repeat;
       z-index: 1;
       overflow: hidden;
     }
 
-    /* 4. BACKGROUND VIDEO LAYER (FIT SCREEN PERFECTLY) */
+    /* 4. BACKGROUND VIDEO LAYER (FORCE FULL WIDTH & FULL SCREEN PERFECT FIT) */
     #bg-video {
       position: absolute;
       top: 0;
       left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      height: 100%;
       width: 100vw;
       height: 100vh;
       height: 100dvh;
-      object-fit: fill; /* Force video to auto-fit screen perfectly */
+      min-width: 100%;
+      min-height: 100%;
+      object-fit: cover; /* Guarantees 100% full screen & full width without left/right empty bars */
       pointer-events: none;
-      z-index: 2; /* Sits over image fallback, UNDER content layer */
+      z-index: 2;
     }
 
-    /* INTERACTIVE CONTENT LAYER (SITS ABOVE VIDEO) */
+    /* INTERACTIVE CONTENT LAYER */
     #content-layer {
       position: absolute;
       top: 0;
       left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      height: 100%;
       width: 100vw;
       height: 100vh;
       height: 100dvh;
-      z-index: 10; /* Higher than background video so content is NEVER hidden */
+      z-index: 10;
       pointer-events: auto;
     }
 
@@ -213,11 +233,23 @@
     #close-btn:hover { transform: scale(1.08); filter: brightness(1.2); }
     #close-btn:active { transform: scale(0.92); }
 
+    /* CARD BACKGROUND PANEL DESIGN (BEHIND SUBSCRIPTION CONTENT) */
+    .plan-card-panel {
+      position: absolute;
+      border-radius: 28px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 2.5px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.25);
+      z-index: 5;
+      pointer-events: none;
+    }
+
     /* PLAN CARD OVERLAY ELEMENTS */
     .plan-el {
       position: absolute;
       pointer-events: none;
-      z-index: 10;
+      z-index: 12;
     }
 
     .plan-name {
@@ -225,8 +257,8 @@
       line-height: 1;
       text-align: center;
       white-space: nowrap;
-      text-shadow: 0 0 10px currentColor, 0 2px 4px rgba(0,0,0,0.6);
-      font-size: clamp(12px, 1.55vw, 24px);
+      text-shadow: 0 0 12px currentColor, 0 2px 6px rgba(0,0,0,0.8);
+      font-size: clamp(12px, 1.5vw, 23px);
     }
 
     .plan-sub {
@@ -235,6 +267,10 @@
       letter-spacing: 0.02em;
       white-space: nowrap;
       font-size: clamp(9px, 0.8vw, 13px);
+      background: rgba(0, 0, 0, 0.3);
+      padding: 2px 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
     }
 
     .plan-price {
@@ -242,29 +278,42 @@
       text-align: center;
       font-weight: 800;
       white-space: nowrap;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+      text-shadow: 0 2px 6px rgba(0,0,0,0.8);
+      background: rgba(0, 0, 0, 0.35);
+      padding: 4px 14px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
     }
-    .plan-price .amount { font-size: clamp(12px, 1.4vw, 22px); }
-    .plan-price .period { font-size: clamp(8px, 0.8vw, 12px); font-weight: 600; opacity: 0.85; margin-left: 0.3em; }
+    .plan-price .amount { font-size: clamp(12px, 1.35vw, 21px); }
+    .plan-price .period { font-size: clamp(8px, 0.78vw, 12px); font-weight: 600; opacity: 0.85; margin-left: 0.3em; }
 
+    /* FEATURE CAPSULE BADGE DESIGN BEHIND TEXT */
     .plan-feature {
       position: absolute;
       display: flex;
       align-items: center;
       gap: 0.4vw;
       pointer-events: none;
-      z-index: 10;
+      z-index: 12;
+      background: rgba(15, 23, 42, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 20px;
+      padding: 3px 10px 3px 6px;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     }
     .plan-feature img {
-      width: clamp(10px, 1.5vw, 22px);
-      height: clamp(10px, 1.5vw, 22px);
+      width: clamp(10px, 1.4vw, 20px);
+      height: clamp(10px, 1.4vw, 20px);
       flex: none;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
     }
     .plan-feature span {
-      color: #fff;
-      font-size: clamp(8px, 0.8vw, 12px);
+      color: #ffffff;
+      font-size: clamp(8px, 0.78vw, 11.5px);
       font-weight: 600;
-      text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+      text-shadow: 0 1px 3px rgba(0,0,0,0.9);
       white-space: nowrap;
     }
 
@@ -278,9 +327,9 @@
       outline: none;
       border-radius: 999px;
       font-weight: 800;
-      font-size: clamp(10px, 0.95vw, 16px);
+      font-size: clamp(10px, 0.9vw, 15px);
       cursor: pointer;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.4), inset 0 1px 2px rgba(255,255,255,0.5);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.45), inset 0 1.5px 3px rgba(255,255,255,0.6);
       transition: transform 0.12s ease, filter 0.12s ease;
       z-index: 15;
     }
@@ -432,7 +481,7 @@
     <!-- STAGE IMAGE FALLBACK (Z-INDEX 1) -->
     <div id="stage"></div>
 
-    <!-- BACKGROUND VIDEO LAYER (Z-INDEX 2) -->
+    <!-- BACKGROUND VIDEO LAYER (Z-INDEX 2 - FULL SCREEN & FULL WIDTH) -->
     <video id="bg-video" autoplay muted playsinline webkit-playsinline loop preload="auto">
       <source src="assets/harga/dashboard/bg.mp4" type="video/mp4">
       <source src="assets/harga/dashboard/bg.webm" type="video/webm">
@@ -484,6 +533,8 @@
         price: 'RM0', period: '/month',
         btnLabel: 'Always Free',
         btnGradient: 'linear-gradient(180deg,#FFDD6B,#F5A623)', btnTextColor: '#3A2600',
+        panelBg: 'rgba(255, 200, 69, 0.12)',
+        panelBorder: 'rgba(255, 200, 69, 0.4)',
         checkIcon: 'assets/harga/dashboard/check_orange.png',
         features: ['Limited games & activities', 'Basic learning videos', 'Coloring pages', 'Daily learning goal (1)', 'Progress tracking'],
         nameBox: {left:135, top:430, width:275, height:40},
@@ -500,6 +551,8 @@
         price: 'RM19.90', period: '/month',
         btnLabel: 'Choose Plan',
         btnGradient: 'linear-gradient(180deg,#FF7C9C,#E8365F)', btnTextColor: '#FFFFFF',
+        panelBg: 'rgba(255, 92, 138, 0.12)',
+        panelBorder: 'rgba(255, 92, 138, 0.4)',
         checkIcon: 'assets/harga/dashboard/check_red.png',
         features: ['All in Little Spark', 'Unlimited games & activities', 'Interactive stories', 'Daily learning goal (3)', 'Progress tracking', 'Certificate of achievement'],
         nameBox: {left:525, top:430, width:110, height:40},
@@ -516,6 +569,8 @@
         price: 'RM34.90', period: '/month',
         btnLabel: 'Choose Plan',
         btnGradient: 'linear-gradient(180deg,#5FC6F7,#1E88E5)', btnTextColor: '#FFFFFF',
+        panelBg: 'rgba(95, 232, 255, 0.12)',
+        panelBorder: 'rgba(95, 232, 255, 0.4)',
         checkIcon: 'assets/harga/dashboard/check_blue.png',
         features: ['All in Ruby', 'Advanced learning games', 'Personalized learning path', 'Daily learning goal (5)', 'Printable worksheets', 'Priority support'],
         nameBox: {left:835, top:440, width:175, height:40},
@@ -533,6 +588,8 @@
         price: 'RM59.90', period: '/month',
         btnLabel: 'Choose Plan',
         btnGradient: 'linear-gradient(180deg,#C9A3F5,#8E44AD)', btnTextColor: '#FFFFFF',
+        panelBg: 'rgba(217, 175, 255, 0.12)',
+        panelBorder: 'rgba(217, 175, 255, 0.4)',
         checkIcon: 'assets/harga/dashboard/check_purple.png',
         features: ['All in Sapphire', '1-on-1 learning insights', 'Premium stories & content', 'Daily learning goal (Unlimited)', 'Early access to new features', 'Priority support'],
         nameBox: {left:1130, top:430, width:190, height:40},
@@ -600,8 +657,26 @@
         });
       }
 
-      // RENDER PLAN CARDS
+      // RENDER SUBSCRIPTION PLAN CARDS WITH DESIGN BACKDROPS
       PLANS.forEach(plan => {
+        // Design Backdrop Panel behind card content
+        const panel = document.createElement('div');
+        panel.className = `plan-card-panel ${plan.colClass}`;
+        const panelLeft = pct(plan.btnBox.left - 12, SRC_W);
+        const panelTop = pct(plan.nameBox.top - 18, SRC_H);
+        const panelWidth = pct(plan.btnBox.width + 24, SRC_W);
+        const panelHeight = pct(450, SRC_H);
+
+        panel.style.setProperty('--base-left', panelLeft + '%');
+        panel.style.setProperty('--base-top', panelTop + '%');
+        panel.style.left = panelLeft + '%';
+        panel.style.top = panelTop + '%';
+        panel.style.width = panelWidth + '%';
+        panel.style.height = panelHeight + '%';
+        panel.style.background = plan.panelBg;
+        panel.style.borderColor = plan.panelBorder;
+        contentLayer.appendChild(panel);
+
         // Name
         const nameEl = document.createElement('div');
         nameEl.className = `plan-el plan-name ${plan.colClass}`;
@@ -651,20 +726,17 @@
         });
         contentLayer.appendChild(btn);
 
-        // Feature list
+        // Feature list items with capsule design
         plan.features.forEach((feat, i) => {
           const row = document.createElement('div');
           row.className = `plan-feature ${plan.colClass}`;
-          const leftPct = pct(plan.featTextLeft, SRC_W);
+          const leftPct = pct(plan.featTextLeft - 22, SRC_W);
           const topPct = pct(plan.featTop + i * plan.featLineHeight, SRC_H);
           row.style.setProperty('--base-left', leftPct + '%');
           row.style.setProperty('--base-top', topPct + '%');
           row.style.left = leftPct + '%';
           row.style.top = topPct + '%';
           row.innerHTML = `<img src="${plan.checkIcon}" alt=""><span>${feat}</span>`;
-          
-          const iconOffsetPct = pct(plan.featTextLeft - plan.featIconLeft, SRC_W);
-          row.querySelector('img').style.marginLeft = '-' + iconOffsetPct + '%';
           contentLayer.appendChild(row);
         });
       });
@@ -726,7 +798,7 @@
           document.documentElement.webkitRequestFullscreen();
         }
 
-        // Start Background Video Playback explicitly
+        // Start Background Video Playback
         if (bgVideo) {
           bgVideo.play().catch(() => {});
         }
