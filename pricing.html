@@ -13,80 +13,76 @@
   <script src="js/sound.js"></script>
 
   <style>
-    /* STRICT GLOBAL RESET & FULL-SCREEN OVERRIDE */
-    *, *::before, *::after {
-      box-sizing: border-box !important;
+    /* AGGRESSIVE FORCE-FIT FULLSCREEN CSS RESET */
+    html, body, #stage-wrapper, #stage, #bg-video {
       margin: 0 !important;
       padding: 0 !important;
-      user-select: none;
+      border: none !important;
+      outline: none !important;
+      box-sizing: border-box !important;
+      overflow: hidden !important;
       -webkit-user-select: none;
-      -webkit-touch-callout: none;
+      user-select: none;
     }
 
     html, body {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      width: 100% !important;
-      height: 100% !important;
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
       width: 100vw !important;
       height: 100vh !important;
       height: 100dvh !important;
-      overflow: hidden !important;
       background-color: #05041a !important;
       font-family: 'Baloo 2', 'Fredoka', 'Comic Sans MS', system-ui, sans-serif;
     }
 
-    /* 1. ARCHITECTURAL ZERO-GAP FULLSCREEN PIPELINE */
+    /* 1. FORCE-FIT STAGE WRAPPER CONTAINER */
     #stage-wrapper {
       position: fixed !important;
       top: 0 !important;
       left: 0 !important;
       right: 0 !important;
       bottom: 0 !important;
-      width: 100% !important;
-      height: 100% !important;
       width: 100vw !important;
       height: 100vh !important;
       height: 100dvh !important;
-      overflow: hidden !important;
       background: #05041a !important;
       z-index: 0;
     }
 
-    /* BACKGROUND IMAGE FALLBACK LAYER */
+    /* BACKGROUND IMAGE FALLBACK (OVERSIZED TO GUARANTEE ZERO GAPS) */
     #stage {
-      position: absolute !important;
-      top: 0 !important;
-      left: 0 !important;
-      width: 100% !important;
-      height: 100% !important;
-      width: 100vw !important;
-      height: 100vh !important;
-      height: 100dvh !important;
+      position: fixed !important;
+      top: 50% !important;
+      left: 50% !important;
+      width: 110vw !important;
+      height: 110vh !important;
+      height: 110dvh !important;
+      min-width: 110% !important;
+      min-height: 110% !important;
+      transform: translate(-50%, -50%) scale(1.1) !important;
       background-image: url('assets/harga/dashboard/bg.jpg');
       background-size: cover !important;
       background-position: center center !important;
       background-repeat: no-repeat !important;
       z-index: 1;
-      overflow: hidden;
     }
 
-    /* 4. BACKGROUND VIDEO LAYER - TRIPLE ENFORCED COVER FIT (ZERO EMPTY GAPS) */
+    /* 4. BACKGROUND VIDEO (OVERSIZED FORCE COVER SCALE - IMPOSSIBLE TO HAVE EMPTY SPACE) */
     #bg-video {
-      position: absolute !important;
+      position: fixed !important;
       top: 50% !important;
       left: 50% !important;
-      transform: translate(-50%, -50%) !important;
-      min-width: 100vw !important;
-      min-height: 100vh !important;
-      min-height: 100dvh !important;
-      width: 100vw !important;
-      height: 100vh !important;
-      height: 100dvh !important;
-      object-fit: cover !important; /* Forces crop-to-fill, eliminating left/right/top/bottom black bars */
+      width: 112vw !important;
+      height: 112vh !important;
+      height: 112dvh !important;
+      min-width: 112% !important;
+      min-height: 112% !important;
+      /* Over-scaling forces video to bleed past screen borders on all 4 sides */
+      transform: translate(-50%, -50%) scale(1.12) !important;
+      object-fit: cover !important;
       pointer-events: none !important;
       z-index: 2;
     }
@@ -96,8 +92,6 @@
       position: absolute !important;
       top: 0 !important;
       left: 0 !important;
-      width: 100% !important;
-      height: 100% !important;
       width: 100vw !important;
       height: 100vh !important;
       height: 100dvh !important;
@@ -216,7 +210,7 @@
       transform: scale(0.92);
     }
 
-    /* CLOSE BUTTON FROM SOURCE */
+    /* CLOSE BUTTON */
     #close-btn {
       -webkit-appearance: none;
       appearance: none;
@@ -481,7 +475,7 @@
     <!-- STAGE IMAGE FALLBACK (Z-INDEX 1) -->
     <div id="stage"></div>
 
-    <!-- BACKGROUND VIDEO LAYER (Z-INDEX 2 - ZERO GAP COVER FIT) -->
+    <!-- BACKGROUND VIDEO LAYER (Z-INDEX 2 - ABSOLUTE FORCE OVERCOVER) -->
     <video id="bg-video" autoplay muted playsinline webkit-playsinline loop preload="auto">
       <source src="assets/harga/dashboard/bg.mp4" type="video/mp4">
       <source src="assets/harga/dashboard/bg.webm" type="video/webm">
@@ -613,24 +607,34 @@
       el.style.height = pct(box.height, SRC_H) + '%';
     }
 
-    // DYNAMIC DEDICATED FULL-SCREEN ENFORCER PIPELINE (WAY B FALLBACK)
+    // MATHEMATICALLY GUARANTEED FULLSCREEN VIDEO COVER PIPELINE
     function enforceFullScreenVideo() {
       const v = document.getElementById('bg-video');
+      const stage = document.getElementById('stage');
       if (!v) return;
 
       const w = window.innerWidth || document.documentElement.clientWidth;
       const h = window.innerHeight || document.documentElement.clientHeight;
 
-      // Video aspect ratio calculation (defaults to 16:9 if metadata not yet read)
       const videoRatio = (v.videoWidth && v.videoHeight) ? (v.videoWidth / v.videoHeight) : (16 / 9);
       const screenRatio = w / h;
 
+      // Calculate oversized dimensions to bleed past screen edges by at least 15%
+      let targetW, targetH;
       if (screenRatio > videoRatio) {
-        v.style.width = (w + 4) + 'px'; // +4px buffer to prevent subpixel edge rendering gap
-        v.style.height = Math.ceil((w / videoRatio) + 4) + 'px';
+        targetW = Math.ceil(w * 1.15);
+        targetH = Math.ceil((w / videoRatio) * 1.15);
       } else {
-        v.style.width = Math.ceil((h * videoRatio) + 4) + 'px';
-        v.style.height = (h + 4) + 'px';
+        targetW = Math.ceil((h * videoRatio) * 1.15);
+        targetH = Math.ceil(h * 1.15);
+      }
+
+      v.style.width = targetW + 'px';
+      v.style.height = targetH + 'px';
+
+      if (stage) {
+        stage.style.width = targetW + 'px';
+        stage.style.height = targetH + 'px';
       }
     }
 
@@ -654,7 +658,7 @@
         toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
       }
 
-      // 4. BACKGROUND VIDEO MUTE LOCK & EARLY LOOP & FORCE COVER PIPELINE
+      // 4. BACKGROUND VIDEO MUTE LOCK & EARLY LOOP
       if (bgVideo) {
         bgVideo.muted = true;
         bgVideo.volume = 0;
@@ -680,11 +684,10 @@
         });
       }
 
-      // Attach resize listeners to guarantee zero black bars / gaps across any device or browser
       window.addEventListener('resize', enforceFullScreenVideo);
       window.addEventListener('orientationchange', enforceFullScreenVideo);
       enforceFullScreenVideo();
-      setInterval(enforceFullScreenVideo, 1000); // Continuous safety check
+      setInterval(enforceFullScreenVideo, 500); // Continuous enforcement loop
 
       // RENDER SUBSCRIPTION PLAN CARDS WITH DESIGN BACKDROPS
       PLANS.forEach(plan => {
@@ -827,7 +830,6 @@
           document.documentElement.webkitRequestFullscreen();
         }
 
-        // Force dynamic full screen sizing calculation
         enforceFullScreenVideo();
 
         // Start Background Video Playback
