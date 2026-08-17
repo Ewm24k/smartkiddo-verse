@@ -31,9 +31,11 @@
       font-family: 'Baloo 2', 'Fredoka', 'Comic Sans MS', system-ui, sans-serif;
     }
 
-    /* 1. FULL-SCREEN & FULL-WIDTH RESPONSIVENESS */
+    /* 1. FULL-SCREEN & DYNAMIC AUTO-FIT RESPONSIVENESS */
     #stage-wrapper {
-      position: relative;
+      position: fixed;
+      top: 0;
+      left: 0;
       width: 100vw;
       height: 100vh;
       height: 100dvh;
@@ -49,7 +51,7 @@
       height: 100vh;
       height: 100dvh;
       background-image: url('assets/harga/dashboard/bg.jpg');
-      background-size: cover;
+      background-size: 100% 100%; /* Force background to auto-fit screen perfectly without top/bottom offset or cropping */
       background-position: center;
       background-repeat: no-repeat;
       z-index: 1;
@@ -64,7 +66,7 @@
       width: 100vw;
       height: 100vh;
       height: 100dvh;
-      object-fit: cover;
+      object-fit: fill; /* Force video to auto-fit screen perfectly without top/bottom offset */
       pointer-events: none;
       z-index: 2;
     }
@@ -208,7 +210,7 @@
     #close-btn:hover { transform: scale(1.08); filter: brightness(1.2); }
     #close-btn:active { transform: scale(0.92); }
 
-    /* PLAN CARD OVERLAY ELEMENTS (Adjusted font sizes slightly smaller as requested) */
+    /* PLAN CARD OVERLAY ELEMENTS (Slightly adjusted smaller with responsive scale) */
     .plan-el {
       position: absolute;
       pointer-events: none;
@@ -221,7 +223,7 @@
       text-align: center;
       white-space: nowrap;
       text-shadow: 0 0 10px currentColor, 0 2px 4px rgba(0,0,0,0.6);
-      font-size: 1.65vw; /* Slightly adjusted smaller */
+      font-size: clamp(12px, 1.55vw, 24px);
     }
 
     .plan-sub {
@@ -229,7 +231,7 @@
       text-align: center;
       letter-spacing: 0.02em;
       white-space: nowrap;
-      font-size: 0.85vw; /* Slightly adjusted smaller */
+      font-size: clamp(9px, 0.8vw, 13px);
     }
 
     .plan-price {
@@ -239,8 +241,8 @@
       white-space: nowrap;
       text-shadow: 0 2px 4px rgba(0,0,0,0.6);
     }
-    .plan-price .amount { font-size: 1.5vw; } /* Slightly adjusted smaller */
-    .plan-price .period { font-size: 0.85vw; font-weight: 600; opacity: 0.85; margin-left: 0.3em; }
+    .plan-price .amount { font-size: clamp(12px, 1.4vw, 22px); }
+    .plan-price .period { font-size: clamp(8px, 0.8vw, 12px); font-weight: 600; opacity: 0.85; margin-left: 0.3em; }
 
     .plan-feature {
       position: absolute;
@@ -251,13 +253,13 @@
       z-index: 10;
     }
     .plan-feature img {
-      width: 1.6vw; /* Slightly adjusted smaller */
-      height: 1.6vw;
+      width: clamp(10px, 1.5vw, 22px);
+      height: clamp(10px, 1.5vw, 22px);
       flex: none;
     }
     .plan-feature span {
       color: #fff;
-      font-size: 0.85vw; /* Slightly adjusted smaller */
+      font-size: clamp(8px, 0.8vw, 12px);
       font-weight: 600;
       text-shadow: 0 1px 3px rgba(0,0,0,0.8);
       white-space: nowrap;
@@ -273,7 +275,7 @@
       outline: none;
       border-radius: 999px;
       font-weight: 800;
-      font-size: 1.0vw; /* Slightly adjusted smaller */
+      font-size: clamp(10px, 0.95vw, 16px);
       cursor: pointer;
       box-shadow: 0 4px 14px rgba(0,0,0,0.4), inset 0 1px 2px rgba(255,255,255,0.5);
       transition: transform 0.12s ease, filter 0.12s ease;
@@ -284,13 +286,13 @@
 
     /* 7. ANDROID & IOS MOBILE PHONE CARD SCALING */
     @media screen and (max-width: 600px), screen and (max-height: 500px) and (max-width: 930px) {
-      .plan-name { font-size: 2.2vw; }
-      .plan-sub { font-size: 1.2vw; }
-      .plan-price .amount { font-size: 2.0vw; }
-      .plan-price .period { font-size: 1.1vw; }
-      .plan-feature span { font-size: 1.1vw; }
-      .plan-feature img { width: 2.1vw; height: 2.1vw; }
-      .plan-btn { font-size: 1.4vw; }
+      .plan-name { font-size: clamp(11px, 2.0vw, 20px); }
+      .plan-sub { font-size: clamp(8px, 1.1vw, 12px); }
+      .plan-price .amount { font-size: clamp(11px, 1.8vw, 18px); }
+      .plan-price .period { font-size: clamp(8px, 1.0vw, 11px); }
+      .plan-feature span { font-size: clamp(8px, 1.0vw, 11px); }
+      .plan-feature img { width: clamp(10px, 1.8vw, 18px); height: clamp(10px, 1.8vw, 18px); }
+      .plan-btn { font-size: clamp(9px, 1.2vw, 14px); }
 
       .card-col-2 {
         left: calc(var(--base-left) - 1.5%) !important;
