@@ -20,6 +20,7 @@
       user-select: none;
       -webkit-user-select: none;
       -webkit-touch-callout: none;
+      -webkit-tap-highlight-color: transparent;
     }
 
     html, body {
@@ -28,7 +29,8 @@
       height: 100dvh;
       overflow: hidden;
       background-color: #05041a;
-      font-family: 'Baloo 2', 'Fredoka', 'Comic Sans MS', system-ui, sans-serif;
+      font-family: 'Baloo 2', 'Fredoka', 'Comic Sans MS', system-ui, -apple-system, sans-serif;
+      -webkit-text-size-adjust: 100%;
     }
 
     /* 1. FULL-SCREEN & DYNAMIC AUTO-FIT RESPONSIVENESS */
@@ -51,14 +53,14 @@
       height: 100vh;
       height: 100dvh;
       background-image: url('assets/harga/dashboard/bg.jpg');
-      background-size: 100% 100%; /* Force background to auto-fit screen perfectly without top/bottom offset or cropping */
+      background-size: 100% 100%;
       background-position: center;
       background-repeat: no-repeat;
       z-index: 1;
       overflow: hidden;
     }
 
-    /* 4. BACKGROUND VIDEO RULES */
+    /* BACKGROUND VIDEO */
     #bg-video {
       position: absolute;
       top: 0;
@@ -66,7 +68,7 @@
       width: 100vw;
       height: 100vh;
       height: 100dvh;
-      object-fit: fill; /* Force video to auto-fit screen perfectly without top/bottom offset */
+      object-fit: fill;
       pointer-events: none;
       z-index: 2;
     }
@@ -82,7 +84,7 @@
       pointer-events: auto;
     }
 
-    /* 2. PRELOADER LAYER & CONTINUE TRIGGER */
+    /* PRELOADER LAYER */
     #loader-layer {
       position: fixed;
       top: 0;
@@ -161,11 +163,11 @@
       100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 92, 138, 0); }
     }
 
-    /* 3. MODERN TOP-LEFT BACK BUTTON */
+    /* NAVIGATION BUTTONS (WITH IOS SAFE-AREA SUPPORT) */
     #back-btn {
       position: absolute;
-      top: 20px;
-      left: 20px;
+      top: max(20px, env(safe-area-inset-top));
+      left: max(20px, env(safe-area-inset-left));
       width: 52px;
       height: 52px;
       border-radius: 50%;
@@ -193,11 +195,9 @@
       transform: scale(0.92);
     }
 
-    /* CLOSE BUTTON FROM SOURCE */
     #close-btn {
       -webkit-appearance: none;
       appearance: none;
-      -webkit-tap-highlight-color: transparent;
       position: absolute;
       border: none;
       outline: none;
@@ -210,99 +210,112 @@
     #close-btn:hover { transform: scale(1.08); filter: brightness(1.2); }
     #close-btn:active { transform: scale(0.92); }
 
-    /* PLAN CARD OVERLAY ELEMENTS (Slightly adjusted smaller with responsive scale) */
+    /* PLAN CARD OVERLAY ELEMENTS */
     .plan-el {
       position: absolute;
       pointer-events: none;
       z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
     }
 
+    /* 1. PLAN NAME / CATEGORY (MOBILE DEFAULT SIZES) */
     .plan-name {
       font-weight: 800;
-      line-height: 1;
+      line-height: 1.1;
       text-align: center;
       white-space: nowrap;
-      text-shadow: 0 0 10px currentColor, 0 2px 4px rgba(0,0,0,0.6);
-      font-size: clamp(12px, 1.55vw, 24px);
+      text-shadow: 0 0 10px currentColor, 0 2px 5px rgba(0,0,0,0.7);
+      font-size: clamp(12px, 1.55vw, 20px);
     }
 
+    /* 2. SUBTITLE */
     .plan-sub {
       font-weight: 700;
       text-align: center;
       letter-spacing: 0.02em;
       white-space: nowrap;
-      font-size: clamp(9px, 0.8vw, 13px);
+      font-size: clamp(9px, 0.95vw, 13px);
+      text-shadow: 0 1px 3px rgba(0,0,0,0.8);
     }
 
+    /* 3. PRICE DISPLAY */
     .plan-price {
       color: #fff;
       text-align: center;
       font-weight: 800;
       white-space: nowrap;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.6);
-    }
-    .plan-price .amount { font-size: clamp(12px, 1.4vw, 22px); }
-    .plan-price .period { font-size: clamp(8px, 0.8vw, 12px); font-weight: 600; opacity: 0.85; margin-left: 0.3em; }
-
-    .plan-feature {
-      position: absolute;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.7);
       display: flex;
-      align-items: center;
-      gap: 0.4vw;
-      pointer-events: none;
-      z-index: 10;
+      align-items: baseline;
+      justify-content: center;
     }
-    .plan-feature img {
-      width: clamp(10px, 1.5vw, 22px);
-      height: clamp(10px, 1.5vw, 22px);
-      flex: none;
-    }
-    .plan-feature span {
-      color: #fff;
-      font-size: clamp(8px, 0.8vw, 12px);
-      font-weight: 600;
-      text-shadow: 0 1px 3px rgba(0,0,0,0.8);
-      white-space: nowrap;
-    }
+    .plan-price .amount { font-size: clamp(12px, 1.45vw, 20px); font-weight: 800; }
+    .plan-price .period { font-size: clamp(8px, 0.85vw, 13px); font-weight: 600; opacity: 0.9; margin-left: 0.25em; }
 
-    /* PLAN BUTTONS */
+    /* 4. PLAN BUTTONS */
     .plan-btn {
       -webkit-appearance: none;
       appearance: none;
-      -webkit-tap-highlight-color: transparent;
       position: absolute;
       border: none;
       outline: none;
       border-radius: 999px;
       font-weight: 800;
-      font-size: clamp(10px, 0.95vw, 16px);
+      font-size: clamp(10px, 1.05vw, 15px);
       cursor: pointer;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.4), inset 0 1px 2px rgba(255,255,255,0.5);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.4), inset 0 1px 2px rgba(255,255,255,0.6);
       transition: transform 0.12s ease, filter 0.12s ease;
       z-index: 15;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      line-height: 1;
+      letter-spacing: 0.02em;
     }
-    .plan-btn:hover { transform: scale(1.035); filter: brightness(1.08); }
-    .plan-btn:active { transform: scale(0.96); filter: brightness(0.95); }
+    .plan-btn:hover { transform: scale(1.04); filter: brightness(1.1); }
+    .plan-btn:active { transform: scale(0.95); filter: brightness(0.92); }
 
-    /* 7. ANDROID & IOS MOBILE PHONE CARD SCALING */
-    @media screen and (max-width: 600px), screen and (max-height: 500px) and (max-width: 930px) {
-      .plan-name { font-size: clamp(11px, 2.0vw, 20px); }
-      .plan-sub { font-size: clamp(8px, 1.1vw, 12px); }
-      .plan-price .amount { font-size: clamp(11px, 1.8vw, 18px); }
-      .plan-price .period { font-size: clamp(8px, 1.0vw, 11px); }
-      .plan-feature span { font-size: clamp(8px, 1.0vw, 11px); }
-      .plan-feature img { width: clamp(10px, 1.8vw, 18px); height: clamp(10px, 1.8vw, 18px); }
-      .plan-btn { font-size: clamp(9px, 1.2vw, 14px); }
+    /* 5. CONTENT FEATURE ITEMS (CLEAN FLEXBOX ALIGNMENT) */
+    .plan-feature {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 6px;
+      pointer-events: none;
+      z-index: 10;
+      box-sizing: border-box;
+    }
+    .plan-feature img {
+      width: clamp(11px, 1.25vw, 22px);
+      height: clamp(11px, 1.25vw, 22px);
+      flex-shrink: 0;
+      object-fit: contain;
+    }
+    .plan-feature span {
+      color: #ffffff;
+      font-size: clamp(8.5px, 0.9vw, 13px);
+      font-weight: 600;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.9);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
-      .card-col-2 {
-        left: calc(var(--base-left) - 1.5%) !important;
-      }
-      .card-col-3 {
-        left: calc(var(--base-left) - 3%) !important;
-      }
-      .card-col-4 {
-        left: calc(var(--base-left) - 4.5%) !important;
-      }
+    /* 6. PC & TABLET ENHANCED TEXT SIZES */
+    @media screen and (min-width: 768px) and (min-height: 500px) {
+      .plan-name { font-size: clamp(17px, 1.8vw, 30px); }
+      .plan-sub { font-size: clamp(11px, 1.1vw, 17px); }
+      .plan-price .amount { font-size: clamp(17px, 1.85vw, 30px); }
+      .plan-price .period { font-size: clamp(10px, 1.0vw, 16px); }
+      .plan-btn { font-size: clamp(13px, 1.25vw, 20px); }
+      .plan-feature { gap: 8px; }
+      .plan-feature img { width: clamp(14px, 1.4vw, 24px); height: clamp(14px, 1.4vw, 24px); }
+      .plan-feature span { font-size: clamp(11px, 1.05vw, 16px); }
     }
 
     /* TOAST NOTIFICATION */
@@ -311,7 +324,7 @@
       bottom: 35px;
       left: 50%;
       transform: translateX(-50%) translateY(100px);
-      background: rgba(15, 23, 42, 0.92);
+      background: rgba(15, 23, 42, 0.94);
       color: #FFEB3B;
       padding: 12px 32px;
       border-radius: 40px;
@@ -332,11 +345,11 @@
       opacity: 1;
     }
 
-    /* 6. INTEGRATED AUTOPLAY MUSIC PLAYER WIDGET */
+    /* MUSIC WIDGET CONTROLS */
     #mw-reopen-btn {
       position: fixed;
-      bottom: 20px;
-      right: 20px;
+      bottom: max(20px, env(safe-area-inset-bottom));
+      right: max(20px, env(safe-area-inset-right));
       width: 50px;
       height: 50px;
       border-radius: 50%;
@@ -359,7 +372,7 @@
 
     #music-widget {
       position: fixed;
-      bottom: 20px;
+      bottom: max(20px, env(safe-area-inset-bottom));
       left: 50%;
       transform: translateX(-50%) translateY(0);
       background: rgba(15, 23, 42, 0.88);
@@ -463,19 +476,25 @@
   <audio id="bg-music-audio" preload="auto"></audio>
 
   <script>
-    // 5. SOUND SYSTEM INTEGRATION HELPER
+    // SOUND SYSTEM INTEGRATION HELPER
     function getSound() {
       return window.SmartKiddoSound || null;
     }
 
-    // DIMENSIONS FOR PERCENTAGE CONVERSIONS
+    // REFERENCE DESIGN RESOLUTION
     const SRC_W = 1536, SRC_H = 1024;
     const pct = (px, total) => (px / total) * 100;
 
+    /* 
+      EXACT CENTER ALIGNMENT GEOMETRY FOR ALL CARDS:
+      Col 1 Center = 270.0px (17.578%)
+      Col 2 Center = 587.5px (38.249%)
+      Col 3 Center = 922.5px (60.059%)
+      Col 4 Center = 1230.0px (80.078%)
+    */
     const PLANS = [
       {
         id: 'little-spark',
-        colClass: 'card-col-1',
         name: 'Little Spark', nameColor: '#FFC845',
         sub: '(FREE)', subColor: '#FFD873',
         price: 'RM0', period: '/month',
@@ -483,15 +502,15 @@
         btnGradient: 'linear-gradient(180deg,#FFDD6B,#F5A623)', btnTextColor: '#3A2600',
         checkIcon: 'assets/harga/dashboard/check_orange.png',
         features: ['Limited games & activities', 'Basic learning videos', 'Coloring pages', 'Daily learning goal (1)', 'Progress tracking'],
-        nameBox: {left:135, top:430, width:275, height:40},
-        subBox: {left:220, top:479, width:95, height:22},
-        priceBox: {left:175, top:516, width:185, height:34},
-        btnBox: {left:120, top:557, width:300, height:44},
-        featIconLeft: 128, featTextLeft: 172, featTop: 615, featIconSize: 30, featLineHeight: 38,
+        center: 270,
+        nameBox: { width: 280, top: 430, height: 40 },
+        subBox: { width: 220, top: 477, height: 22 },
+        priceBox: { width: 260, top: 512, height: 34 },
+        btnBox: { width: 290, top: 556, height: 44 },
+        featLeft: 135, featTop: 615, featWidth: 270, featLineHeight: 38
       },
       {
         id: 'ruby',
-        colClass: 'card-col-2',
         name: 'Ruby', nameColor: '#FF5C8A',
         sub: '(BASIC)', subColor: '#FF8FAE',
         price: 'RM19.90', period: '/month',
@@ -499,15 +518,15 @@
         btnGradient: 'linear-gradient(180deg,#FF7C9C,#E8365F)', btnTextColor: '#FFFFFF',
         checkIcon: 'assets/harga/dashboard/check_red.png',
         features: ['All in Little Spark', 'Unlimited games & activities', 'Interactive stories', 'Daily learning goal (3)', 'Progress tracking', 'Certificate of achievement'],
-        nameBox: {left:525, top:430, width:110, height:40},
-        subBox: {left:540, top:479, width:95, height:22},
-        priceBox: {left:475, top:516, width:225, height:34},
-        btnBox: {left:435, top:557, width:305, height:44},
-        featIconLeft: 463, featTextLeft: 478, featTop: 615, featIconSize: 30, featLineHeight: 38,
+        center: 587.5,
+        nameBox: { width: 280, top: 430, height: 40 },
+        subBox: { width: 220, top: 477, height: 22 },
+        priceBox: { width: 260, top: 512, height: 34 },
+        btnBox: { width: 290, top: 556, height: 44 },
+        featLeft: 452.5, featTop: 615, featWidth: 270, featLineHeight: 38
       },
       {
         id: 'sapphire',
-        colClass: 'card-col-3',
         name: 'Sapphire', nameColor: '#5FE8FF',
         sub: '(INTERMEDIATE)', subColor: '#A0F0FF',
         price: 'RM34.90', period: '/month',
@@ -515,16 +534,15 @@
         btnGradient: 'linear-gradient(180deg,#5FC6F7,#1E88E5)', btnTextColor: '#FFFFFF',
         checkIcon: 'assets/harga/dashboard/check_blue.png',
         features: ['All in Ruby', 'Advanced learning games', 'Personalized learning path', 'Daily learning goal (5)', 'Printable worksheets', 'Priority support'],
-        nameBox: {left:835, top:440, width:175, height:40},
-        subBox: {left:825, top:486, width:195, height:22},
-        priceBox: {left:805, top:524, width:235, height:34},
-        btnBox: {left:770, top:566, width:305, height:44},
-        featIconLeft: 798, featTextLeft: 813, featTop: 620, featIconSize: 30, featLineHeight: 37.5,
-        ribbon: true,
+        center: 922.5,
+        nameBox: { width: 280, top: 438, height: 40 },
+        subBox: { width: 220, top: 485, height: 22 },
+        priceBox: { width: 260, top: 520, height: 34 },
+        btnBox: { width: 290, top: 564, height: 44 },
+        featLeft: 787.5, featTop: 622, featWidth: 270, featLineHeight: 37.5
       },
       {
         id: 'diamond',
-        colClass: 'card-col-4',
         name: 'Diamond', nameColor: '#D9AFFF',
         sub: '(ADVANCE)', subColor: '#EBD4FF',
         price: 'RM59.90', period: '/month',
@@ -532,25 +550,30 @@
         btnGradient: 'linear-gradient(180deg,#C9A3F5,#8E44AD)', btnTextColor: '#FFFFFF',
         checkIcon: 'assets/harga/dashboard/check_purple.png',
         features: ['All in Sapphire', '1-on-1 learning insights', 'Premium stories & content', 'Daily learning goal (Unlimited)', 'Early access to new features', 'Priority support'],
-        nameBox: {left:1130, top:430, width:190, height:40},
-        subBox: {left:1150, top:479, width:150, height:22},
-        priceBox: {left:1120, top:518, width:230, height:34},
-        btnBox: {left:1085, top:558, width:305, height:44},
-        featIconLeft: 1123, featTextLeft: 1130, featTop: 622, featIconSize: 30, featLineHeight: 35.3,
-      },
+        center: 1230,
+        nameBox: { width: 280, top: 430, height: 40 },
+        subBox: { width: 220, top: 477, height: 22 },
+        priceBox: { width: 260, top: 512, height: 34 },
+        btnBox: { width: 290, top: 556, height: 44 },
+        featLeft: 1095, featTop: 618, featWidth: 270, featLineHeight: 36.5
+      }
     ];
 
     const CLOSE_BOX = { left: 1405, top: 63, width: 66, height: 66 };
 
     function boxStyle(el, box) {
-      const leftPct = pct(box.left, SRC_W);
-      const topPct = pct(box.top, SRC_H);
-      el.style.setProperty('--base-left', leftPct + '%');
-      el.style.setProperty('--base-top', topPct + '%');
-      el.style.left = leftPct + '%';
-      el.style.top = topPct + '%';
+      el.style.left = pct(box.left, SRC_W) + '%';
+      el.style.top = pct(box.top, SRC_H) + '%';
       el.style.width = pct(box.width, SRC_W) + '%';
       el.style.height = pct(box.height, SRC_H) + '%';
+    }
+
+    function boxCenteredStyle(el, centerPx, topPx, widthPx, heightPx) {
+      const leftPx = centerPx - (widthPx / 2);
+      el.style.left = pct(leftPx, SRC_W) + '%';
+      el.style.top = pct(topPx, SRC_H) + '%';
+      el.style.width = pct(widthPx, SRC_W) + '%';
+      el.style.height = pct(heightPx, SRC_H) + '%';
     }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -573,7 +596,7 @@
         toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
       }
 
-      // 4. BACKGROUND VIDEO MUTE LOCK & EARLY LOOP
+      // BACKGROUND VIDEO AUTOPLAY LOCK FOR IOS/ANDROID
       if (bgVideo) {
         bgVideo.muted = true;
         bgVideo.volume = 0;
@@ -586,56 +609,46 @@
         });
 
         bgVideo.addEventListener('timeupdate', () => {
-          if (bgVideo.duration && bgVideo.currentTime >= bgVideo.duration - 1.0) {
+          if (bgVideo.duration && bgVideo.currentTime >= bgVideo.duration - 0.8) {
             bgVideo.currentTime = 0.0;
           }
         });
       }
 
-      // RENDER PLAN CARDS
+      // RENDER ALL CARDS WITH MATHEMATICAL CENTERING
       PLANS.forEach(plan => {
-        // Name
+        // 1. Plan Category Name
         const nameEl = document.createElement('div');
-        nameEl.className = `plan-el plan-name ${plan.colClass}`;
+        nameEl.className = 'plan-el plan-name';
         nameEl.textContent = plan.name;
         nameEl.style.color = plan.nameColor;
-        boxStyle(nameEl, plan.nameBox);
-        nameEl.style.display = 'flex';
-        nameEl.style.alignItems = 'center';
-        nameEl.style.justifyContent = 'center';
+        boxCenteredStyle(nameEl, plan.center, plan.nameBox.top, plan.nameBox.width, plan.nameBox.height);
         contentLayer.appendChild(nameEl);
 
-        // Subtitle
+        // 2. Subtitle
         const subEl = document.createElement('div');
-        subEl.className = `plan-el plan-sub ${plan.colClass}`;
+        subEl.className = 'plan-el plan-sub';
         subEl.textContent = plan.sub;
         subEl.style.color = plan.subColor;
-        boxStyle(subEl, plan.subBox);
-        subEl.style.display = 'flex';
-        subEl.style.alignItems = 'center';
-        subEl.style.justifyContent = 'center';
+        boxCenteredStyle(subEl, plan.center, plan.subBox.top, plan.subBox.width, plan.subBox.height);
         contentLayer.appendChild(subEl);
 
-        // Price
+        // 3. Price Display
         const priceEl = document.createElement('div');
-        priceEl.className = `plan-el plan-price ${plan.colClass}`;
+        priceEl.className = 'plan-el plan-price';
         priceEl.innerHTML = `<span class="amount">${plan.price}</span><span class="period">${plan.period}</span>`;
-        boxStyle(priceEl, plan.priceBox);
-        priceEl.style.display = 'flex';
-        priceEl.style.alignItems = 'baseline';
-        priceEl.style.justifyContent = 'center';
+        boxCenteredStyle(priceEl, plan.center, plan.priceBox.top, plan.priceBox.width, plan.priceBox.height);
         contentLayer.appendChild(priceEl);
 
-        // Button
+        // 4. Action Button
         const btn = document.createElement('button');
-        btn.className = `plan-btn ${plan.colClass}`;
+        btn.className = 'plan-btn';
         btn.textContent = plan.btnLabel;
         btn.style.background = plan.btnGradient;
         btn.style.color = plan.btnTextColor;
-        boxStyle(btn, plan.btnBox);
+        boxCenteredStyle(btn, plan.center, plan.btnBox.top, plan.btnBox.width, plan.btnBox.height);
         btn.setAttribute('aria-label', plan.name + ' - ' + plan.btnLabel);
 
-        // Sound & Click events
         btn.addEventListener('mouseenter', () => getSound()?.playHover?.());
         btn.addEventListener('click', () => {
           getSound()?.playClick?.();
@@ -643,25 +656,19 @@
         });
         contentLayer.appendChild(btn);
 
-        // Feature list
-        plan.features.forEach((feat, i) => {
+        // 5. Features Content Rows (Unified Left-Aligned Flexbox)
+        plan.features.forEach((featText, i) => {
           const row = document.createElement('div');
-          row.className = `plan-feature ${plan.colClass}`;
-          const leftPct = pct(plan.featTextLeft, SRC_W);
-          const topPct = pct(plan.featTop + i * plan.featLineHeight, SRC_H);
-          row.style.setProperty('--base-left', leftPct + '%');
-          row.style.setProperty('--base-top', topPct + '%');
-          row.style.left = leftPct + '%';
-          row.style.top = topPct + '%';
-          row.innerHTML = `<img src="${plan.checkIcon}" alt=""><span>${feat}</span>`;
-          
-          const iconOffsetPct = pct(plan.featTextLeft - plan.featIconLeft, SRC_W);
-          row.querySelector('img').style.marginLeft = '-' + iconOffsetPct + '%';
+          row.className = 'plan-feature';
+          row.style.left = pct(plan.featLeft, SRC_W) + '%';
+          row.style.top = pct(plan.featTop + (i * plan.featLineHeight), SRC_H) + '%';
+          row.style.width = pct(plan.featWidth, SRC_W) + '%';
+          row.innerHTML = `<img src="${plan.checkIcon}" alt="check"><span>${featText}</span>`;
           contentLayer.appendChild(row);
         });
       });
 
-      // Close button positioning & behavior
+      // Close button positioning
       boxStyle(closeBtn, CLOSE_BOX);
       closeBtn.addEventListener('mouseenter', () => getSound()?.playHover?.());
       closeBtn.addEventListener('click', () => {
@@ -669,7 +676,7 @@
         showToast('Closed');
       });
 
-      // 3. BACK BUTTON
+      // Back Button Trigger
       backBtn.addEventListener('mouseenter', () => getSound()?.playHover?.());
       backBtn.addEventListener('click', () => {
         getSound()?.playClick?.();
@@ -680,7 +687,7 @@
         }
       });
 
-      // 2. ASSET PRELOADER ENGINE
+      // ASSET PRELOADER ENGINE
       const assetsToLoad = [
         'assets/harga/dashboard/bg.jpg',
         'assets/harga/dashboard/check_orange.png',
@@ -707,28 +714,25 @@
         img.src = src;
       });
 
-      // Preloader Continue Button Trigger
+      // Continue Button
       continueBtn.addEventListener('click', () => {
         getSound()?.playClick?.();
 
-        // Native Fullscreen Trigger
         if (document.documentElement.requestFullscreen) {
           document.documentElement.requestFullscreen().catch(() => {});
         } else if (document.documentElement.webkitRequestFullscreen) {
           document.documentElement.webkitRequestFullscreen();
         }
 
-        // Start Music
         if (typeof window.startBgMusic === 'function') {
           window.startBgMusic();
         }
 
-        // Fade Out Loader
         loaderLayer.style.opacity = '0';
         loaderLayer.style.visibility = 'hidden';
       });
 
-      // 6. INTEGRATED AUTOPLAY MUSIC PLAYER WIDGET logic
+      // MUSIC WIDGET CONTROLS
       const musicAudio = document.getElementById('bg-music-audio');
       const musicWidget = document.getElementById('music-widget');
       const mwPlayBtn = document.getElementById('mw-play-btn');
@@ -752,7 +756,7 @@
           if (res.ok) {
             playlist = await res.json();
           } else {
-            throw new Error('Local playlist not found');
+            throw new Error('Local playlist missing');
           }
         } catch (e1) {
           try {
@@ -760,7 +764,7 @@
             if (res2.ok) {
               playlist = await res2.json();
             } else {
-              throw new Error('Global playlist not found');
+              throw new Error('Global playlist missing');
             }
           } catch (e2) {
             playlist = fallbackPlaylist;
@@ -807,12 +811,10 @@
         }
       };
 
-      // Auto-Next Track Engine
       musicAudio.addEventListener('ended', () => {
         playTrackAtIndex(currentTrackIndex + 1);
       });
 
-      // Widget Show/Hide Controls
       function resetWidgetTimer() {
         clearTimeout(hideWidgetTimer);
         hideWidgetTimer = setTimeout(() => {
@@ -853,7 +855,6 @@
         showWidget();
       });
 
-      // Hover near bottom reveal widget
       document.addEventListener('mousemove', (e) => {
         if (window.innerHeight - e.clientY <= 90) {
           showWidget();
