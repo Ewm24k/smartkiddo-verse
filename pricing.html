@@ -1,872 +1,349 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Choose Your Plan</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Choose Your Plan</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #05041a;
+    font-family: 'Baloo 2', 'Comic Sans MS', system-ui, -apple-system, sans-serif;
+  }
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+  /* ---------- Stage: locked to the source image aspect ratio (FIT / letterbox) ---------- */
+  #stage-wrapper {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #05041a; /* sampled from the scene's own deep-space corner color */
+    overflow: hidden;
+  }
 
-  <!-- Sound System Integration -->
-  <script src="js/sound.js"></script>
+  #stage {
+    position: relative;
+    aspect-ratio: 1536 / 1024;
+    width: 100%;
+    height: 100%;
+    max-width: calc(100vh * 1536 / 1024);
+    max-height: calc(100vw * 1024 / 1536);
+    background-image: url('assets/harga/dashboard/bg.jpg'); /* fallback if the video is missing/still loading */
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    overflow: hidden;
+  }
 
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      user-select: none;
-      -webkit-user-select: none;
-      -webkit-touch-callout: none;
-    }
+  /* ---------- Background video (optional — drop bg.mp4 into the assets folder to enable) ---------- */
+  #bg-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+    z-index: 0;
+    pointer-events: none;
+  }
 
-    html, body {
-      width: 100vw;
-      height: 100vh;
-      height: 100dvh;
-      overflow: hidden;
-      background-color: #05041a;
-      font-family: 'Baloo 2', 'Fredoka', 'Comic Sans MS', system-ui, sans-serif;
-    }
+  /* ---------- Plan card overlay elements ---------- */
+  .plan-el {
+    position: absolute;
+    pointer-events: none;
+  }
 
-    /* 1. FULL-SCREEN & FULL-WIDTH RESPONSIVENESS */
-    #stage-wrapper {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
-      height: 100dvh;
-      overflow: hidden;
-      background: #05041a;
-    }
+  .plan-name {
+    font-weight: 800;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    text-shadow: 0 0 10px currentColor, 0 2px 4px rgba(0,0,0,0.6);
+    font-size: 1.9vw;
+  }
 
-    #stage {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      height: 100dvh;
-      background-image: url('assets/harga/dashboard/bg.jpg');
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      z-index: 1;
-      overflow: hidden;
-    }
+  .plan-sub {
+    font-weight: 700;
+    text-align: center;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    font-size: 0.95vw;
+  }
 
-    /* 4. BACKGROUND VIDEO RULES */
-    #bg-video {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      height: 100dvh;
-      object-fit: cover;
-      pointer-events: none;
-      z-index: 2;
-    }
+  .plan-price {
+    color: #fff;
+    text-align: center;
+    font-weight: 800;
+    white-space: nowrap;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+  }
+  .plan-price .amount { font-size: 1.7vw; }
+  .plan-price .period { font-size: 0.95vw; font-weight: 600; opacity: 0.85; margin-left: 0.3em; }
 
-    #content-layer {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      height: 100dvh;
-      z-index: 3;
-      pointer-events: auto;
-    }
+  .plan-feature {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    gap: 0.5vw;
+    pointer-events: none;
+  }
+  .plan-feature img {
+    width: 1.9vw;
+    height: 1.9vw;
+    flex: none;
+  }
+  .plan-feature span {
+    color: #fff;
+    font-size: 1vw;
+    font-weight: 600;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.7);
+    white-space: nowrap;
+  }
 
-    /* 2. PRELOADER LAYER & CONTINUE TRIGGER */
-    #loader-layer {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      height: 100dvh;
-      background: rgba(5, 4, 26, 0.95);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      z-index: 9999;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      transition: opacity 0.6s ease, visibility 0.6s ease;
-    }
+  /* ---------- Plan button (real, clickable) ---------- */
+  .plan-btn {
+    -webkit-appearance: none;
+    appearance: none;
+    -webkit-tap-highlight-color: transparent;
+    position: absolute;
+    border: none;
+    outline: none;
+    border-radius: 999px;
+    font-weight: 800;
+    font-size: 1.15vw;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.4), inset 0 1px 2px rgba(255,255,255,0.5);
+    transition: transform 0.12s ease, filter 0.12s ease;
+  }
+  .plan-btn:hover { transform: scale(1.035); filter: brightness(1.08); }
+  .plan-btn:active { transform: scale(0.96); filter: brightness(0.95); }
 
-    #loader-spinner-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
+  /* ---------- Close button (real, clickable) ---------- */
+  #close-btn {
+    -webkit-appearance: none;
+    appearance: none;
+    -webkit-tap-highlight-color: transparent;
+    position: absolute;
+    border: none;
+    outline: none;
+    background: transparent;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: transform 0.12s ease, filter 0.12s ease;
+  }
+  #close-btn:hover { transform: scale(1.08); filter: brightness(1.2); }
+  #close-btn:active { transform: scale(0.92); }
 
-    .spinner {
-      width: 70px;
-      height: 70px;
-      border: 8px solid rgba(255, 255, 255, 0.15);
-      border-top: 8px solid #FFC845;
-      border-right: 8px solid #FF5C8A;
-      border-bottom: 8px solid #5FE8FF;
-      border-left: 8px solid #D9AFFF;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    #loader-text {
-      color: #ffffff;
-      font-size: 24px;
-      font-weight: 700;
-      margin-top: 24px;
-      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-      letter-spacing: 1px;
-    }
-
-    #continue-btn {
-      display: none;
-      padding: 18px 48px;
-      font-size: 28px;
-      font-weight: 800;
-      color: #ffffff;
-      background: linear-gradient(135deg, #FF5C8A, #5FE8FF);
-      border: 3px solid #ffffff;
-      border-radius: 50px;
-      cursor: pointer;
-      box-shadow: 0 10px 30px rgba(95, 232, 255, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.6);
-      animation: pulse 1.5s infinite;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      transition: transform 0.2s ease;
-    }
-
-    #continue-btn:active {
-      transform: scale(0.95);
-    }
-
-    @keyframes pulse {
-      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 92, 138, 0.7); }
-      70% { transform: scale(1.08); box-shadow: 0 0 0 22px rgba(255, 92, 138, 0); }
-      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 92, 138, 0); }
-    }
-
-    /* 3. MODERN TOP-LEFT BACK BUTTON */
-    #back-btn {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      width: 52px;
-      height: 52px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.25);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 2px solid rgba(255, 255, 255, 0.6);
-      color: #ffffff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-      cursor: pointer;
-      z-index: 100;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-      transition: transform 0.2s ease, background 0.2s ease;
-    }
-
-    #back-btn:hover {
-      transform: scale(1.1);
-      background: rgba(255, 255, 255, 0.4);
-    }
-
-    #back-btn:active {
-      transform: scale(0.92);
-    }
-
-    /* CLOSE BUTTON FROM SOURCE */
-    #close-btn {
-      -webkit-appearance: none;
-      appearance: none;
-      -webkit-tap-highlight-color: transparent;
-      position: absolute;
-      border: none;
-      outline: none;
-      background: transparent;
-      cursor: pointer;
-      border-radius: 50%;
-      z-index: 90;
-      transition: transform 0.12s ease, filter 0.12s ease;
-    }
-    #close-btn:hover { transform: scale(1.08); filter: brightness(1.2); }
-    #close-btn:active { transform: scale(0.92); }
-
-    /* PLAN CARD OVERLAY ELEMENTS (Adjusted font sizes slightly smaller as requested) */
-    .plan-el {
-      position: absolute;
-      pointer-events: none;
-      z-index: 10;
-    }
-
-    .plan-name {
-      font-weight: 800;
-      line-height: 1;
-      text-align: center;
-      white-space: nowrap;
-      text-shadow: 0 0 10px currentColor, 0 2px 4px rgba(0,0,0,0.6);
-      font-size: 1.65vw; /* Slightly adjusted smaller */
-    }
-
-    .plan-sub {
-      font-weight: 700;
-      text-align: center;
-      letter-spacing: 0.02em;
-      white-space: nowrap;
-      font-size: 0.85vw; /* Slightly adjusted smaller */
-    }
-
-    .plan-price {
-      color: #fff;
-      text-align: center;
-      font-weight: 800;
-      white-space: nowrap;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.6);
-    }
-    .plan-price .amount { font-size: 1.5vw; } /* Slightly adjusted smaller */
-    .plan-price .period { font-size: 0.85vw; font-weight: 600; opacity: 0.85; margin-left: 0.3em; }
-
-    .plan-feature {
-      position: absolute;
-      display: flex;
-      align-items: center;
-      gap: 0.4vw;
-      pointer-events: none;
-      z-index: 10;
-    }
-    .plan-feature img {
-      width: 1.6vw; /* Slightly adjusted smaller */
-      height: 1.6vw;
-      flex: none;
-    }
-    .plan-feature span {
-      color: #fff;
-      font-size: 0.85vw; /* Slightly adjusted smaller */
-      font-weight: 600;
-      text-shadow: 0 1px 3px rgba(0,0,0,0.8);
-      white-space: nowrap;
-    }
-
-    /* PLAN BUTTONS */
-    .plan-btn {
-      -webkit-appearance: none;
-      appearance: none;
-      -webkit-tap-highlight-color: transparent;
-      position: absolute;
-      border: none;
-      outline: none;
-      border-radius: 999px;
-      font-weight: 800;
-      font-size: 1.0vw; /* Slightly adjusted smaller */
-      cursor: pointer;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.4), inset 0 1px 2px rgba(255,255,255,0.5);
-      transition: transform 0.12s ease, filter 0.12s ease;
-      z-index: 15;
-    }
-    .plan-btn:hover { transform: scale(1.035); filter: brightness(1.08); }
-    .plan-btn:active { transform: scale(0.96); filter: brightness(0.95); }
-
-    /* 7. ANDROID & IOS MOBILE PHONE CARD SCALING */
-    @media screen and (max-width: 600px), screen and (max-height: 500px) and (max-width: 930px) {
-      .plan-name { font-size: 2.2vw; }
-      .plan-sub { font-size: 1.2vw; }
-      .plan-price .amount { font-size: 2.0vw; }
-      .plan-price .period { font-size: 1.1vw; }
-      .plan-feature span { font-size: 1.1vw; }
-      .plan-feature img { width: 2.1vw; height: 2.1vw; }
-      .plan-btn { font-size: 1.4vw; }
-
-      .card-col-2 {
-        left: calc(var(--base-left) - 1.5%) !important;
-      }
-      .card-col-3 {
-        left: calc(var(--base-left) - 3%) !important;
-      }
-      .card-col-4 {
-        left: calc(var(--base-left) - 4.5%) !important;
-      }
-    }
-
-    /* TOAST NOTIFICATION */
-    #toast {
-      position: fixed;
-      bottom: 35px;
-      left: 50%;
-      transform: translateX(-50%) translateY(100px);
-      background: rgba(15, 23, 42, 0.92);
-      color: #FFEB3B;
-      padding: 12px 32px;
-      border-radius: 40px;
-      font-size: 19px;
-      font-weight: 800;
-      border: 2px solid #FFEB3B;
-      z-index: 1000;
-      opacity: 0;
-      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease;
-      pointer-events: none;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
-      text-align: center;
-      white-space: nowrap;
-    }
-
-    #toast.show {
-      transform: translateX(-50%) translateY(0);
-      opacity: 1;
-    }
-
-    /* 6. INTEGRATED AUTOPLAY MUSIC PLAYER WIDGET */
-    #mw-reopen-btn {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #FF5C8A, #7C4DFF);
-      color: #ffffff;
-      border: 2px solid #ffffff;
-      font-size: 22px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      z-index: 500;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
-    }
-
-    #mw-reopen-btn:hover {
-      transform: scale(1.15);
-    }
-
-    #music-widget {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%) translateY(0);
-      background: rgba(15, 23, 42, 0.88);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      padding: 10px 24px;
-      border-radius: 40px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      z-index: 500;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease;
-    }
-
-    #music-widget.is-minimized {
-      transform: translateX(-50%) translateY(150%);
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    .mw-btn {
-      background: rgba(255, 255, 255, 0.2);
-      border: 1.5px solid rgba(255, 255, 255, 0.5);
-      color: #ffffff;
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 16px;
-      transition: background 0.2s ease, transform 0.2s ease;
-    }
-
-    .mw-btn:hover {
-      background: rgba(255, 255, 255, 0.4);
-      transform: scale(1.1);
-    }
-
-    #mw-track-info {
-      color: #ffffff;
-      font-size: 15px;
-      font-weight: 600;
-      max-width: 180px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-  </style>
+  /* ---------- Toast ---------- */
+  #toast {
+    position: absolute;
+    left: 50%;
+    top: 4%;
+    transform: translate(-50%, -20px);
+    background: linear-gradient(180deg, #ffffff, #f0e9ff);
+    color: #4a2a86;
+    font-weight: 800;
+    font-size: clamp(13px, 2vw, 22px);
+    padding: 0.6em 1.3em;
+    border-radius: 999px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4), 0 0 0 4px rgba(255,255,255,0.4) inset;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    white-space: nowrap;
+    z-index: 30;
+    text-align: center;
+  }
+  #toast.show { opacity: 1; transform: translate(-50%, 0); }
+</style>
 </head>
 <body>
 
-  <!-- PRELOADER LAYER -->
-  <div id="loader-layer">
-    <div id="loader-spinner-container">
-      <div class="spinner"></div>
-      <div id="loader-text">Loading Fun...</div>
-    </div>
-    <button id="continue-btn">CONTINUE ▶</button>
-  </div>
-
-  <!-- MAIN STAGE WRAPPER -->
   <div id="stage-wrapper">
-    <!-- BACKGROUND VIDEO -->
-    <video id="bg-video" autoplay muted playsinline webkit-playsinline loop preload="auto">
-      <source src="assets/harga/dashboard/bg.mp4" type="video/mp4">
-      <source src="assets/harga/dashboard/bg.webm" type="video/webm">
-    </video>
-
-    <!-- STAGE CONTAINER -->
     <div id="stage">
-      <!-- CONTENT LAYER -->
-      <div id="content-layer">
-        <!-- MODERN BACK BUTTON -->
-        <button id="back-btn" title="Go Back">◀</button>
+      <!-- Background video. Replace assets/harga/dashboard/bg.mp4 with your clip (mp4 + webm recommended).
+           If this fails to load or is removed, the #stage background-image (assets/harga/dashboard/bg.jpg) shows instead. -->
+      <video id="bg-video" autoplay muted loop playsinline poster="assets/harga/dashboard/bg.jpg">
+        <source src="assets/harga/dashboard/bg.mp4" type="video/mp4">
+        <source src="assets/harga/dashboard/bg.webm" type="video/webm">
+      </video>
 
-        <!-- CLOSE BUTTON -->
-        <button id="close-btn" aria-label="Close"></button>
-      </div>
+      <div id="toast"></div>
+      <button id="close-btn" aria-label="Close"></button>
+      <!-- Plan cards injected by JS from PLANS data -->
     </div>
   </div>
 
-  <!-- TOAST NOTIFICATION -->
-  <div id="toast">Coming Soon! 🚀</div>
+<script>
+  // All positions are percentages of the source image (1536 x 1024) —
+  // edit PLANS below to change any plan's name, subtitle, price, button label, or features.
+  const SRC_W = 1536, SRC_H = 1024;
+  const pct = (px, total) => (px / total) * 100;
 
-  <!-- MUSIC WIDGET REOPEN BUTTON -->
-  <button id="mw-reopen-btn" title="Music Player">🎵</button>
+  const PLANS = [
+    {
+      id: 'little-spark',
+      name: 'Little Spark', nameColor: '#FFC845',
+      sub: '(FREE)', subColor: '#FFD873',
+      price: 'RM0', period: '/month',
+      btnLabel: 'Always Free',
+      btnGradient: 'linear-gradient(180deg,#FFDD6B,#F5A623)', btnTextColor: '#3A2600',
+      checkIcon: 'assets/harga/dashboard/check_orange.png',
+      features: ['Limited games & activities', 'Basic learning videos', 'Coloring pages', 'Daily learning goal (1)', 'Progress tracking'],
+      nameBox: {left:135, top:430, width:275, height:40},
+      subBox: {left:220, top:479, width:95, height:22},
+      priceBox: {left:175, top:516, width:185, height:34},
+      btnBox: {left:120, top:557, width:300, height:44},
+      featIconLeft: 128, featTextLeft: 172, featTop: 615, featIconSize: 30, featLineHeight: 38,
+    },
+    {
+      id: 'ruby',
+      name: 'Ruby', nameColor: '#FF5C8A',
+      sub: '(BASIC)', subColor: '#FF8FAE',
+      price: 'RM19.90', period: '/month',
+      btnLabel: 'Choose Plan',
+      btnGradient: 'linear-gradient(180deg,#FF7C9C,#E8365F)', btnTextColor: '#FFFFFF',
+      checkIcon: 'assets/harga/dashboard/check_red.png',
+      features: ['All in Little Spark', 'Unlimited games & activities', 'Interactive stories', 'Daily learning goal (3)', 'Progress tracking', 'Certificate of achievement'],
+      nameBox: {left:525, top:430, width:110, height:40},
+      subBox: {left:540, top:479, width:95, height:22},
+      priceBox: {left:475, top:516, width:225, height:34},
+      btnBox: {left:435, top:557, width:305, height:44},
+      featIconLeft: 463, featTextLeft: 478, featTop: 615, featIconSize: 30, featLineHeight: 38,
+    },
+    {
+      id: 'sapphire',
+      name: 'Sapphire', nameColor: '#5FE8FF',
+      sub: '(INTERMEDIATE)', subColor: '#A0F0FF',
+      price: 'RM34.90', period: '/month',
+      btnLabel: 'Choose Plan',
+      btnGradient: 'linear-gradient(180deg,#5FC6F7,#1E88E5)', btnTextColor: '#FFFFFF',
+      checkIcon: 'assets/harga/dashboard/check_blue.png',
+      features: ['All in Ruby', 'Advanced learning games', 'Personalized learning path', 'Daily learning goal (5)', 'Printable worksheets', 'Priority support'],
+      nameBox: {left:835, top:440, width:175, height:40},
+      subBox: {left:825, top:486, width:195, height:22},
+      priceBox: {left:805, top:524, width:235, height:34},
+      btnBox: {left:770, top:566, width:305, height:44},
+      featIconLeft: 798, featTextLeft: 813, featTop: 620, featIconSize: 30, featLineHeight: 37.5,
+      ribbon: true,
+    },
+    {
+      id: 'diamond',
+      name: 'Diamond', nameColor: '#D9AFFF',
+      sub: '(ADVANCE)', subColor: '#EBD4FF',
+      price: 'RM59.90', period: '/month',
+      btnLabel: 'Choose Plan',
+      btnGradient: 'linear-gradient(180deg,#C9A3F5,#8E44AD)', btnTextColor: '#FFFFFF',
+      checkIcon: 'assets/harga/dashboard/check_purple.png',
+      features: ['All in Sapphire', '1-on-1 learning insights', 'Premium stories & content', 'Daily learning goal (Unlimited)', 'Early access to new features', 'Priority support'],
+      nameBox: {left:1130, top:430, width:190, height:40},
+      subBox: {left:1150, top:479, width:150, height:22},
+      priceBox: {left:1120, top:518, width:230, height:34},
+      btnBox: {left:1085, top:558, width:305, height:44},
+      featIconLeft: 1123, featTextLeft: 1130, featTop: 622, featIconSize: 30, featLineHeight: 35.3,
+    },
+  ];
 
-  <!-- FLOATING MUSIC PLAYER WIDGET -->
-  <div id="music-widget" class="is-minimized">
-    <button id="mw-play-btn" class="mw-btn">⏸</button>
-    <div id="mw-track-info">Loading Music...</div>
-    <button id="mw-next-btn" class="mw-btn">⏭</button>
-    <button id="mw-minimize-btn" class="mw-btn">✖</button>
-  </div>
+  const CLOSE_BOX = { left: 1405, top: 63, width: 66, height: 66 };
 
-  <!-- AUDIO ELEMENT -->
-  <audio id="bg-music-audio" preload="auto"></audio>
+  const stage = document.getElementById('stage');
+  const toast = document.getElementById('toast');
+  let toastTimer = null;
 
-  <script>
-    // 5. SOUND SYSTEM INTEGRATION HELPER
-    function getSound() {
-      return window.SmartKiddoSound || null;
-    }
+  function showToast(msg) {
+    clearTimeout(toastTimer);
+    toast.textContent = msg;
+    toast.classList.add('show');
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 1800);
+  }
 
-    // DIMENSIONS FOR PERCENTAGE CONVERSIONS
-    const SRC_W = 1536, SRC_H = 1024;
-    const pct = (px, total) => (px / total) * 100;
+  function boxStyle(el, box) {
+    el.style.left = pct(box.left, SRC_W) + '%';
+    el.style.top = pct(box.top, SRC_H) + '%';
+    el.style.width = pct(box.width, SRC_W) + '%';
+    el.style.height = pct(box.height, SRC_H) + '%';
+  }
 
-    const PLANS = [
-      {
-        id: 'little-spark',
-        colClass: 'card-col-1',
-        name: 'Little Spark', nameColor: '#FFC845',
-        sub: '(FREE)', subColor: '#FFD873',
-        price: 'RM0', period: '/month',
-        btnLabel: 'Always Free',
-        btnGradient: 'linear-gradient(180deg,#FFDD6B,#F5A623)', btnTextColor: '#3A2600',
-        checkIcon: 'assets/harga/dashboard/check_orange.png',
-        features: ['Limited games & activities', 'Basic learning videos', 'Coloring pages', 'Daily learning goal (1)', 'Progress tracking'],
-        nameBox: {left:135, top:430, width:275, height:40},
-        subBox: {left:220, top:479, width:95, height:22},
-        priceBox: {left:175, top:516, width:185, height:34},
-        btnBox: {left:120, top:557, width:300, height:44},
-        featIconLeft: 128, featTextLeft: 172, featTop: 615, featIconSize: 30, featLineHeight: 38,
-      },
-      {
-        id: 'ruby',
-        colClass: 'card-col-2',
-        name: 'Ruby', nameColor: '#FF5C8A',
-        sub: '(BASIC)', subColor: '#FF8FAE',
-        price: 'RM19.90', period: '/month',
-        btnLabel: 'Choose Plan',
-        btnGradient: 'linear-gradient(180deg,#FF7C9C,#E8365F)', btnTextColor: '#FFFFFF',
-        checkIcon: 'assets/harga/dashboard/check_red.png',
-        features: ['All in Little Spark', 'Unlimited games & activities', 'Interactive stories', 'Daily learning goal (3)', 'Progress tracking', 'Certificate of achievement'],
-        nameBox: {left:525, top:430, width:110, height:40},
-        subBox: {left:540, top:479, width:95, height:22},
-        priceBox: {left:475, top:516, width:225, height:34},
-        btnBox: {left:435, top:557, width:305, height:44},
-        featIconLeft: 463, featTextLeft: 478, featTop: 615, featIconSize: 30, featLineHeight: 38,
-      },
-      {
-        id: 'sapphire',
-        colClass: 'card-col-3',
-        name: 'Sapphire', nameColor: '#5FE8FF',
-        sub: '(INTERMEDIATE)', subColor: '#A0F0FF',
-        price: 'RM34.90', period: '/month',
-        btnLabel: 'Choose Plan',
-        btnGradient: 'linear-gradient(180deg,#5FC6F7,#1E88E5)', btnTextColor: '#FFFFFF',
-        checkIcon: 'assets/harga/dashboard/check_blue.png',
-        features: ['All in Ruby', 'Advanced learning games', 'Personalized learning path', 'Daily learning goal (5)', 'Printable worksheets', 'Priority support'],
-        nameBox: {left:835, top:440, width:175, height:40},
-        subBox: {left:825, top:486, width:195, height:22},
-        priceBox: {left:805, top:524, width:235, height:34},
-        btnBox: {left:770, top:566, width:305, height:44},
-        featIconLeft: 798, featTextLeft: 813, featTop: 620, featIconSize: 30, featLineHeight: 37.5,
-        ribbon: true,
-      },
-      {
-        id: 'diamond',
-        colClass: 'card-col-4',
-        name: 'Diamond', nameColor: '#D9AFFF',
-        sub: '(ADVANCE)', subColor: '#EBD4FF',
-        price: 'RM59.90', period: '/month',
-        btnLabel: 'Choose Plan',
-        btnGradient: 'linear-gradient(180deg,#C9A3F5,#8E44AD)', btnTextColor: '#FFFFFF',
-        checkIcon: 'assets/harga/dashboard/check_purple.png',
-        features: ['All in Sapphire', '1-on-1 learning insights', 'Premium stories & content', 'Daily learning goal (Unlimited)', 'Early access to new features', 'Priority support'],
-        nameBox: {left:1130, top:430, width:190, height:40},
-        subBox: {left:1150, top:479, width:150, height:22},
-        priceBox: {left:1120, top:518, width:230, height:34},
-        btnBox: {left:1085, top:558, width:305, height:44},
-        featIconLeft: 1123, featTextLeft: 1130, featTop: 622, featIconSize: 30, featLineHeight: 35.3,
-      },
-    ];
+  PLANS.forEach(plan => {
+    // Name
+    const nameEl = document.createElement('div');
+    nameEl.className = 'plan-el plan-name';
+    nameEl.textContent = plan.name;
+    nameEl.style.color = plan.nameColor;
+    boxStyle(nameEl, plan.nameBox);
+    nameEl.style.display = 'flex';
+    nameEl.style.alignItems = 'center';
+    nameEl.style.justifyContent = 'center';
+    stage.appendChild(nameEl);
 
-    const CLOSE_BOX = { left: 1405, top: 63, width: 66, height: 66 };
+    // Subtitle
+    const subEl = document.createElement('div');
+    subEl.className = 'plan-el plan-sub';
+    subEl.textContent = plan.sub;
+    subEl.style.color = plan.subColor;
+    boxStyle(subEl, plan.subBox);
+    subEl.style.display = 'flex';
+    subEl.style.alignItems = 'center';
+    subEl.style.justifyContent = 'center';
+    stage.appendChild(subEl);
 
-    function boxStyle(el, box) {
-      const leftPct = pct(box.left, SRC_W);
-      const topPct = pct(box.top, SRC_H);
-      el.style.setProperty('--base-left', leftPct + '%');
-      el.style.setProperty('--base-top', topPct + '%');
-      el.style.left = leftPct + '%';
-      el.style.top = topPct + '%';
-      el.style.width = pct(box.width, SRC_W) + '%';
-      el.style.height = pct(box.height, SRC_H) + '%';
-    }
+    // Price
+    const priceEl = document.createElement('div');
+    priceEl.className = 'plan-el plan-price';
+    priceEl.innerHTML = `<span class="amount">${plan.price}</span><span class="period">${plan.period}</span>`;
+    boxStyle(priceEl, plan.priceBox);
+    priceEl.style.display = 'flex';
+    priceEl.style.alignItems = 'baseline';
+    priceEl.style.justifyContent = 'center';
+    stage.appendChild(priceEl);
 
-    document.addEventListener('DOMContentLoaded', () => {
-      const stage = document.getElementById('stage');
-      const contentLayer = document.getElementById('content-layer');
-      const toast = document.getElementById('toast');
-      const bgVideo = document.getElementById('bg-video');
-      const loaderLayer = document.getElementById('loader-layer');
-      const spinnerContainer = document.getElementById('loader-spinner-container');
-      const continueBtn = document.getElementById('continue-btn');
-      const backBtn = document.getElementById('back-btn');
-      const closeBtn = document.getElementById('close-btn');
+    // Button (real, clickable)
+    const btn = document.createElement('button');
+    btn.className = 'plan-btn';
+    btn.textContent = plan.btnLabel;
+    btn.style.background = plan.btnGradient;
+    btn.style.color = plan.btnTextColor;
+    boxStyle(btn, plan.btnBox);
+    btn.setAttribute('aria-label', plan.name + ' - ' + plan.btnLabel);
+    btn.addEventListener('click', () => showToast(plan.name + ' plan selected!'));
+    stage.appendChild(btn);
 
-      let toastTimer = null;
-
-      function showToast(msg) {
-        clearTimeout(toastTimer);
-        toast.textContent = msg;
-        toast.classList.add('show');
-        toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
-      }
-
-      // 4. BACKGROUND VIDEO MUTE LOCK & EARLY LOOP
-      if (bgVideo) {
-        bgVideo.muted = true;
-        bgVideo.volume = 0;
-        
-        bgVideo.addEventListener('volumechange', () => {
-          if (!bgVideo.muted || bgVideo.volume !== 0) {
-            bgVideo.muted = true;
-            bgVideo.volume = 0;
-          }
-        });
-
-        bgVideo.addEventListener('timeupdate', () => {
-          if (bgVideo.duration && bgVideo.currentTime >= bgVideo.duration - 1.0) {
-            bgVideo.currentTime = 0.0;
-          }
-        });
-      }
-
-      // RENDER PLAN CARDS
-      PLANS.forEach(plan => {
-        // Name
-        const nameEl = document.createElement('div');
-        nameEl.className = `plan-el plan-name ${plan.colClass}`;
-        nameEl.textContent = plan.name;
-        nameEl.style.color = plan.nameColor;
-        boxStyle(nameEl, plan.nameBox);
-        nameEl.style.display = 'flex';
-        nameEl.style.alignItems = 'center';
-        nameEl.style.justifyContent = 'center';
-        contentLayer.appendChild(nameEl);
-
-        // Subtitle
-        const subEl = document.createElement('div');
-        subEl.className = `plan-el plan-sub ${plan.colClass}`;
-        subEl.textContent = plan.sub;
-        subEl.style.color = plan.subColor;
-        boxStyle(subEl, plan.subBox);
-        subEl.style.display = 'flex';
-        subEl.style.alignItems = 'center';
-        subEl.style.justifyContent = 'center';
-        contentLayer.appendChild(subEl);
-
-        // Price
-        const priceEl = document.createElement('div');
-        priceEl.className = `plan-el plan-price ${plan.colClass}`;
-        priceEl.innerHTML = `<span class="amount">${plan.price}</span><span class="period">${plan.period}</span>`;
-        boxStyle(priceEl, plan.priceBox);
-        priceEl.style.display = 'flex';
-        priceEl.style.alignItems = 'baseline';
-        priceEl.style.justifyContent = 'center';
-        contentLayer.appendChild(priceEl);
-
-        // Button
-        const btn = document.createElement('button');
-        btn.className = `plan-btn ${plan.colClass}`;
-        btn.textContent = plan.btnLabel;
-        btn.style.background = plan.btnGradient;
-        btn.style.color = plan.btnTextColor;
-        boxStyle(btn, plan.btnBox);
-        btn.setAttribute('aria-label', plan.name + ' - ' + plan.btnLabel);
-
-        // Sound & Click events
-        btn.addEventListener('mouseenter', () => getSound()?.playHover?.());
-        btn.addEventListener('click', () => {
-          getSound()?.playClick?.();
-          showToast(plan.name + ' plan selected!');
-        });
-        contentLayer.appendChild(btn);
-
-        // Feature list
-        plan.features.forEach((feat, i) => {
-          const row = document.createElement('div');
-          row.className = `plan-feature ${plan.colClass}`;
-          const leftPct = pct(plan.featTextLeft, SRC_W);
-          const topPct = pct(plan.featTop + i * plan.featLineHeight, SRC_H);
-          row.style.setProperty('--base-left', leftPct + '%');
-          row.style.setProperty('--base-top', topPct + '%');
-          row.style.left = leftPct + '%';
-          row.style.top = topPct + '%';
-          row.innerHTML = `<img src="${plan.checkIcon}" alt=""><span>${feat}</span>`;
-          
-          const iconOffsetPct = pct(plan.featTextLeft - plan.featIconLeft, SRC_W);
-          row.querySelector('img').style.marginLeft = '-' + iconOffsetPct + '%';
-          contentLayer.appendChild(row);
-        });
-      });
-
-      // Close button positioning & behavior
-      boxStyle(closeBtn, CLOSE_BOX);
-      closeBtn.addEventListener('mouseenter', () => getSound()?.playHover?.());
-      closeBtn.addEventListener('click', () => {
-        getSound()?.playClick?.();
-        showToast('Closed');
-      });
-
-      // 3. BACK BUTTON
-      backBtn.addEventListener('mouseenter', () => getSound()?.playHover?.());
-      backBtn.addEventListener('click', () => {
-        getSound()?.playClick?.();
-        if (window.history.length > 1) {
-          window.history.back();
-        } else {
-          window.location.href = 'index.html';
-        }
-      });
-
-      // 2. ASSET PRELOADER ENGINE
-      const assetsToLoad = [
-        'assets/harga/dashboard/bg.jpg',
-        'assets/harga/dashboard/check_orange.png',
-        'assets/harga/dashboard/check_red.png',
-        'assets/harga/dashboard/check_blue.png',
-        'assets/harga/dashboard/check_purple.png'
-      ];
-
-      let loadedCount = 0;
-      const totalAssets = assetsToLoad.length;
-
-      function checkAllLoaded() {
-        loadedCount++;
-        if (loadedCount >= totalAssets) {
-          if (spinnerContainer) spinnerContainer.style.display = 'none';
-          if (continueBtn) continueBtn.style.display = 'inline-block';
-        }
-      }
-
-      assetsToLoad.forEach(src => {
-        const img = new Image();
-        img.onload = checkAllLoaded;
-        img.onerror = checkAllLoaded;
-        img.src = src;
-      });
-
-      // Preloader Continue Button Trigger
-      continueBtn.addEventListener('click', () => {
-        getSound()?.playClick?.();
-
-        // Native Fullscreen Trigger
-        if (document.documentElement.requestFullscreen) {
-          document.documentElement.requestFullscreen().catch(() => {});
-        } else if (document.documentElement.webkitRequestFullscreen) {
-          document.documentElement.webkitRequestFullscreen();
-        }
-
-        // Start Music
-        if (typeof window.startBgMusic === 'function') {
-          window.startBgMusic();
-        }
-
-        // Fade Out Loader
-        loaderLayer.style.opacity = '0';
-        loaderLayer.style.visibility = 'hidden';
-      });
-
-      // 6. INTEGRATED AUTOPLAY MUSIC PLAYER WIDGET logic
-      const musicAudio = document.getElementById('bg-music-audio');
-      const musicWidget = document.getElementById('music-widget');
-      const mwPlayBtn = document.getElementById('mw-play-btn');
-      const mwNextBtn = document.getElementById('mw-next-btn');
-      const mwMinimizeBtn = document.getElementById('mw-minimize-btn');
-      const mwReopenBtn = document.getElementById('mw-reopen-btn');
-      const mwTrackInfo = document.getElementById('mw-track-info');
-
-      let playlist = [];
-      let currentTrackIndex = 0;
-      let hideWidgetTimer = null;
-
-      const fallbackPlaylist = [
-        { title: 'Kids Learning Melodies', src: 'assets/audio/music/track1.mp3' },
-        { title: 'Happy Playtime', src: 'assets/audio/music/track2.mp3' }
-      ];
-
-      async function initPlaylist() {
-        try {
-          const res = await fetch('assets/harga/dashboard/music/playlist.json');
-          if (res.ok) {
-            playlist = await res.json();
-          } else {
-            throw new Error('Local playlist not found');
-          }
-        } catch (e1) {
-          try {
-            const res2 = await fetch('assets/audio/music/playlist.json');
-            if (res2.ok) {
-              playlist = await res2.json();
-            } else {
-              throw new Error('Global playlist not found');
-            }
-          } catch (e2) {
-            playlist = fallbackPlaylist;
-          }
-        }
-        if (playlist && playlist.length > 0) {
-          loadTrack(0);
-        }
-      }
-
-      function loadTrack(index) {
-        if (!playlist || playlist.length === 0) return;
-        currentTrackIndex = index % playlist.length;
-        const track = playlist[currentTrackIndex];
-        mwTrackInfo.textContent = track.title || `Track ${currentTrackIndex + 1}`;
-        musicAudio.src = track.src;
-        musicAudio.load();
-      }
-
-      function playTrackAtIndex(index) {
-        loadTrack(index);
-        const playPromise = musicAudio.play();
-        if (playPromise !== undefined) {
-          playPromise.then(() => {
-            mwPlayBtn.textContent = '⏸';
-          }).catch(() => {
-            mwPlayBtn.textContent = '▶';
-          });
-        }
-      }
-
-      window.startBgMusic = function() {
-        if (!musicAudio.src && playlist.length > 0) {
-          loadTrack(0);
-        }
-        musicAudio.muted = false;
-        const playPromise = musicAudio.play();
-        if (playPromise !== undefined) {
-          playPromise.then(() => {
-            mwPlayBtn.textContent = '⏸';
-          }).catch(() => {
-            mwPlayBtn.textContent = '▶';
-          });
-        }
-      };
-
-      // Auto-Next Track Engine
-      musicAudio.addEventListener('ended', () => {
-        playTrackAtIndex(currentTrackIndex + 1);
-      });
-
-      // Widget Show/Hide Controls
-      function resetWidgetTimer() {
-        clearTimeout(hideWidgetTimer);
-        hideWidgetTimer = setTimeout(() => {
-          musicWidget.classList.add('is-minimized');
-        }, 5000);
-      }
-
-      function showWidget() {
-        musicWidget.classList.remove('is-minimized');
-        resetWidgetTimer();
-      }
-
-      mwPlayBtn.addEventListener('click', () => {
-        getSound()?.playClick?.();
-        if (musicAudio.paused) {
-          musicAudio.play();
-          mwPlayBtn.textContent = '⏸';
-        } else {
-          musicAudio.pause();
-          mwPlayBtn.textContent = '▶';
-        }
-        resetWidgetTimer();
-      });
-
-      mwNextBtn.addEventListener('click', () => {
-        getSound()?.playClick?.();
-        playTrackAtIndex(currentTrackIndex + 1);
-        resetWidgetTimer();
-      });
-
-      mwMinimizeBtn.addEventListener('click', () => {
-        getSound()?.playClick?.();
-        musicWidget.classList.add('is-minimized');
-      });
-
-      mwReopenBtn.addEventListener('click', () => {
-        getSound()?.playClick?.();
-        showWidget();
-      });
-
-      // Hover near bottom reveal widget
-      document.addEventListener('mousemove', (e) => {
-        if (window.innerHeight - e.clientY <= 90) {
-          showWidget();
-        }
-      });
-
-      document.addEventListener('click', (e) => {
-        if (e.target === stage || e.target === contentLayer) {
-          showWidget();
-        }
-      });
-
-      initPlaylist();
+    // Feature list
+    plan.features.forEach((feat, i) => {
+      const row = document.createElement('div');
+      row.className = 'plan-feature';
+      row.style.left = pct(plan.featTextLeft, SRC_W) + '%';
+      row.style.top = pct(plan.featTop + i * plan.featLineHeight, SRC_H) + '%';
+      row.innerHTML = `<img src="${plan.checkIcon}" alt=""><span>${feat}</span>`;
+      // position icon slightly left of text via negative margin using icon's own left coord
+      const iconOffsetPct = pct(plan.featTextLeft - plan.featIconLeft, SRC_W);
+      row.querySelector('img').style.marginLeft = '-' + iconOffsetPct + '%';
+      stage.appendChild(row);
     });
-  </script>
+  });
+
+  // Close button
+  const closeBtn = document.getElementById('close-btn');
+  boxStyle(closeBtn, CLOSE_BOX);
+  closeBtn.addEventListener('click', () => {
+    stage.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+    stage.style.opacity = '0';
+    stage.style.transform = 'scale(0.96)';
+    setTimeout(() => showToast('Closed'), 300);
+  });
+
+  // Background video graceful fallback
+  const bgVideo = document.getElementById('bg-video');
+  bgVideo.addEventListener('error', () => {
+    if (bgVideo.error) bgVideo.style.display = 'none';
+  });
+</script>
 
 </body>
 </html>
