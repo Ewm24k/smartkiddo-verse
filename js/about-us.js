@@ -10,13 +10,6 @@
       ms: "Kenali kisah, misi dan visi di sebalik SmartKiddo Verse — alam semesta pembelajaran yang selamat dan menyeronokkan untuk si comel anda.",
       en: "Discover the story, mission and vision behind SmartKiddo Verse — a safe, joyful learning universe for your little one."
     },
-    nav_home: { ms: "Rumah", en: "Home" },
-    nav_onboarding: { ms: "Onboarding", en: "Onboarding" },
-    nav_about: { ms: "Tentang Kami", en: "About Us" },
-    nav_family: { ms: "Keluarga Saya", en: "My Family" },
-    nav_logout: { ms: "Log Keluar", en: "Log Out" },
-    toast_logout: { ms: "Berjaya log keluar. Sampai jumpa lagi! 👋", en: "Logged out successfully. See you soon! 👋" },
-
     hero_eyebrow: { ms: "Kisah di sebalik alam semesta kecil ini", en: "The story behind this little universe" },
     hero_title: { ms: "Tentang Kami", en: "About Us" },
     hero_subtitle: {
@@ -252,53 +245,11 @@
 
   applyLanguage(getSavedLang());
 
-  /* ---------- side menu ---------- */
-  var hamburger = document.getElementById("hamburgerBtn");
-  var sideMenu = document.getElementById("sideMenu");
-  var backdrop = document.getElementById("sideMenuBackdrop");
-
-  function openMenu() {
-    sideMenu.classList.add("is-open");
-    backdrop.classList.add("is-open");
-    hamburger.classList.add("is-open");
-    hamburger.setAttribute("aria-expanded", "true");
-    sideMenu.setAttribute("aria-hidden", "false");
-  }
-  function closeMenu() {
-    sideMenu.classList.remove("is-open");
-    backdrop.classList.remove("is-open");
-    hamburger.classList.remove("is-open");
-    hamburger.setAttribute("aria-expanded", "false");
-    sideMenu.setAttribute("aria-hidden", "true");
-  }
-  if (hamburger) {
-    hamburger.addEventListener("click", function () {
-      var isOpen = sideMenu.classList.contains("is-open");
-      isOpen ? closeMenu() : openMenu();
-    });
-  }
-  if (backdrop) backdrop.addEventListener("click", closeMenu);
-  document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape") closeMenu();
-  });
-
-  /* ---------- logout (matches pattern used on home.html / profile.html) ---------- */
-  var logoutBtn = document.getElementById("logoutBtn");
-  var toast = document.getElementById("logoutToast");
-  if (logoutBtn) {
-    logoutBtn.addEventListener("click", function () {
-      closeMenu();
-      if (toast) {
-        toast.classList.add("is-visible");
-        setTimeout(function () {
-          toast.classList.remove("is-visible");
-          window.location.href = "index.html";
-        }, 1400);
-      } else {
-        window.location.href = "index.html";
-      }
-    });
-  }
+  /* Hamburger toggle, side menu open/close, login-state switching, and
+     the logout flow (including the logout-notification checkmark) are
+     all handled by the shared js/sidemenu.js and js/logout.js — the
+     same scripts home.html uses — so this page behaves identically
+     without duplicating that logic here. */
 
   /* ---------- scroll reveal ---------- */
   var revealEls = document.querySelectorAll(".reveal");
