@@ -43,6 +43,33 @@
 }
 
 *{ box-sizing:border-box; }
+
+/* ---------------------------------------------------------
+   Scroll restore — scoped to this page only.
+   css/base.css locks html/body/.app to a fixed, non-scrolling
+   fullscreen layout for home.html's video dashboard. About Us
+   is a normal long page, so we override that here rather than
+   touching the shared base.css (home.html and other pages still
+   depend on the locked behavior).
+   --------------------------------------------------------- */
+html, body{
+  height:auto !important;
+  min-height:100%;
+  overflow-y:auto !important;
+  overflow-x:hidden !important;
+  -webkit-overflow-scrolling:touch;
+}
+.app{
+  height:auto !important;
+  min-height:100%;
+  overflow:visible !important;
+  position:static !important;
+}
+#main{
+  overflow:visible !important;
+  height:auto !important;
+}
+
 html{ scroll-behavior:smooth; }
 body{
   margin:0;
@@ -52,7 +79,6 @@ body{
   font-size:16px;
   line-height:1.6;
   -webkit-font-smoothing:antialiased;
-  overflow-x:hidden;
   -webkit-text-size-adjust:100%;
   padding-left:var(--sal);
   padding-right:var(--sar);
