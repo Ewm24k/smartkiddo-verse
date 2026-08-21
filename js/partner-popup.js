@@ -8,6 +8,8 @@
   const translations = {
     ms: {
       "title": "Rangkaian Rakan Kongsi",
+      "tab-network": "Rangkaian",
+      "tab-banner": "Banner Pemasaran",
       "crumb-you": "Anda",
       "loading": "Memuatkan rangkaian...",
       "no-members": "Tiada ahli didaftarkan di bawah pautan ini.",
@@ -21,10 +23,13 @@
       "badge-sapphire": "Sapphire",
       "badge-diamond": "Diamond",
       "view-sub": "Lihat Rangkaian ➔",
-      "err-fetch": "Gagal mendapatkan data. Sila semak sambungan internet."
+      "err-fetch": "Gagal mendapatkan data. Sila semak sambungan internet.",
+      "banner-empty": "Kandungan banner pemasaran akan ditambah tidak lama lagi."
     },
     en: {
       "title": "Partner Network",
+      "tab-network": "Network",
+      "tab-banner": "Marketing Banner",
       "crumb-you": "You",
       "loading": "Loading network...",
       "no-members": "No registered members under this link.",
@@ -38,13 +43,14 @@
       "badge-sapphire": "Sapphire",
       "badge-diamond": "Diamond",
       "view-sub": "View Network ➔",
-      "err-fetch": "Failed to retrieve data. Please check internet connection."
+      "err-fetch": "Failed to retrieve data. Please check internet connection.",
+      "banner-empty": "Marketing banner content will be added soon."
     }
   };
 
   let navStack = []; // Navigation trail stack: { email, code, name }
 
-  // Dynamic CSS injection for modern popups
+  // Dynamic CSS injection for modern popups & tabbed controls
   const styles = `
     .partner-modal-backdrop {
       position: fixed;
@@ -105,9 +111,41 @@
     .partner-modal-close:hover {
       color: var(--color-neon-green, #39ff88);
     }
+    
+    /* ---- Modal Tabs Bar ---- */
+    .partner-modal-tabs {
+      display: flex;
+      background: rgba(255, 255, 255, 0.02);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .partner-tab-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      border-bottom: 3px solid transparent;
+      color: rgba(255, 255, 255, 0.6);
+      font-family: var(--font-display, "Fredoka"), sans-serif;
+      font-weight: 600;
+      font-size: 14px;
+      padding: 14px 0;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+      outline: none;
+    }
+    .partner-tab-btn:hover {
+      color: var(--color-white, #fff);
+      background: rgba(255, 255, 255, 0.01);
+    }
+    .partner-tab-btn--active {
+      color: var(--color-neon-green, #39ff88);
+      border-bottom-color: var(--color-neon-green, #39ff88);
+      font-weight: 700;
+    }
+
     .partner-modal-crumbs {
       padding: 12px 24px;
-      background: rgba(255, 255, 255, 0.02);
+      background: rgba(255, 255, 255, 0.01);
       border-bottom: 1px solid rgba(255, 255, 255, 0.05);
       display: flex;
       flex-wrap: wrap;
@@ -194,6 +232,16 @@
       color: var(--color-neon-green, #39ff88);
       font-size: 12px;
       font-weight: 700;
+    }
+
+    /* ---- Marketing Banner Styles ---- */
+    .partner-banner-placeholder {
+      text-align: center;
+      padding: 60px 20px;
+      color: rgba(255, 255, 255, 0.45);
+      font-family: var(--font-body, "Nunito"), sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
     }
   `;
 
@@ -371,11 +419,54 @@
               <h2 class="partner-modal-title" id="partnerTitle"></h2>
               <button class="partner-modal-close" id="partnerCloseBtn">&times;</button>
             </div>
-            <div class="partner-modal-crumbs" id="partnerCrumbs"></div>
-            <div class="partner-modal-body" id="partnerBody"></div>
+            
+            <!-- Dynamic Tab Bar Header -->
+            <div class="partner-modal-tabs">
+              <button class="partner-tab-btn partner-tab-btn--active" id="partnerTabNetwork"></button>
+              <button class="partner-tab-btn" id="partnerTabBanner"></button>
+            </div>
+
+            <!-- Tab Panel 1: Network Trace (Default) -->
+            <div id="partnerNetworkPanel">
+              <div class="partner-modal-crumbs" id="partnerCrumbs"></div>
+              <div class="partner-modal-body" id="partnerBody"></div>
+            </div>
+
+            <!-- Tab Panel 2: Marketing Banner (Initially Hidden) -->
+            <div id="partnerBannerPanel" class="partner-modal-body" hidden>
+              <div class="partner-banner-placeholder" id="partnerBannerPlaceholder"></div>
+            </div>
           </div>
         `;
         document.body.appendChild(backdrop);
+
+        const tabNetwork = backdrop.querySelector("#partnerTabNetwork");
+        const tabBanner = backdrop.querySelector("#partnerTabBanner");
+        const networkPanel = backdrop.querySelector("#partnerNetworkPanel");
+        const bannerPanel = backdrop.querySelector("#partnerBannerPanel");
+
+        // Tab Switching Event Listeners with Click/Hover sounds
+        tabNetwork.addEventListener("click", () => {
+          if (typeof SmartKiddoSound !== "undefined") SmartKiddoSound.playClick();
+          tabNetwork.classList.add("partner-tab-btn--active");
+          tabBanner.classList.remove("partner-tab-btn--active");
+          networkPanel.hidden = false;
+          bannerPanel.hidden = true;
+        });
+        tabNetwork.addEventListener("mouseenter", () => {
+          if (typeof SmartKiddoSound !== "undefined") SmartKiddoSound.playHover();
+        });
+
+        tabBanner.addEventListener("click", () => {
+          if (typeof SmartKiddoSound !== "undefined") SmartKiddoSound.playClick();
+          tabBanner.classList.add("partner-tab-btn--active");
+          tabNetwork.classList.remove("partner-tab-btn--active");
+          networkPanel.hidden = true;
+          bannerPanel.hidden = false;
+        });
+        tabBanner.addEventListener("mouseenter", () => {
+          if (typeof SmartKiddoSound !== "undefined") SmartKiddoSound.playHover();
+        });
 
         backdrop.querySelector("#partnerCloseBtn").addEventListener("click", () => {
           if (typeof SmartKiddoSound !== "undefined") SmartKiddoSound.playClick();
@@ -392,8 +483,22 @@
         });
       }
 
-      // Sync active language title label
+      // Sync active language titles and tab labels
+      const tabNetwork = backdrop.querySelector("#partnerTabNetwork");
+      const tabBanner = backdrop.querySelector("#partnerTabBanner");
+      const networkPanel = backdrop.querySelector("#partnerNetworkPanel");
+      const bannerPanel = backdrop.querySelector("#partnerBannerPanel");
+
       backdrop.querySelector("#partnerTitle").textContent = getLocalizedText("title");
+      tabNetwork.textContent = getLocalizedText("tab-network");
+      tabBanner.textContent = getLocalizedText("tab-banner");
+      backdrop.querySelector("#partnerBannerPlaceholder").textContent = getLocalizedText("banner-empty");
+
+      // Reset Tab Status to default (Network panel active)
+      tabNetwork.classList.add("partner-tab-btn--active");
+      tabBanner.classList.remove("partner-tab-btn--active");
+      networkPanel.hidden = false;
+      bannerPanel.hidden = true;
 
       // Reset Stack Trace on startup
       navStack = [
