@@ -1,5 +1,5 @@
 /* =========================================================
-   profile.js — profile page behavior with Multilingual Support
+   profile.js — profile page behavior with Modern Custom Dropdown
    Reads and writes the signup record keyed by the logged-in
    email (see the note in signup.js / auth-check.js about why
    this is keyed by email rather than a real per-user auth UID).
@@ -22,7 +22,13 @@
   const affiliateLinkWrap = document.getElementById("affiliateLinkWrap");
   const affiliateLinkInput = document.getElementById("affiliateLinkInput");
   const copyAffiliateBtn = document.getElementById("copyAffiliateBtn");
-  const langSelect = document.getElementById("langSelect");
+
+  // Custom Dropdown Selectors
+  const langSelector = document.getElementById("langSelector");
+  const langTrigger = document.getElementById("langTrigger");
+  const langActiveLabel = document.getElementById("langActiveLabel");
+  const langMenu = document.getElementById("langMenu");
+  const langOptions = document.querySelectorAll(".lang-selector__option");
 
   let kidsData = [];
   let pendingPhotoBase64 = null; // set only if the user picks a new photo
@@ -114,10 +120,18 @@
 
   function updateLanguage(lang) {
     localStorage.setItem("smartkiddo_language", lang);
-    langSelect.value = lang;
     const t = translations[lang] || translations["ms"];
     
-    // Update simple text elements
+    // Sync current active selection UI state inside custom elements
+    langOptions.forEach((opt) => {
+      const active = opt.getAttribute("data-value") === lang;
+      opt.setAttribute("aria-selected", active ? "true" : "false");
+      if (active) {
+        langActiveLabel.textContent = opt.textContent.trim();
+      }
+    });
+
+    // Update standard static localized texts
     document.querySelectorAll("[data-i18n]").forEach((el) => {
       const key = el.getAttribute("data-i18n");
       if (t[key]) el.textContent = t[key];
@@ -139,17 +153,24 @@
       }
     });
 
-    // Re-render children list to translate custom labels and placeholders
+    // Re-render child rows to switch translations
     renderKids(kidsData);
   }
 
   /* ---------------- Sound wiring (same pattern as every other page) ---------------- */
-  document.querySelectorAll("input, select, textarea, button, a").forEach((el) => {
-    el.addEventListener("mouseenter", () => SmartKiddoSound.playHover());
-  });
+  function applySoundListeners() {
+    document.querySelectorAll("input, select, textarea, button, a, .lang-selector__trigger, .lang-selector__option").forEach((el) => {
+      if (!el.dataset.soundBound) {
+        el.addEventListener("mouseenter", () => SmartKiddoSound.playHover());
+        el.dataset.soundBound = "true";
+      }
+    });
+  }
+
   document.querySelectorAll("button, a").forEach((el) => {
     el.addEventListener("click", () => SmartKiddoSound.playClick());
   });
+
   let scrollSoundReady = true;
   document.getElementById("profileMain").addEventListener(
     "scroll",
@@ -161,6 +182,47 @@
     },
     { passive: true }
   );
+
+  /* ---------------- Custom Language Selector Logic ---------------- */
+  function openDropdown() {
+    langSelector.classList.add("lang-selector--active");
+    langTrigger.setAttribute("aria-expanded", "true");
+    langMenu.removeAttribute("hidden");
+  }
+
+  function closeDropdown() {
+    langSelector.classList.remove("lang-selector--active");
+    langTrigger.setAttribute("aria-expanded", "false");
+    langMenu.setAttribute("hidden", "true");
+  }
+
+  langTrigger.addEventListener("click", (e) => {
+    e.stopPropagation();
+    SmartKiddoSound.playClick();
+    const isExpanded = langTrigger.getAttribute("aria-expanded") === "true";
+    if (isExpanded) {
+      closeDropdown();
+    } else {
+      openDropdown();
+    }
+  });
+
+  langOptions.forEach((option) => {
+    option.addEventListener("click", (e) => {
+      e.stopPropagation();
+      SmartKiddoSound.playClick();
+      const val = option.getAttribute("data-value");
+      updateLanguage(val);
+      closeDropdown();
+    });
+  });
+
+  // Close dropdown if clicking outside the container
+  document.addEventListener("click", (e) => {
+    if (!langSelector.contains(e.target)) {
+      closeDropdown();
+    }
+  });
 
   /* ---------------- Load existing profile data ---------------- */
   function renderKids(kids) {
@@ -185,6 +247,7 @@
         kidsData[i].name = e.target.value;
       });
     });
+    applySoundListeners();
   }
 
   docRef
@@ -325,11 +388,7 @@
     });
   });
 
-  /* ---------------- Initialize Language Switcher event ---------------- */
-  langSelect.addEventListener("change", (e) => {
-    updateLanguage(e.target.value);
-  });
-
-  // Load language settings on page startup
+  // Apply sounds and language settings on startup
+  applySoundListeners();
   updateLanguage(getCurrentLang());
 })();
