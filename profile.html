@@ -38,30 +38,39 @@
 
   <div class="app">
 
-    <!-- Top bar: hamburger + brand, same as every other page -->
+    <!-- Top bar: hamburger + brand + language switcher -->
     <div class="topbar">
-      <button id="menuToggle" class="menu-toggle" aria-label="Buka menu" aria-expanded="false" aria-controls="sideMenu">
+      <button id="menuToggle" class="menu-toggle" aria-expanded="false" aria-controls="sideMenu" data-i18n-aria="aria-label:menu-toggle-label">
         <span class="menu-toggle__bar"></span>
         <span class="menu-toggle__bar"></span>
         <span class="menu-toggle__bar"></span>
       </button>
       <span class="brand">SmartKiddo <span class="brand__accent">Verse</span></span>
+      
+      <!-- Multilingual Dropdown -->
+      <div class="lang-selector">
+        <span class="lang-selector__icon">🌐</span>
+        <select id="langSelect" class="lang-selector__select" aria-label="Pilih Bahasa / Select Language">
+          <option value="ms">Melayu</option>
+          <option value="en">English</option>
+        </select>
+      </div>
     </div>
 
     <!-- Side menu (slides in from left) — same component as every other page -->
     <div id="sideMenuBackdrop" class="side-menu-backdrop"></div>
     <nav id="sideMenu" class="side-menu" aria-hidden="true">
-      <button id="menuClose" class="side-menu__close" aria-label="Tutup menu">&times;</button>
+      <button id="menuClose" class="side-menu__close" data-i18n-aria="aria-label:menu-close-label">&times;</button>
 
       <div class="side-menu__brand">SmartKiddo <span class="brand__accent">Verse</span></div>
 
       <div id="menuLoggedOut" class="menu-state">
         <form id="loginForm" class="login-form" autocomplete="off">
           <label class="login-form__label" for="loginEmail">Emel</label>
-          <input class="login-form__input" type="email" id="loginEmail" name="loginEmail" placeholder="contoh@gmail.com" required />
+          <input class="login-form__input" type="email" id="loginEmail" name="loginEmail" placeholder="contoh@gmail.com" />
 
           <label class="login-form__label" for="password">Kata Laluan</label>
-          <input class="login-form__input" type="password" id="password" name="password" placeholder="Masukkan kata laluan" required />
+          <input class="login-form__input" type="password" id="password" name="password" placeholder="Masukkan kata laluan" />
           <p id="loginError" class="login-form__error" hidden></p>
 
           <button type="submit" class="login-form__submit">Log Masuk</button>
@@ -78,27 +87,27 @@
 
       <div id="menuLoggedIn" class="menu-state" hidden>
         <ul class="side-menu__links">
-          <li><a href="home.html">Rumah</a></li>
-          <li><a href="profile.html">Profil</a></li>
-          <li><a href="#">Permainan</a></li>
-          <li><a href="#">Pencapaian Saya</a></li>
-          <li><a href="pricing.html">Pricing</a></li>
-          <li><a href="about-us.html">Tentang Kami</a></li>
+          <li><a href="home.html" data-i18n="menu-home">Rumah</a></li>
+          <li><a href="profile.html" data-i18n="menu-profile">Profil</a></li>
+          <li><a href="#" data-i18n="menu-games">Permainan</a></li>
+          <li><a href="#" data-i18n="menu-achievements">Pencapaian Saya</a></li>
+          <li><a href="pricing.html" data-i18n="menu-pricing">Pricing</a></li>
+          <li><a href="about-us.html" data-i18n="menu-about">Tentang Kami</a></li>
         </ul>
-        <button id="sideMenuLogoutBtn" class="side-menu__logout">Log Keluar 👋</button>
+        <button id="sideMenuLogoutBtn" class="side-menu__logout" data-i18n="menu-logout">Log Keluar 👋</button>
       </div>
     </nav>
 
     <!-- Profile content -->
     <main id="profileMain" class="profile-main">
       <div class="profile-content">
-        <h1 class="profile-title">Profil Keluarga</h1>
+        <h1 class="profile-title" data-i18n="profile-title">Profil Keluarga</h1>
 
         <!-- Photo -->
         <section class="profile-photo-section">
           <div class="profile-photo-wrap">
             <img id="profilePhotoPreview" class="profile-photo" src="assets/icons/favicon.svg" alt="Gambar profil" />
-            <button id="profilePhotoBtn" class="profile-photo-btn" aria-label="Tukar gambar profil">📷</button>
+            <button id="profilePhotoBtn" class="profile-photo-btn" data-i18n-aria="aria-label:photo-btn-label">📷</button>
             <input type="file" id="profilePhotoInput" accept="image/*" hidden />
           </div>
         </section>
@@ -106,44 +115,44 @@
         <!-- Account fields -->
         <section class="profile-fields">
           <div class="profile-field">
-            <label for="profileEmail">Emel</label>
+            <label for="profileEmail" data-i18n="label-email">Emel</label>
             <input type="email" id="profileEmail" placeholder="contoh@gmail.com" />
           </div>
 
           <div class="profile-field">
-            <label for="profileGender">Jantina</label>
+            <label for="profileGender" data-i18n="label-gender">Jantina</label>
             <select id="profileGender">
-              <option value="">Pilih jantina</option>
-              <option value="Lelaki">Lelaki</option>
-              <option value="Perempuan">Perempuan</option>
+              <option value="" data-i18n="gender-placeholder">Pilih jantina</option>
+              <option value="Lelaki" data-i18n="gender-male">Lelaki</option>
+              <option value="Perempuan" data-i18n="gender-female">Perempuan</option>
             </select>
           </div>
 
           <div class="profile-field">
-            <label for="profileBio">Bio</label>
-            <textarea id="profileBio" rows="3" placeholder="Ceritakan sedikit tentang keluarga anda..."></textarea>
+            <label for="profileBio" data-i18n="label-bio">Bio</label>
+            <textarea id="profileBio" rows="3" data-i18n-placeholder="bio-placeholder" placeholder="Ceritakan sedikit tentang keluarga anda..."></textarea>
           </div>
         </section>
 
         <!-- Kids nicknames -->
         <section class="profile-kids-section">
-          <h2 class="profile-section-title">Nama Panggilan Anak-Anak</h2>
+          <h2 class="profile-section-title" data-i18n="kids-section-title">Nama Panggilan Anak-Anak</h2>
           <div id="profileKidsList" class="profile-kids-list"></div>
         </section>
 
-        <button id="profileSaveBtn" class="profile-save-btn">Simpan Perubahan</button>
+        <button id="profileSaveBtn" class="profile-save-btn" data-i18n="save-btn">Simpan Perubahan</button>
         <p id="profileSaveMessage" class="profile-save-message" hidden></p>
 
         <hr class="profile-breakline" />
 
         <!-- Affiliate link -->
         <section class="profile-affiliate-section">
-          <h2 class="profile-section-title">Jana Pautan Affiliate</h2>
-          <p class="profile-affiliate-hint">Kongsi pautan ini dengan rakan — apabila mereka mendaftar, ia akan dikaitkan dengan akaun anda.</p>
-          <button id="generateAffiliateBtn" class="profile-affiliate-btn">Jana Pautan</button>
+          <h2 class="profile-section-title" data-i18n="affiliate-title">Jana Pautan Affiliate</h2>
+          <p class="profile-affiliate-hint" data-i18n="affiliate-hint">Kongsi pautan ini dengan rakan — apabila mereka mendaftar, ia akan dikaitkan dengan akaun anda.</p>
+          <button id="generateAffiliateBtn" class="profile-affiliate-btn" data-i18n="affiliate-btn">Jana Pautan</button>
           <div id="affiliateLinkWrap" class="affiliate-link-wrap" hidden>
             <input type="text" id="affiliateLinkInput" class="affiliate-link-input" readonly />
-            <button id="copyAffiliateBtn" class="affiliate-copy-btn">Salin</button>
+            <button id="copyAffiliateBtn" class="affiliate-copy-btn" data-i18n="copy-btn">Salin</button>
           </div>
         </section>
       </div>
