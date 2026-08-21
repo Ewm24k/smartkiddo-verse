@@ -1,8 +1,6 @@
 /* =========================================================
    profile.js — profile page behavior with Modern Custom Dropdown
-   Reads and writes the signup record keyed by the logged-in
-   email (see the note in signup.js / auth-check.js about why
-   this is keyed by email rather than a real per-user auth UID).
+   and Guaranteed Unique Affiliate Link Generator.
    ========================================================= */
 
 (function () {
@@ -14,6 +12,7 @@
   const photoInput = document.getElementById("profilePhotoInput");
   const emailInput = document.getElementById("profileEmail");
   const genderSelect = document.getElementById("profileGender");
+  const genderBtns = document.querySelectorAll(".gender-btn");
   const bioInput = document.getElementById("profileBio");
   const kidsList = document.getElementById("profileKidsList");
   const saveBtn = document.getElementById("profileSaveBtn");
@@ -22,8 +21,10 @@
   const affiliateLinkWrap = document.getElementById("affiliateLinkWrap");
   const affiliateLinkInput = document.getElementById("affiliateLinkInput");
   const copyAffiliateBtn = document.getElementById("copyAffiliateBtn");
+  const referralStatsBox = document.getElementById("referralStatsBox");
+  const referralCountText = document.getElementById("referralCountText");
 
-  // Custom Dropdown Selectors
+  // Custom Language Dropdown Selectors
   const langSelector = document.getElementById("langSelector");
   const langTrigger = document.getElementById("langTrigger");
   const langActiveLabel = document.getElementById("langActiveLabel");
@@ -159,7 +160,7 @@
 
   /* ---------------- Sound wiring (same pattern as every other page) ---------------- */
   function applySoundListeners() {
-    document.querySelectorAll("input, select, textarea, button, a, .lang-selector__trigger, .lang-selector__option").forEach((el) => {
+    document.querySelectorAll("input, select, textarea, button, a, .lang-selector__trigger, .lang-selector__option, .gender-btn").forEach((el) => {
       if (!el.dataset.soundBound) {
         el.addEventListener("mouseenter", () => SmartKiddoSound.playHover());
         el.dataset.soundBound = "true";
@@ -182,6 +183,30 @@
     },
     { passive: true }
   );
+
+  /* ---------------- Segmented Gender Toggle Controls ---------------- */
+  genderBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      SmartKiddoSound.playClick();
+      const val = btn.getAttribute("data-gender");
+      genderSelect.value = val;
+      
+      // Toggle CSS visual status
+      genderBtns.forEach((b) => b.classList.remove("gender-btn--active"));
+      btn.classList.add("gender-btn--active");
+    });
+  });
+
+  function selectGenderOption(genderVal) {
+    genderSelect.value = genderVal || "";
+    genderBtns.forEach((btn) => {
+      if (btn.getAttribute("data-gender") === genderVal) {
+        btn.classList.add("gender-btn--active");
+      } else {
+        btn.classList.remove("gender-btn--active");
+      }
+    });
+  }
 
   /* ---------------- Custom Language Selector Logic ---------------- */
   function openDropdown() {
@@ -250,6 +275,22 @@
     applySoundListeners();
   }
 
+  /* ---------------- Referral Stats retrieval ---------------- */
+  function fetchReferralStats(code) {
+    if (!code) return;
+    
+    db.collection("signups")
+      .where("referredBy", "==", code)
+      .get()
+      .then((querySnapshot) => {
+        referralCountText.textContent = querySnapshot.size;
+        referralStatsBox.hidden = false;
+      })
+      .catch((err) => {
+        console.error("Error fetching referral stats:", err);
+      });
+  }
+
   docRef
     .get()
     .then((doc) => {
@@ -257,7 +298,6 @@
       const t = translations[lang] || translations["ms"];
 
       if (!doc.exists) {
-        // Fallback: Populate active email but warn they need to save to create the record
         emailInput.value = loggedInEmail;
         renderKids([]);
         showSaveMessage(t["err-no-profile"], "error");
@@ -265,13 +305,17 @@
       }
       const data = doc.data();
       emailInput.value = data.parentEmail || loggedInEmail;
-      genderSelect.value = data.gender || "";
+      
+      // Update Segmented Control Option UI
+      selectGenderOption(data.gender || "");
+      
       bioInput.value = data.bio || "";
       if (data.profilePhoto) photoPreview.src = data.profilePhoto;
       renderKids(data.kids || []);
       if (data.affiliateCode) {
         existingAffiliateCode = data.affiliateCode;
         showAffiliateLink(existingAffiliateCode);
+        fetchReferralStats(existingAffiliateCode);
       }
     })
     .catch((err) => {
@@ -338,7 +382,6 @@
       updates.profilePhoto = pendingPhotoBase64;
     }
 
-    // Changed from .update() to .set(updates, { merge: true }) to handle missing/upsert records
     docRef
       .set(updates, { merge: true })
       .then(() => {
@@ -355,14 +398,37 @@
   });
 
   /* ---------------- Affiliate link ---------------- */
+  
+  // Forces secure production HTTPS domain and reveals controls elegantly
   function showAffiliateLink(code) {
-    const link = `${window.location.origin}${window.location.pathname.replace("profile.html", "signup.html")}?ref=${code}`;
+    const link = `https://smartkiddouniverse.com/signup.html?ref=${code}`;
     affiliateLinkInput.value = link;
     affiliateLinkWrap.hidden = false;
+    
+    // Hide the generate button cleanly once generation completes
+    generateAffiliateBtn.hidden = true;
   }
 
-  function generateCode() {
-    return Math.random().toString(36).slice(2, 8).toUpperCase();
+  // Generates and returns a unique code by checking existing Firestore documents
+  function generateUniqueCode(attempts = 0) {
+    const maxAttempts = 12;
+    if (attempts >= maxAttempts) {
+      return Promise.reject(new Error("UNIQUE_GENERATION_FAILED"));
+    }
+
+    const code = Math.random().toString(36).slice(2, 8).toUpperCase();
+    
+    // Checks if any signup record already uses this specific code
+    return db.collection("signups")
+      .where("affiliateCode", "==", code)
+      .get()
+      .then((querySnapshot) => {
+        if (!querySnapshot.empty) {
+          // Collision found! Try again recursively
+          return generateUniqueCode(attempts + 1);
+        }
+        return code;
+      });
   }
 
   generateAffiliateBtn.addEventListener("click", () => {
@@ -370,27 +436,60 @@
       showAffiliateLink(existingAffiliateCode);
       return;
     }
-    const code = generateCode();
-    docRef
-      // Changed to .set with merge to support creating the doc if it was missing
-      .set({ affiliateCode: code }, { merge: true })
-      .then(() => {
-        existingAffiliateCode = code;
-        showAffiliateLink(code);
+
+    const originalBtnText = generateAffiliateBtn.textContent;
+    generateAffiliateBtn.disabled = true;
+    generateAffiliateBtn.textContent = "Menjana..."; // Update status during DB check
+
+    generateUniqueCode()
+      .then((code) => {
+        docRef
+          .set({ affiliateCode: code }, { merge: true })
+          .then(() => {
+            existingAffiliateCode = code;
+            showAffiliateLink(code);
+            fetchReferralStats(code);
+            generateAffiliateBtn.disabled = false;
+            generateAffiliateBtn.textContent = originalBtnText;
+          })
+          .catch((err) => {
+            console.error("Affiliate code save error:", err);
+            const lang = getCurrentLang();
+            const t = translations[lang] || translations["ms"];
+            showSaveMessage(t["err-affiliate"], "error");
+            generateAffiliateBtn.disabled = false;
+            generateAffiliateBtn.textContent = originalBtnText;
+          });
       })
       .catch((err) => {
-        console.error("Affiliate code save error:", err);
+        console.error("Failed to generate unique code:", err);
         const lang = getCurrentLang();
         const t = translations[lang] || translations["ms"];
         showSaveMessage(t["err-affiliate"], "error");
+        generateAffiliateBtn.disabled = false;
+        generateAffiliateBtn.textContent = originalBtnText;
       });
   });
 
+  // Modern satisfying copy confirmation
   copyAffiliateBtn.addEventListener("click", () => {
     affiliateLinkInput.select();
-    navigator.clipboard.writeText(affiliateLinkInput.value).catch(() => {
-      document.execCommand("copy");
-    });
+    navigator.clipboard.writeText(affiliateLinkInput.value)
+      .then(() => {
+        const originalText = copyAffiliateBtn.textContent;
+        copyAffiliateBtn.textContent = "✓"; // Show a success checkmark
+        copyAffiliateBtn.style.background = "#39ff88"; // Neon green feedback background
+        copyAffiliateBtn.style.color = "#06331c";
+        
+        setTimeout(() => {
+          copyAffiliateBtn.textContent = originalText;
+          copyAffiliateBtn.style.background = ""; // Restore design styling
+          copyAffiliateBtn.style.color = "";
+        }, 1500);
+      })
+      .catch(() => {
+        document.execCommand("copy");
+      });
   });
 
   // Apply sounds and language settings on startup
