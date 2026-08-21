@@ -421,3 +421,25 @@
 .affiliate-copy-btn:active {
   transform: scale(0.95);
 }
+
+/* ---- Partner Button ---- */
+.profile-partner-btn {
+  width: 100%;
+  height: 46px;
+  border-radius: 999px;
+  background: var(--color-teal);
+  color: #08302b;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 15px;
+  margin-top: 14px;
+  transition: transform 0.1s ease;
+}
+
+.profile-partner-btn[hidden] {
+  display: none !important;
+}
+
+.profile-partner-btn:active {
+  transform: scale(0.98);
+}
