@@ -515,7 +515,9 @@
   // Partner Button standard event wire
   partnerBtn.addEventListener("click", () => {
     SmartKiddoSound.playClick();
-    // Behavior and design updates to be handled at a later stage as requested.
+    if (existingAffiliateCode && typeof PartnerPopup !== "undefined") {
+      PartnerPopup.open(loggedInEmail, existingAffiliateCode);
+    }
   });
 
   // Apply sounds and language settings on startup
