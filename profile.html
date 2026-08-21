@@ -127,13 +127,21 @@
             <input type="email" id="profileEmail" readonly style="opacity: 0.7; cursor: not-allowed;" placeholder="contoh@gmail.com" />
           </div>
 
+          <!-- Modernized Segmented Gender Selector -->
           <div class="profile-field">
-            <label for="profileGender" data-i18n="label-gender">Jantina</label>
-            <select id="profileGender">
-              <option value="" data-i18n="gender-placeholder">Pilih jantina</option>
-              <option value="Lelaki" data-i18n="gender-male">Lelaki</option>
-              <option value="Perempuan" data-i18n="gender-female">Perempuan</option>
-            </select>
+            <label data-i18n="label-gender">Jantina</label>
+            <div class="gender-selector">
+              <button type="button" class="gender-btn" data-gender="Lelaki">
+                <span class="gender-icon">👦</span>
+                <span data-i18n="gender-male">Lelaki</span>
+              </button>
+              <button type="button" class="gender-btn" data-gender="Perempuan">
+                <span class="gender-icon">👧</span>
+                <span data-i18n="gender-female">Perempuan</span>
+              </button>
+            </div>
+            <!-- Hidden input to store selected value for backend saving -->
+            <input type="hidden" id="profileGender" value="" />
           </div>
 
           <div class="profile-field">
@@ -158,9 +166,16 @@
           <h2 class="profile-section-title" data-i18n="affiliate-title">Jana Pautan Affiliate</h2>
           <p class="profile-affiliate-hint" data-i18n="affiliate-hint">Kongsi pautan ini dengan rakan — apabila mereka mendaftar, ia akan dikaitkan dengan akaun anda.</p>
           <button id="generateAffiliateBtn" class="profile-affiliate-btn" data-i18n="affiliate-btn">Jana Pautan</button>
+          
           <div id="affiliateLinkWrap" class="affiliate-link-wrap" hidden>
             <input type="text" id="affiliateLinkInput" class="affiliate-link-input" readonly />
             <button id="copyAffiliateBtn" class="affiliate-copy-btn" data-i18n="copy-btn">Salin</button>
+          </div>
+
+          <!-- Referral Stats Box -->
+          <div id="referralStatsBox" style="margin-top: 16px; padding: 12px; background: rgba(255,255,255,0.04); border-radius: 10px; text-align: center;" hidden>
+            <p style="font-size: 13px; color: rgba(255,255,255,0.6); margin: 0;">Jumlah Pendaftaran Dirujuk:</p>
+            <p id="referralCountText" style="font-size: 24px; font-weight: bold; color: var(--color-neon-green); margin: 4px 0 0 0;">0</p>
           </div>
         </section>
       </div>
