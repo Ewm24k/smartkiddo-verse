@@ -1,6 +1,6 @@
 /* =========================================================
    profile.js — profile page behavior with Modern Custom Dropdown
-   and Guaranteed Unique Affiliate Link Generator.
+   and Secure, Rule-Friendly Affiliate Link Generator.
    ========================================================= */
 
 (function () {
@@ -409,7 +409,8 @@
     generateAffiliateBtn.hidden = true;
   }
 
-  // Generates and returns a unique code by checking existing Firestore documents
+  // Generates and returns a unique code by checking direct doc existence in affiliate-lookup
+  // Bypasses collection-wide query permission limits completely
   function generateUniqueCode(attempts = 0) {
     const maxAttempts = 12;
     if (attempts >= maxAttempts) {
@@ -418,12 +419,12 @@
 
     const code = Math.random().toString(36).slice(2, 8).toUpperCase();
     
-    // Checks if any signup record already uses this specific code
-    return db.collection("signups")
-      .where("affiliateCode", "==", code)
+    // Check direct document ID lookup (O(1) request - is always allowed by secure rules)
+    return db.collection("affiliate-lookup")
+      .doc(code)
       .get()
-      .then((querySnapshot) => {
-        if (!querySnapshot.empty) {
+      .then((doc) => {
+        if (doc.exists) {
           // Collision found! Try again recursively
           return generateUniqueCode(attempts + 1);
         }
@@ -443,17 +444,32 @@
 
     generateUniqueCode()
       .then((code) => {
-        docRef
-          .set({ affiliateCode: code }, { merge: true })
+        // Step 1: Securely write the code inside "affiliate-lookup" to claim it
+        db.collection("affiliate-lookup")
+          .doc(code)
+          .set({ owner: loggedInEmail, createdAt: firebase.firestore.FieldValue.serverTimestamp() })
           .then(() => {
-            existingAffiliateCode = code;
-            showAffiliateLink(code);
-            fetchReferralStats(code);
-            generateAffiliateBtn.disabled = false;
-            generateAffiliateBtn.textContent = originalBtnText;
+            // Step 2: Save the unique code to the parent's signup profile document
+            docRef
+              .set({ affiliateCode: code }, { merge: true })
+              .then(() => {
+                existingAffiliateCode = code;
+                showAffiliateLink(code);
+                fetchReferralStats(code);
+                generateAffiliateBtn.disabled = false;
+                generateAffiliateBtn.textContent = originalBtnText;
+              })
+              .catch((err) => {
+                console.error("Affiliate code save to signup error:", err);
+                const lang = getCurrentLang();
+                const t = translations[lang] || translations["ms"];
+                showSaveMessage(t["err-affiliate"], "error");
+                generateAffiliateBtn.disabled = false;
+                generateAffiliateBtn.textContent = originalBtnText;
+              });
           })
           .catch((err) => {
-            console.error("Affiliate code save error:", err);
+            console.error("Failed to write to affiliate-lookup:", err);
             const lang = getCurrentLang();
             const t = translations[lang] || translations["ms"];
             showSaveMessage(t["err-affiliate"], "error");
