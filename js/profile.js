@@ -1,6 +1,6 @@
 /* =========================================================
    profile.js — profile page behavior with Modern Custom Dropdown
-   and Secure, Rule-Friendly Affiliate Link Generator.
+   and Guaranteed Unique Affiliate Link Generator.
    ========================================================= */
 
 (function () {
@@ -21,6 +21,7 @@
   const affiliateLinkWrap = document.getElementById("affiliateLinkWrap");
   const affiliateLinkInput = document.getElementById("affiliateLinkInput");
   const copyAffiliateBtn = document.getElementById("copyAffiliateBtn");
+  const partnerBtn = document.getElementById("partnerBtn");
   const referralStatsBox = document.getElementById("referralStatsBox");
   const referralCountText = document.getElementById("referralCountText");
 
@@ -160,7 +161,7 @@
 
   /* ---------------- Sound wiring (same pattern as every other page) ---------------- */
   function applySoundListeners() {
-    document.querySelectorAll("input, select, textarea, button, a, .lang-selector__trigger, .lang-selector__option, .gender-btn").forEach((el) => {
+    document.querySelectorAll("input, select, textarea, button, a, .lang-selector__trigger, .lang-selector__option, .gender-btn, .profile-partner-btn").forEach((el) => {
       if (!el.dataset.soundBound) {
         el.addEventListener("mouseenter", () => SmartKiddoSound.playHover());
         el.dataset.soundBound = "true";
@@ -405,6 +406,9 @@
     affiliateLinkInput.value = link;
     affiliateLinkWrap.hidden = false;
     
+    // Show the Partner button
+    partnerBtn.hidden = false;
+    
     // Hide the generate button cleanly once generation completes
     generateAffiliateBtn.hidden = true;
   }
@@ -506,6 +510,12 @@
       .catch(() => {
         document.execCommand("copy");
       });
+  });
+
+  // Partner Button standard event wire
+  partnerBtn.addEventListener("click", () => {
+    SmartKiddoSound.playClick();
+    // Behavior and design updates to be handled at a later stage as requested.
   });
 
   // Apply sounds and language settings on startup
