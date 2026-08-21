@@ -38,7 +38,7 @@
 
   <div class="app">
 
-    <!-- Top bar: hamburger + brand + language switcher -->
+    <!-- Top bar: hamburger + brand + modern language switcher -->
     <div class="topbar">
       <button id="menuToggle" class="menu-toggle" aria-expanded="false" aria-controls="sideMenu" data-i18n-aria="aria-label:menu-toggle-label">
         <span class="menu-toggle__bar"></span>
@@ -47,13 +47,21 @@
       </button>
       <span class="brand">SmartKiddo <span class="brand__accent">Verse</span></span>
       
-      <!-- Multilingual Dropdown -->
-      <div class="lang-selector">
-        <span class="lang-selector__icon">🌐</span>
-        <select id="langSelect" class="lang-selector__select" aria-label="Pilih Bahasa / Select Language">
-          <option value="ms">Melayu</option>
-          <option value="en">English</option>
-        </select>
+      <!-- Modern Interactive Language Selector -->
+      <div class="lang-selector" id="langSelector">
+        <button class="lang-selector__trigger" id="langTrigger" aria-haspopup="listbox" aria-expanded="false" aria-label="Tukar Bahasa / Change Language">
+          <span class="lang-selector__icon">🌐</span>
+          <span class="lang-selector__label" id="langActiveLabel">Melayu</span>
+          <span class="lang-selector__arrow">▼</span>
+        </button>
+        <ul class="lang-selector__menu" id="langMenu" role="listbox" hidden>
+          <li class="lang-selector__option" data-value="ms" role="option" aria-selected="true">
+            Melayu
+          </li>
+          <li class="lang-selector__option" data-value="en" role="option" aria-selected="false">
+            English
+          </li>
+        </ul>
       </div>
     </div>
 
