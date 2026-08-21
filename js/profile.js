@@ -1,5 +1,5 @@
 /* =========================================================
-   profile.js — profile page behavior
+   profile.js — profile page behavior with Multilingual Support
    Reads and writes the signup record keyed by the logged-in
    email (see the note in signup.js / auth-check.js about why
    this is keyed by email rather than a real per-user auth UID).
@@ -22,10 +22,126 @@
   const affiliateLinkWrap = document.getElementById("affiliateLinkWrap");
   const affiliateLinkInput = document.getElementById("affiliateLinkInput");
   const copyAffiliateBtn = document.getElementById("copyAffiliateBtn");
+  const langSelect = document.getElementById("langSelect");
 
   let kidsData = [];
   let pendingPhotoBase64 = null; // set only if the user picks a new photo
   let existingAffiliateCode = null;
+
+  /* ---------------- Localization / Translations Dictionary ---------------- */
+  const translations = {
+    ms: {
+      "menu-toggle-label": "Buka menu",
+      "menu-close-label": "Tutup menu",
+      "menu-home": "Rumah",
+      "menu-profile": "Profil",
+      "menu-games": "Permainan",
+      "menu-achievements": "Pencapaian Saya",
+      "menu-pricing": "Pricing",
+      "menu-about": "Tentang Kami",
+      "menu-logout": "Log Keluar 👋",
+      
+      "profile-title": "Profil Keluarga",
+      "photo-btn-label": "Tukar gambar profil",
+      "label-email": "Emel",
+      "label-gender": "Jantina",
+      "gender-placeholder": "Pilih jantina",
+      "gender-male": "Lelaki",
+      "gender-female": "Perempuan",
+      "label-bio": "Bio",
+      "bio-placeholder": "Ceritakan sedikit tentang keluarga anda...",
+      "kids-section-title": "Nama Panggilan Anak-Anak",
+      "save-btn": "Simpan Perubahan",
+      "save-btn-saving": "Menyimpan...",
+      
+      "err-load-profile": "Gagal memuatkan profil. Sila semak sambungan internet.",
+      "err-no-profile": "Tidak dapat mencari profil anda.",
+      "success-save": "Perubahan berjaya disimpan!",
+      "err-save": "Gagal menyimpan. Sila cuba lagi.",
+      
+      "kid-label-prefix": "Anak",
+      "kid-placeholder": "Nama panggilan",
+      
+      "affiliate-title": "Jana Pautan Affiliate",
+      "affiliate-hint": "Kongsi pautan ini dengan rakan — apabila mereka mendaftar, ia akan dikaitkan dengan akaun anda.",
+      "affiliate-btn": "Jana Pautan",
+      "copy-btn": "Salin",
+      "err-affiliate": "Gagal menjana pautan. Sila cuba lagi."
+    },
+    en: {
+      "menu-toggle-label": "Open menu",
+      "menu-close-label": "Close menu",
+      "menu-home": "Home",
+      "menu-profile": "Profile",
+      "menu-games": "Games",
+      "menu-achievements": "My Achievements",
+      "menu-pricing": "Pricing",
+      "menu-about": "About Us",
+      "menu-logout": "Log Out 👋",
+      
+      "profile-title": "Family Profile",
+      "photo-btn-label": "Change profile photo",
+      "label-email": "Email",
+      "label-gender": "Gender",
+      "gender-placeholder": "Select gender",
+      "gender-male": "Male",
+      "gender-female": "Female",
+      "label-bio": "Bio",
+      "bio-placeholder": "Tell us a bit about your family...",
+      "kids-section-title": "Kids' Nicknames",
+      "save-btn": "Save Changes",
+      "save-btn-saving": "Saving...",
+      
+      "err-load-profile": "Failed to load profile. Please check your internet connection.",
+      "err-no-profile": "Could not find your profile.",
+      "success-save": "Changes saved successfully!",
+      "err-save": "Failed to save. Please try again.",
+      
+      "kid-label-prefix": "Kid",
+      "kid-placeholder": "Nickname",
+      
+      "affiliate-title": "Generate Affiliate Link",
+      "affiliate-hint": "Share this link with friends — when they sign up, it will be linked to your account.",
+      "affiliate-btn": "Generate Link",
+      "copy-btn": "Copy",
+      "err-affiliate": "Failed to generate link. Please try again."
+    }
+  };
+
+  function getCurrentLang() {
+    return localStorage.getItem("smartkiddo_language") || "ms";
+  }
+
+  function updateLanguage(lang) {
+    localStorage.setItem("smartkiddo_language", lang);
+    langSelect.value = lang;
+    const t = translations[lang] || translations["ms"];
+    
+    // Update simple text elements
+    document.querySelectorAll("[data-i18n]").forEach((el) => {
+      const key = el.getAttribute("data-i18n");
+      if (t[key]) el.textContent = t[key];
+    });
+    
+    // Update inputs and placeholders
+    document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
+      const key = el.getAttribute("data-i18n-placeholder");
+      if (t[key]) el.placeholder = t[key];
+    });
+
+    // Update attributes like aria-labels
+    document.querySelectorAll("[data-i18n-aria]").forEach((el) => {
+      const parts = el.getAttribute("data-i18n-aria").split(":");
+      if (parts.length === 2) {
+        const attr = parts[0];
+        const key = parts[1];
+        if (t[key]) el.setAttribute(attr, t[key]);
+      }
+    });
+
+    // Re-render children list to translate custom labels and placeholders
+    renderKids(kidsData);
+  }
 
   /* ---------------- Sound wiring (same pattern as every other page) ---------------- */
   document.querySelectorAll("input, select, textarea, button, a").forEach((el) => {
@@ -50,12 +166,18 @@
   function renderKids(kids) {
     kidsData = kids || [];
     kidsList.innerHTML = "";
+    
+    const lang = getCurrentLang();
+    const t = translations[lang] || translations["ms"];
+    const labelPrefix = t["kid-label-prefix"];
+    const placeholderText = t["kid-placeholder"];
+
     kidsData.forEach((kid, i) => {
       const row = document.createElement("div");
       row.className = "profile-kid-row";
       row.innerHTML = `
-        <label for="kidNick${i}">Anak ${i + 1}</label>
-        <input type="text" id="kidNick${i}" data-kid-index="${i}" value="${kid.name || ""}" placeholder="Nama panggilan" />
+        <label for="kidNick${i}">${labelPrefix} ${i + 1}</label>
+        <input type="text" id="kidNick${i}" data-kid-index="${i}" value="${kid.name || ""}" placeholder="${placeholderText}" />
       `;
       kidsList.appendChild(row);
       row.querySelector("input").addEventListener("mouseenter", () => SmartKiddoSound.playHover());
@@ -68,8 +190,11 @@
   docRef
     .get()
     .then((doc) => {
+      const lang = getCurrentLang();
+      const t = translations[lang] || translations["ms"];
+
       if (!doc.exists) {
-        showSaveMessage("Tidak dapat mencari profil anda.", "error");
+        showSaveMessage(t["err-no-profile"], "error");
         return;
       }
       const data = doc.data();
@@ -85,7 +210,9 @@
     })
     .catch((err) => {
       console.error("Profile load error:", err);
-      showSaveMessage("Gagal memuatkan profil. Sila semak sambungan internet.", "error");
+      const lang = getCurrentLang();
+      const t = translations[lang] || translations["ms"];
+      showSaveMessage(t["err-load-profile"], "error");
     });
 
   /* ---------------- Photo upload: resize + compress client-side ---------------- */
@@ -128,9 +255,12 @@
   }
 
   saveBtn.addEventListener("click", () => {
-    const originalText = saveBtn.textContent;
+    const lang = getCurrentLang();
+    const t = translations[lang] || translations["ms"];
+
+    const originalText = t["save-btn"];
     saveBtn.disabled = true;
-    saveBtn.textContent = "Menyimpan...";
+    saveBtn.textContent = t["save-btn-saving"];
 
     const updates = {
       parentEmail: emailInput.value.trim().toLowerCase(),
@@ -145,13 +275,13 @@
     docRef
       .update(updates)
       .then(() => {
-        showSaveMessage("Perubahan berjaya disimpan!", "success");
+        showSaveMessage(t["success-save"], "success");
         saveBtn.disabled = false;
         saveBtn.textContent = originalText;
       })
       .catch((err) => {
         console.error("Profile save error:", err);
-        showSaveMessage("Gagal menyimpan. Sila cuba lagi.", "error");
+        showSaveMessage(t["err-save"], "error");
         saveBtn.disabled = false;
         saveBtn.textContent = originalText;
       });
@@ -182,7 +312,9 @@
       })
       .catch((err) => {
         console.error("Affiliate code save error:", err);
-        showSaveMessage("Gagal menjana pautan. Sila cuba lagi.", "error");
+        const lang = getCurrentLang();
+        const t = translations[lang] || translations["ms"];
+        showSaveMessage(t["err-affiliate"], "error");
       });
   });
 
@@ -192,4 +324,12 @@
       document.execCommand("copy");
     });
   });
+
+  /* ---------------- Initialize Language Switcher event ---------------- */
+  langSelect.addEventListener("change", (e) => {
+    updateLanguage(e.target.value);
+  });
+
+  // Load language settings on page startup
+  updateLanguage(getCurrentLang());
 })();
