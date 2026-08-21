@@ -12,50 +12,118 @@
   padding: 0 16px;
 }
 
-/* ---- Language Selector Dropdown ---- */
+/* ---- Modern Glassmorphic Language Selector ---- */
 .lang-selector {
   position: relative;
   display: inline-flex;
+  margin-left: auto;
+  z-index: 100;
+}
+
+.lang-selector__trigger {
+  display: inline-flex;
   align-items: center;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 20px;
-  padding: 6px 12px;
-  gap: 6px;
-  margin-left: auto; /* Ensures it floats to the right side next to brand */
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+  padding: 7px 14px;
+  color: var(--color-white);
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.lang-selector__trigger:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: var(--color-neon-green);
 }
 
 .lang-selector__icon {
   font-size: 14px;
   line-height: 1;
-  pointer-events: none;
 }
 
-.lang-selector__select {
-  background: transparent;
-  border: none;
-  color: var(--color-white);
-  font-family: var(--font-body);
-  font-weight: 700;
-  font-size: 12px;
-  cursor: pointer;
-  outline: none;
-  padding-right: 14px; /* Space for the custom indicator arrow */
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
+.lang-selector__label {
+  line-height: 1;
 }
 
-/* Custom arrow for language switcher */
-.lang-selector::after {
-  content: "▼";
-  font-size: 8px;
-  color: rgba(255, 255, 255, 0.6);
+.lang-selector__arrow {
+  font-size: 7px;
+  color: rgba(255, 255, 255, 0.5);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-block;
+}
+
+/* Arrow rotation when active */
+.lang-selector--active .lang-selector__arrow {
+  transform: rotate(180deg);
+}
+
+/* Styled drop down panel */
+.lang-selector__menu {
   position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 130px;
+  background: rgba(13, 9, 24, 0.96); /* Aligns with theme dark background */
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 14px;
+  padding: 6px;
+  margin: 0;
+  list-style: none;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  transform-origin: top right;
+  opacity: 0;
+  transform: translateY(-8px) scale(0.96);
+  transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   pointer-events: none;
+}
+
+/* When the hidden attribute is removed, transition in */
+.lang-selector__menu:not([hidden]) {
+  display: block;
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.lang-selector__option {
+  padding: 8px 14px;
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.85);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+.lang-selector__option:hover {
+  background: rgba(57, 255, 136, 0.1);
+  color: var(--color-neon-green);
+}
+
+/* Style selected language option */
+.lang-selector__option[aria-selected="true"] {
+  background: rgba(57, 255, 136, 0.15);
+  color: var(--color-neon-green);
+  font-weight: 700;
+}
+
+.lang-selector__option[aria-selected="true"]::after {
+  content: "✓";
+  font-size: 11px;
+  font-weight: 800;
 }
 
 .profile-main {
