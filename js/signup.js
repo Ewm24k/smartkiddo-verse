@@ -1,18 +1,18 @@
 /* =========================================================
    signup.js — dynamic kid fields, password rule validation,
-   and the same SmartKiddoSound effects used across the app.
+   affiliate tracking, and SmartKiddoSound effects.
    ========================================================= */
 
 (function () {
+  /* ---------------- Referral Code Capture ---------------- */
+  // Parse and temporarily save the referral code from the URL on landing
+  const urlParams = new URLSearchParams(window.location.search);
+  const refCode = urlParams.get("ref");
+  if (refCode) {
+    localStorage.setItem("smartkiddo_referral_cookie", refCode.trim().toUpperCase());
+  }
+
   /* ---------------- Welcome sound (auto-plays on page load) ---------------- */
-  // Same browser autoplay-with-sound rule as the rest of the app applies
-  // here too: if this is a genuinely fresh visit with no prior interaction
-  // on this domain, the browser may block it until the first tap/click —
-  // that fallback is handled automatically below.
-  //
-  // Tries welcoming-parents.wav first, and automatically falls back to
-  // welcoming-parents.mp3 if the .wav file isn't found — so either
-  // format works with no code changes needed.
   function createSoundWithFallback(basePath, extensions) {
     const audio = new Audio();
     let index = 0;
@@ -58,8 +58,7 @@
     el.addEventListener("click", () => SmartKiddoSound.playClick());
   });
 
-  // Throttled scroll sound (same one used in the side menu) — plays at
-  // most once every 250ms while the page scrolls, not continuously.
+  // Throttled scroll sound
   let scrollSoundReady = true;
   document.body.addEventListener(
     "scroll",
@@ -75,7 +74,7 @@
   );
 
   /* ---------------- Dynamic kid name/age fields ---------------- */
-  let savedKids = []; // keeps entered values if the count changes, e.g. { name, age, gender }
+  let savedKids = []; 
 
   function renderKidFields() {
     const count = Math.min(Math.max(parseInt(kidsCountInput.value, 10) || 0, 0), 6);
@@ -110,7 +109,7 @@
       kidsContainer.appendChild(card);
     }
 
-    // Wire sounds + change tracking on the freshly created inputs
+    // Wire sounds + change tracking on dynamic inputs
     kidsContainer.querySelectorAll("input, select").forEach((input) => {
       input.addEventListener("mouseenter", () => SmartKiddoSound.playHover());
       input.addEventListener("input", () => {
@@ -131,8 +130,6 @@
   kidsCountInput.addEventListener("input", renderKidFields);
 
   /* ---------------- Password rule validation (live checklist) ---------------- */
-  // Rule: password must be EXACTLY 5 characters, containing exactly
-  // 1 uppercase letter, 1 digit, and 1 symbol (the rest lowercase).
   function checkPassword(pw) {
     const upperCount = (pw.match(/[A-Z]/g) || []).length;
     const digitCount = (pw.match(/[0-9]/g) || []).length;
@@ -159,7 +156,7 @@
 
   passwordInput.addEventListener("input", updateChecklist);
 
-  /* ---------------- Email validation: domain rule + typo check + duplicate check ---------------- */
+  /* ---------------- Email validation ---------------- */
   const ALLOWED_EMAIL_DOMAINS = ["gmail.com", "yahoo.com", "yahoo.com.my"];
 
   const parentEmailInput = document.getElementById("parentEmail");
@@ -168,7 +165,7 @@
   const parentEmailMessage = document.getElementById("parentEmailMessage");
 
   let parentEmailValid = false;
-  let emailCheckToken = 0; // lets a fresh check ignore a stale/late response
+  let emailCheckToken = 0; 
 
   function levenshtein(a, b) {
     const m = a.length,
@@ -237,7 +234,7 @@
   function validateEmailField() {
     const email = parentEmailInput.value.trim().toLowerCase();
     parentEmailValid = false;
-    emailCheckToken++; // invalidates any in-flight check from before this run
+    emailCheckToken++; 
     setEmailMessage("");
     setEmailState("idle");
 
@@ -254,8 +251,6 @@
 
     if (!ALLOWED_EMAIL_DOMAINS.includes(domain)) {
       const { best, bestDist } = closestAllowedDomain(domain);
-      // A small edit-distance (typo range) suggests a likely typo of an
-      // allowed domain, e.g. "gmial.com", "gmail.cun", "yaho.com".
       if (bestDist > 0 && bestDist <= 3) {
         setEmailState("invalid");
         showEmailSuggestion(email.split("@")[0] + "@" + best);
@@ -266,17 +261,13 @@
       return;
     }
 
-    // Domain is a valid Gmail/Yahoo address — now check for duplicates.
-    // Uses a separate, minimal "email-lookup" collection (doc ID = the
-    // email itself) so the check can be allowed to READ without ever
-    // exposing the real signups data (names, kids, password, etc.).
     const token = emailCheckToken;
     setEmailState("checking");
     db.collection("email-lookup")
       .doc(email)
       .get()
       .then((doc) => {
-        if (token !== emailCheckToken) return; // a newer check has since started
+        if (token !== emailCheckToken) return; 
         if (doc.exists) {
           setEmailState("invalid");
           setEmailMessage("Emel ini telah didaftarkan. Sila guna emel lain.", "error");
@@ -374,13 +365,16 @@
       return;
     }
 
+    // Retrieve saved referral code from localStorage
+    const referredBy = localStorage.getItem("smartkiddo_referral_cookie") || null;
+
     const payload = {
       fatherName,
       motherName,
       parentEmail,
       kids: savedKids.slice(0, kidsCount),
-      password, // NOTE: stored as plain text for now — see the security
-      // note in the README about hashing this before real launch.
+      password, 
+      referredBy, // Enforce referral tracking attribution on database payload
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
     };
 
@@ -399,13 +393,14 @@
         }
         transaction.set(emailLookupRef, {
           registeredAt: firebase.firestore.FieldValue.serverTimestamp(),
-          password, // used by the login check on auth-check.html
+          password, 
         });
         transaction.set(signupRef, payload);
       });
     })
       .then(() => {
         localStorage.setItem("smartkiddo_logged_in_email", parentEmail);
+        localStorage.removeItem("smartkiddo_referral_cookie"); // Clear the cookie upon success
         form.reset();
         savedKids = [];
         kidsContainer.innerHTML = "";
