@@ -257,6 +257,9 @@
       const t = translations[lang] || translations["ms"];
 
       if (!doc.exists) {
+        // Fallback: Populate active email but warn they need to save to create the record
+        emailInput.value = loggedInEmail;
+        renderKids([]);
         showSaveMessage(t["err-no-profile"], "error");
         return;
       }
@@ -335,8 +338,9 @@
       updates.profilePhoto = pendingPhotoBase64;
     }
 
+    // Changed from .update() to .set(updates, { merge: true }) to handle missing/upsert records
     docRef
-      .update(updates)
+      .set(updates, { merge: true })
       .then(() => {
         showSaveMessage(t["success-save"], "success");
         saveBtn.disabled = false;
@@ -368,7 +372,8 @@
     }
     const code = generateCode();
     docRef
-      .update({ affiliateCode: code })
+      // Changed to .set with merge to support creating the doc if it was missing
+      .set({ affiliateCode: code }, { merge: true })
       .then(() => {
         existingAffiliateCode = code;
         showAffiliateLink(code);
