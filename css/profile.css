@@ -241,6 +241,49 @@
   box-shadow: 0 0 0 3px rgba(57, 255, 136, 0.15);
 }
 
+/* ---- Segmented Gender Selector ---- */
+.gender-selector {
+  display: flex;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.gender-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 48px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.7);
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.gender-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: var(--color-white);
+}
+
+/* Active Segmented Button style */
+.gender-btn--active {
+  background: rgba(57, 255, 136, 0.12);
+  border-color: var(--color-neon-green);
+  color: var(--color-neon-green);
+  box-shadow: 0 0 12px rgba(57, 255, 136, 0.15);
+}
+
+.gender-icon {
+  font-size: 16px;
+}
+
 /* ---- Kids nicknames ---- */
 .profile-kids-section {
   margin-bottom: 30px;
@@ -335,6 +378,11 @@
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 15px;
+  transition: transform 0.1s ease;
+}
+
+.profile-affiliate-btn:active {
+  transform: scale(0.98);
 }
 
 .affiliate-link-wrap {
@@ -367,4 +415,9 @@
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 13px;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.affiliate-copy-btn:active {
+  transform: scale(0.95);
 }
