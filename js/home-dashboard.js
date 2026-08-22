@@ -75,6 +75,12 @@ const SmartKiddoDashboard = (() => {
     return `${category.filePrefix}${index}${category.fileSuffix}`;
   }
 
+  function buildPosterSrc(category, index) {
+    if (!category.posterSuffix) return null;
+    const prefix = category.posterPrefix || category.filePrefix;
+    return `${prefix}${index}${category.posterSuffix}`;
+  }
+
   // Shared observer: only actually play a card's video while it's near
   // the viewport, and pause it once it scrolls away. With 50+ video
   // cards on the page, having them all try to decode/play at once is
@@ -102,6 +108,13 @@ const SmartKiddoDashboard = (() => {
       const video = document.createElement("video");
       video.className = "dash-card__media";
       video.src = buildItemSrc(category, index);
+
+      // Apply the poster image before the video playback loads
+      const posterSrc = buildPosterSrc(category, index);
+      if (posterSrc) {
+        video.poster = posterSrc;
+      }
+
       video.muted = true;
       video.loop = true;
       video.playsInline = true;
