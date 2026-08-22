@@ -39,8 +39,13 @@ const SmartKiddoDashboardData = {
       itemCount: 6,
       filePrefix: "assets/videos/dashboard/bt",
       fileSuffix: "v.mp4",
-      posterSuffix: ".jpg", // Enables native poster thumbnail preview support
-      launched: false,
+      posterSuffix: ".jpg",
+      // Item-level launch status: Items 1 and 2 are active, 3-6 remain "Coming Soon"
+      launched: [true, true, false, false, false, false],
+      links: [
+        "https://canva.link/smartkiddouniverse",  // Destination link for Card 1
+        "https://canva.link/smartkiddouniverse1"  // Destination link for Card 2
+      ],
       collapsible: false,
     },
     {
