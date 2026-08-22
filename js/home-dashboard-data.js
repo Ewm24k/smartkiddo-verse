@@ -43,7 +43,7 @@ const SmartKiddoDashboardData = {
       // Item-level launch status: Items 1 and 2 are active, 3-6 remain "Coming Soon"
       launched: [true, true, false, false, false, false],
       links: [
-        "https://canva.link/smartkiddouniverse",  // Destination link for Card 1
+        "bedtime-story-1.html",   // Destination link for Card 1
         "https://canva.link/smartkiddouniverse1"  // Destination link for Card 2
       ],
       collapsible: false,
