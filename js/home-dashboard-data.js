@@ -39,6 +39,7 @@ const SmartKiddoDashboardData = {
       itemCount: 6,
       filePrefix: "assets/videos/dashboard/bt",
       fileSuffix: "v.mp4",
+      posterSuffix: ".jpg", // Enables native poster thumbnail preview support
       launched: false,
       collapsible: false,
     },
