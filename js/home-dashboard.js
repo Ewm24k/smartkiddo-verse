@@ -16,6 +16,42 @@ const SmartKiddoDashboard = (() => {
   function buildContainerMarkup() {
     return `
       <div class="dash-content">
+        <!-- Layout and 16:9 4-card aspect ratio overrides -->
+        <style>
+          .dash-row__track {
+            display: flex !important;
+            gap: 16px !important;
+            overflow-x: auto !important;
+            scroll-behavior: smooth !important;
+            padding: 10px 4px !important;
+          }
+          .dash-card {
+            flex: 0 0 calc((100% - 48px) / 4) !important; /* Shows exactly 4 cards by default */
+            aspect-ratio: 16 / 9 !important;               /* Enforces widescreen landscape format */
+            height: auto !important;                       /* Prevents height overrides from breaking layout */
+            position: relative !important;
+            overflow: hidden !important;
+            border-radius: 12px !important;
+          }
+          .dash-card__media {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;                 /* Ensures images & videos fit cleanly without stretching */
+          }
+          
+          /* Responsive adjustments for tablets and mobile devices */
+          @media (max-width: 1024px) {
+            .dash-card {
+              flex: 0 0 calc((100% - 32px) / 3) !important; /* Shows 3 cards on tablet viewports */
+            }
+          }
+          @media (max-width: 768px) {
+            .dash-card {
+              flex: 0 0 calc((100% - 16px) / 2) !important; /* Shows 2 cards on mobile viewports */
+            }
+          }
+        </style>
+
         <section class="hero2">
           <div class="hero2__text">
             <video class="hero2__text-bg" src="assets/videos/main-video.mp4" autoplay muted loop playsinline></video>
@@ -124,7 +160,22 @@ const SmartKiddoDashboard = (() => {
       // would try to start all cards at once regardless of visibility.
       // If the file doesn't exist yet, fail quietly instead of showing
       // a broken-video icon — just leaves the placeholder background.
-      video.addEventListener("error", () => video.remove());
+      video.addEventListener("error", () => {
+        if (video.poster) {
+          // If the video file is missing but a poster exists, convert
+          // the card to an img element so the preview image remains visible.
+          const fallbackImg = document.createElement("img");
+          fallbackImg.className = "dash-card__media";
+          fallbackImg.src = video.poster;
+          fallbackImg.alt = `${category.title} ${index}`;
+          fallbackImg.loading = "lazy";
+          if (video.parentNode) {
+            video.parentNode.replaceChild(fallbackImg, video);
+          }
+        } else {
+          video.remove();
+        }
+      });
       card.appendChild(video);
       cardVideoObserver.observe(card);
     } else {
