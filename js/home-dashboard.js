@@ -198,7 +198,12 @@ const SmartKiddoDashboard = (() => {
     // Retrieve the target link if specified in the data structure
     const targetLink = (category.links && category.links[index - 1]) || null;
 
-    if (category.launched) {
+    // Evaluates item launch state safely by handling array or boolean inputs
+    const isItemLaunched = Array.isArray(category.launched)
+      ? !!category.launched[index - 1]
+      : !!category.launched;
+
+    if (isItemLaunched) {
       const ageLabel = (category.ageLabels && category.ageLabels[index - 1]) || "";
       overlay.innerHTML = `
         <span class="dash-card__overlay-label">${category.title.split(" / ")[0]} ${ageLabel}</span>
