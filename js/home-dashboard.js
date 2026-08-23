@@ -69,6 +69,28 @@ const SmartKiddoDashboard = (() => {
             letter-spacing: 0.5px !important;
           }
           
+          /* premium "Paid Version" Badge (Top-Left) */
+          .dash-card__badge-paid {
+            position: absolute !important;
+            top: 10px !important;
+            left: 10px !important;
+            background: linear-gradient(135deg, #fff2cc 0%, #f1c40f 40%, #d4af37 70%, #996515 100%) !important;
+            color: #0a0714 !important;
+            font-family: 'Fredoka', sans-serif !important;
+            font-weight: 800 !important;
+            font-size: 9px !important;
+            padding: 5px 10px !important;
+            border-radius: 50px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.5) !important;
+            border: 1px solid #ffffffa0 !important;
+            z-index: 3 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+          }
+          
           /* "EN" Tag (Top-Right) */
           .dash-card__badge-en {
             position: absolute !important;
@@ -77,6 +99,23 @@ const SmartKiddoDashboard = (() => {
             background-color: rgba(10, 7, 20, 0.8) !important; /* Dark theme matching cosmos color palette */
             border: 1.5px solid #3c2a6b !important;
             color: #ff914d !important; /* Vibrant orange accent */
+            font-family: 'Fredoka', sans-serif !important;
+            font-weight: 700 !important;
+            font-size: 11px !important;
+            padding: 3px 8px !important;
+            border-radius: 6px !important;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4) !important;
+            z-index: 3 !important;
+          }
+          
+          /* "MY" Tag (Top-Right) */
+          .dash-card__badge-my {
+            position: absolute !important;
+            top: 10px !important;
+            right: 10px !important;
+            background-color: rgba(10, 7, 20, 0.8) !important;
+            border: 1.5px solid #4a90e2 !important; /* Royal blue border matching premium styling */
+            color: #ffffff !important;
             font-family: 'Fredoka', sans-serif !important;
             font-weight: 700 !important;
             font-size: 11px !important;
@@ -187,17 +226,31 @@ const SmartKiddoDashboard = (() => {
     const card = document.createElement("div");
     card.className = "dash-card";
 
-    // Append visual badges for live Bedtime Story cards (index 1, 2, and 3)
-    if (category.id === "bedtime" && (index === 1 || index === 2 || index === 3)) {
-      const freeBadge = document.createElement("div");
-      freeBadge.className = "dash-card__badge-free";
-      freeBadge.textContent = "Free";
-      card.appendChild(freeBadge);
+    // Append visual badges to bedtime story cards dynamically
+    if (category.id === "bedtime") {
+      if (index === 1 || index === 2 || index === 3) {
+        // Free Cards (1, 2, 3)
+        const freeBadge = document.createElement("div");
+        freeBadge.className = "dash-card__badge-free";
+        freeBadge.textContent = "Free";
+        card.appendChild(freeBadge);
 
-      const enBadge = document.createElement("div");
-      enBadge.className = "dash-card__badge-en";
-      enBadge.textContent = "EN";
-      card.appendChild(enBadge);
+        const enBadge = document.createElement("div");
+        enBadge.className = "dash-card__badge-en";
+        enBadge.textContent = "EN";
+        card.appendChild(enBadge);
+      } else if (index === 4) {
+        // Paid Premium Card (4)
+        const paidBadge = document.createElement("div");
+        paidBadge.className = "dash-card__badge-paid";
+        paidBadge.textContent = "Paid Version";
+        card.appendChild(paidBadge);
+
+        const myBadge = document.createElement("div");
+        myBadge.className = "dash-card__badge-my";
+        myBadge.textContent = "MY";
+        card.appendChild(myBadge);
+      }
     }
 
     if (category.itemType === "video") {
