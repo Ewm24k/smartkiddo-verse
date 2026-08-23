@@ -44,7 +44,8 @@ const SmartKiddoDashboardData = {
       launched: [true, true, false, false, false, false],
       links: [
         "bedtime-story-1.html",   // Destination link for Card 1
-        "bedtime-story-2.html"  // Destination link for Card 2
+        "bedtime-story-2.html",   // Destination link for Card 2
+        "bedtime-story-3.html"    // Destination link for Card 3
       ],
       collapsible: false,
     },
