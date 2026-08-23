@@ -16,7 +16,7 @@ const SmartKiddoDashboard = (() => {
   function buildContainerMarkup() {
     return `
       <div class="dash-content">
-        <!-- Layout and 16:9 4-card aspect ratio overrides -->
+        <!-- Layout, 16:9 4-card aspect ratio, and Badge overrides -->
         <style>
           .dash-row__track {
             display: flex !important;
@@ -37,6 +37,53 @@ const SmartKiddoDashboard = (() => {
             width: 100% !important;
             height: 100% !important;
             object-fit: cover !important;                 /* Ensures images & videos fit cleanly without stretching */
+          }
+          
+          /* Overlay reveals on hover or when tap active (Android/iOS) */
+          .dash-card:hover .dash-card__overlay,
+          .dash-card.is-hovered .dash-card__overlay {
+            opacity: 1 !important;
+            visibility: visible !important;
+            pointer-events: auto !important;
+          }
+          
+          /* Circular "Free" Badge (Top-Left) */
+          .dash-card__badge-free {
+            position: absolute !important;
+            top: 10px !important;
+            left: 10px !important;
+            background-color: #2ec4b6 !important; /* Clean mint green circle */
+            color: #ffffff !important;
+            font-family: 'Fredoka', sans-serif !important;
+            font-weight: 700 !important;
+            font-size: 10px !important;
+            width: 32px !important;
+            height: 32px !important;
+            border-radius: 50% !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4) !important;
+            z-index: 3 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+          }
+          
+          /* "EN" Tag (Top-Right) */
+          .dash-card__badge-en {
+            position: absolute !important;
+            top: 10px !important;
+            right: 10px !important;
+            background-color: rgba(10, 7, 20, 0.8) !important; /* Dark theme matching cosmos color palette */
+            border: 1.5px solid #3c2a6b !important;
+            color: #ff914d !important; /* Vibrant orange accent */
+            font-family: 'Fredoka', sans-serif !important;
+            font-weight: 700 !important;
+            font-size: 11px !important;
+            padding: 3px 8px !important;
+            border-radius: 6px !important;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4) !important;
+            z-index: 3 !important;
           }
           
           /* Responsive adjustments for tablets and mobile devices */
@@ -140,6 +187,19 @@ const SmartKiddoDashboard = (() => {
     const card = document.createElement("div");
     card.className = "dash-card";
 
+    // Append visual badges for live Bedtime Story cards (index 1, 2, and 3)
+    if (category.id === "bedtime" && (index === 1 || index === 2 || index === 3)) {
+      const freeBadge = document.createElement("div");
+      freeBadge.className = "dash-card__badge-free";
+      freeBadge.textContent = "Free";
+      card.appendChild(freeBadge);
+
+      const enBadge = document.createElement("div");
+      enBadge.className = "dash-card__badge-en";
+      enBadge.textContent = "EN";
+      card.appendChild(enBadge);
+    }
+
     if (category.itemType === "video") {
       const video = document.createElement("video");
       video.className = "dash-card__media";
@@ -210,7 +270,7 @@ const SmartKiddoDashboard = (() => {
         <button type="button" class="dash-card__overlay-btn">Masuk Kelas</button>
       `;
       overlay.querySelector(".dash-card__overlay-btn").addEventListener("click", (e) => {
-        e.stopPropagation();
+        e.stopPropagation(); // Prevents touch parent overlay toggle off
         SmartKiddoSound.playClick();
         if (targetLink) {
           window.location.href = targetLink;
@@ -224,10 +284,22 @@ const SmartKiddoDashboard = (() => {
     card.appendChild(overlay);
 
     card.addEventListener("mouseenter", () => SmartKiddoSound.playHover());
-    card.addEventListener("click", () => {
+    
+    // Touch Interaction (Android/iOS): Click reveals hover overlay controls instead of triggering navigation
+    card.addEventListener("click", (e) => {
       SmartKiddoSound.playClick();
-      if (targetLink) {
-        window.location.href = targetLink;
+      
+      const isHovered = card.classList.contains("is-hovered");
+      
+      // Close other card overlays
+      document.querySelectorAll(".dash-card.is-hovered").forEach(c => {
+        if (c !== card) c.classList.remove("is-hovered");
+      });
+
+      if (!isHovered) {
+        card.classList.add("is-hovered");
+      } else {
+        card.classList.remove("is-hovered");
       }
     });
 
@@ -442,6 +514,15 @@ const SmartKiddoDashboard = (() => {
         console.log("AI assistant: coming soon.");
       });
     }
+
+    // Close overlays if clicking outside active cards
+    document.addEventListener("click", (e) => {
+      if (!e.target.closest(".dash-card")) {
+        document.querySelectorAll(".dash-card.is-hovered").forEach(c => {
+          c.classList.remove("is-hovered");
+        });
+      }
+    });
   }
 
   return { init };
