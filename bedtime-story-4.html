@@ -206,6 +206,43 @@
       background-color: #1a152e;
       border: 2px solid #2d234a;
     }
+    
+    /* Synced Navigation Bar for Manual Controls */
+    .nav-controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      margin-top: 16px;
+      width: 100%;
+    }
+    .nav-btn {
+      background-color: #1a152e;
+      color: #ff914d;
+      border: 2px solid #3c2a6b;
+      padding: 10px 24px;
+      border-radius: 50px;
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 600;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .nav-btn:hover:not(:disabled) {
+      background-color: #3c2a6b;
+      transform: translateY(-2px);
+    }
+    .nav-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+    .page-indicator {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 16px;
+      color: #b0a8c9;
+      font-weight: 600;
+    }
+
     .attribution-link {
       display: inline-block;
       margin-top: 16px;
@@ -234,6 +271,9 @@
       }
     }
   </style>
+
+  <!-- Import the PDF.js library to handle data processing locally -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
 </head>
 <body>
 
@@ -285,6 +325,13 @@
       </div>
     </div>
 
+    <!-- Synced Navigation Controls -->
+    <div class="nav-controls">
+      <button id="btnPrev" class="nav-btn" disabled>Sebelum (Back)</button>
+      <span class="page-indicator" id="pageIndicator">Muka Surat: 1 / --</span>
+      <button id="btnNext" class="nav-btn" disabled>Seterusnya (Next)</button>
+    </div>
+
     <a class="attribution-link" href="https://www.canva.com/design/DAHTGMEO6yQ/Ss8WGUIH24TsONn7_VsOqA/watch?utm_content=DAHTGMEO6yQ&amp;utm_campaign=designshare&amp;utm_medium=embeds&amp;utm_source=link" target="_blank" rel="noopener">
       Bedtime Story Intro Cover
     </a> by Tengku Fibo
@@ -292,38 +339,59 @@
 
   <script src="js/sound.js"></script>
   <script>
-    // Canva Embed Paths configurations (Adjusted specifically to Slide 4 assets)
-    const AUTO_URL = "https://www.canva.com/design/DAHTGMEO6yQ/Ss8WGUIH24TsONn7_VsOqA/watch?embed&autoplay=1&loop=1";
-    const MANUAL_URL = "https://www.canva.com/design/DAHTGMEO6yQ/Ss8WGUIH24TsONn7_VsOqA/view?embed";
+    // Set up PDF.js global worker path
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
 
-    // Dynamic Multi-Language localization definitions
+    // The shared presentation source (Always uses the standard /view?embed player so we can control hash navigation)
+    const BASE_URL = "https://www.canva.com/design/DAHTGMEO6yQ/Ss8WGUIH24TsONn7_VsOqA/view?embed";
+    const PDF_PATH = "assets/file/presentation/story4.pdf";
+
+    // Playback state variables
+    let playMode = 'auto'; // 'auto' or 'manual'
+    let currentPage = 1;
+    let totalPages = 0;
+    let textPagesArray = []; // Stores extracted text from local PDF
+
+    let synth = window.speechSynthesis;
+    let currentUtterance = null;
+
+    // Dynamic Multi-Language definitions
     const translations = {
       ms: {
         title: "Cerita Dodoi Vol 4",
         backBtn: "‹ Kembali ke Utama",
-        hintText: "<strong>PENTING:</strong> Pelayar menyenyapkan bunyi secara lalai. Sila <strong>ketuk ikon pembesar suara</strong> di penjuru video untuk memasang bunyi. Anda boleh <strong>menyapu skrin (swipe)</strong> ke kiri/kanan untuk menukar halaman!",
+        hintText: "<strong>PENTING:</strong> Sistem ini menggunakan suara peranti automatik yang diselaraskan dengan slaid persembahan anda. Gunakan butang kawalan untuk navigasi.",
         modeTitle: "Pilih Mod Tayangan:",
         modeAuto: "Auto",
         modeManual: "Manual",
-        langTag: "🇲🇾 Slaid Versi Melayu"
+        langTag: "🇲🇾 Slaid Versi Melayu",
+        btnPrev: "Sebelum",
+        btnNext: "Seterusnya",
+        indicator: "Muka Surat"
       },
       en: {
         title: "Bedtime Story Vol 4",
         backBtn: "‹ Back to Home",
-        hintText: "<strong>IMPORTANT:</strong> Browsers mute autoplaying sound by default. Please <strong>tap the speaker icon</strong> in the corner of the video to enable audio. You can <strong>swipe left/right</strong> to change pages!",
+        hintText: "<strong>IMPORTANT:</strong> This system uses automatic device voiceovers synchronized directly with your presentation slides. Use the navigation buttons below.",
         modeTitle: "Select Play Mode:",
         modeAuto: "Auto",
         modeManual: "Manual",
-        langTag: "🇲🇾 Malay Slide Version"
+        langTag: "🇲🇾 Malay Slide Version",
+        btnPrev: "Back",
+        btnNext: "Next",
+        indicator: "Page"
       },
       zh: {
         title: "睡前故事 第4册",
         backBtn: "‹ 返回首页",
-        hintText: "<strong>重要提示：</strong> 浏览器默认会将自动播放的音频静音。请<strong>点击视频角落的扬声器图标</strong>来开启声音。您可以<strong>向左/向右滑动</strong>来切换页面！",
+        hintText: "<strong>重要提示：</strong> 本系统使用与您的演示幻灯片直接同步的自动设备语音。请使用下方的控制按钮进行导航。",
         modeTitle: "选择播放模式：",
         modeAuto: "自动",
         modeManual: "手动",
-        langTag: "🇲🇾 马来语幻灯片版本"
+        langTag: "🇲🇾 马来语幻灯片版本",
+        btnPrev: "上一页",
+        btnNext: "下一页",
+        indicator: "页数"
       }
     };
 
@@ -331,6 +399,10 @@
     const btnAuto = document.getElementById('btnAuto');
     const btnManual = document.getElementById('btnManual');
     const langSelect = document.getElementById('langSelect');
+    
+    const btnPrev = document.getElementById('btnPrev');
+    const btnNext = document.getElementById('btnNext');
+    const pageIndicator = document.getElementById('pageIndicator');
 
     const domElements = {
       title: document.getElementById('pageTitle'),
@@ -342,20 +414,136 @@
       tag: document.getElementById('langTag')
     };
 
-    // Swaps player source configuration and styles
-    function setMode(mode) {
-      if (mode === 'auto') {
-        btnAuto.classList.add('active');
-        btnManual.classList.remove('active');
-        iframe.src = AUTO_URL;
+    // Step 1: Fetch and Extract Text from the PDF standard compiled file page-by-page
+    function loadAndSyncPDF() {
+      pdfjsLib.getDocument(PDF_PATH).promise.then((loadedDoc) => {
+        totalPages = loadedDoc.numPages;
+        let pagesPromises = [];
+
+        for (let num = 1; num <= totalPages; num++) {
+          pagesPromises.push(
+            loadedDoc.getPage(num).then((page) => {
+              return page.getTextContent().then((textContent) => {
+                return textContent.items.map(item => item.str).join(" ");
+              });
+            })
+          );
+        }
+
+        Promise.all(pagesPromises).then((results) => {
+          textPagesArray = results;
+          
+          // Enable navigation buttons
+          btnNext.disabled = false;
+          updateNavigationUI();
+          
+          // Run the starting slide configuration
+          syncSlide(1);
+        });
+
+      }).catch((err) => {
+        console.error("Gagal mengekstrak PDF untuk penyelarasan suara: ", err);
+      });
+    }
+
+    // Step 2: Synchronize Slide URL hash and Voiceover playing
+    function syncSlide(pageNumber) {
+      if (pageNumber < 1 || pageNumber > totalPages) return;
+      currentPage = pageNumber;
+
+      // 1. Sync Slide Visually using standard Canva URL hash page routing
+      iframe.src = `${BASE_URL}#page-${currentPage}`;
+
+      // 2. Play matching Voiceover paragraph
+      speakActivePage();
+
+      // 3. Update the UI buttons
+      updateNavigationUI();
+    }
+
+    // Step 3: Run the Text-To-Speech for the active page
+    function speakActivePage() {
+      if (synth.speaking) {
+        synth.cancel(); // Stop any active speech before starting new page
+      }
+
+      const textToRead = textPagesArray[currentPage - 1];
+      if (!textToRead || textToRead.trim().length === 0) {
+        // If slide is blank/cover page with no text, wait 3 seconds and skip to next page if in Auto mode
+        if (playMode === 'auto') {
+          setTimeout(() => {
+            navigateNext();
+          }, 3000);
+        }
+        return;
+      }
+
+      currentUtterance = new SpeechSynthesisUtterance(textToRead);
+      
+      // Check active translation language setting
+      const currentLang = langSelect.value;
+      if (currentLang === 'zh') {
+        currentUtterance.lang = 'zh-CN';
+      } else if (currentLang === 'en') {
+        currentUtterance.lang = 'en-US';
       } else {
-        btnManual.classList.add('active');
-        btnAuto.classList.remove('active');
-        iframe.src = MANUAL_URL;
+        currentUtterance.lang = 'ms-MY';
+      }
+
+      // AUTO-PLAY SPREAD: Auto advance slide exactly when active page voiceover finishes
+      currentUtterance.onend = () => {
+        if (playMode === 'auto' && currentPage < totalPages) {
+          navigateNext();
+        }
+      };
+
+      synth.speak(currentUtterance);
+    }
+
+    // Navigation logic functions
+    function navigateNext() {
+      if (currentPage < totalPages) {
+        syncSlide(currentPage + 1);
       }
     }
 
-    // Localized layout translations renderer
+    function navigatePrev() {
+      if (currentPage > 1) {
+        syncSlide(currentPage - 1);
+      }
+    }
+
+    function updateNavigationUI() {
+      btnPrev.disabled = (currentPage === 1);
+      btnNext.disabled = (currentPage === totalPages);
+      
+      const lang = langSelect.value;
+      const textMap = translations[lang] || translations.ms;
+      pageIndicator.textContent = `${textMap.indicator}: ${currentPage} / ${totalPages}`;
+      
+      btnPrev.textContent = textMap.btnPrev;
+      btnNext.textContent = textMap.btnNext;
+    }
+
+    // Mode Toggle functions
+    function setPlayMode(mode) {
+      playMode = mode;
+      if (mode === 'auto') {
+        btnAuto.classList.add('active');
+        btnManual.classList.remove('active');
+        // Restart autoplay sync sequence
+        speakActivePage();
+      } else {
+        btnManual.classList.add('active');
+        btnAuto.classList.remove('active');
+        // Stop any autoplay queues
+        if (currentUtterance) {
+          currentUtterance.onend = null;
+        }
+      }
+    }
+
+    // Localized UI text transitions helper
     function updateLanguage(lang) {
       const textMap = translations[lang] || translations.ms;
       domElements.title.textContent = textMap.title;
@@ -367,37 +555,51 @@
       domElements.tag.textContent = textMap.langTag;
       
       localStorage.setItem('smartkiddo_preferred_lang', lang);
+      updateNavigationUI();
     }
 
-    // Language select listener
+    // DOM Action Listeners
     langSelect.addEventListener('change', (e) => {
       if (typeof SmartKiddoSound !== 'undefined') SmartKiddoSound.playClick();
       updateLanguage(e.target.value);
+      // Restart speech with new voice language
+      speakActivePage();
     });
 
-    // Segment mode select listeners
     btnAuto.addEventListener('click', () => {
       if (typeof SmartKiddoSound !== 'undefined') SmartKiddoSound.playClick();
-      setMode('auto');
+      setPlayMode('auto');
     });
 
     btnManual.addEventListener('click', () => {
       if (typeof SmartKiddoSound !== 'undefined') SmartKiddoSound.playClick();
-      setMode('manual');
+      setPlayMode('manual');
     });
 
-    // System Bootstrapping Initialization
+    btnPrev.addEventListener('click', () => {
+      if (typeof SmartKiddoSound !== 'undefined') SmartKiddoSound.playClick();
+      navigatePrev();
+    });
+
+    btnNext.addEventListener('click', () => {
+      if (typeof SmartKiddoSound !== 'undefined') SmartKiddoSound.playClick();
+      navigateNext();
+    });
+
+    // Page initialization setups
     window.addEventListener('DOMContentLoaded', () => {
-      // 1. Resolve localized preference values
       const storedLang = localStorage.getItem('smartkiddo_preferred_lang') || 'ms';
       langSelect.value = storedLang;
       updateLanguage(storedLang);
 
-      // 2. Initialize DEFAULT play layout configuration (AUTO)
-      setMode('auto');
+      // Default play mode is auto on page load
+      setPlayMode('auto');
+
+      // Load PDF data and initialize sync player
+      loadAndSyncPDF();
     });
 
-    // Return Navigation Sound configuration
+    // Sound integrations
     const backBtn = document.getElementById('backBtn');
     if (backBtn) {
       backBtn.addEventListener('mouseenter', () => {
@@ -407,6 +609,7 @@
         if (typeof SmartKiddoSound !== 'undefined') {
           e.preventDefault();
           SmartKiddoSound.playClick();
+          synth.cancel(); // Mute TTS on navigate back
           setTimeout(() => {
             window.location.href = backBtn.href;
           }, 150);
