@@ -41,11 +41,12 @@ const SmartKiddoDashboardData = {
       fileSuffix: "v.mp4",
       posterSuffix: ".jpg",
       // Unlocks Card 1, Card 2, and Card 3. Only Cards 4, 5, and 6 remain "Coming Soon".
-      launched: [true, true, true, false, false, false],
+      launched: [true, true, true, true, false, false],
       links: [
         "bedtime-story-1.html",  // Routes Card 1
         "bedtime-story-2.html",  // Routes Card 2
-        "bedtime-story-3.html"   // Routes Card 3
+        "bedtime-story-3.html",  // Routes Card 3
+        "bedtime-story-4.html"   // Routes Card 4 to the new player
       ],
       collapsible: false,
     },
