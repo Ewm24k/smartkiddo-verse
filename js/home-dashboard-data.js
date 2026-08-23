@@ -40,12 +40,12 @@ const SmartKiddoDashboardData = {
       filePrefix: "assets/videos/dashboard/bt",
       fileSuffix: "v.mp4",
       posterSuffix: ".jpg",
-      // Item-level launch status: Items 1 and 2 are active, 3-6 remain "Coming Soon"
-      launched: [true, true, false, false, false, false],
+      // Unlocks Card 1, Card 2, and Card 3. Only Cards 4, 5, and 6 remain "Coming Soon".
+      launched: [true, true, true, false, false, false],
       links: [
-        "bedtime-story-1.html",   // Destination link for Card 1
-        "bedtime-story-2.html",   // Destination link for Card 2
-        "bedtime-story-3.html"    // Destination link for Card 3
+        "bedtime-story-1.html",  // Routes Card 1
+        "bedtime-story-2.html",  // Routes Card 2
+        "bedtime-story-3.html"   // Routes Card 3
       ],
       collapsible: false,
     },
@@ -55,8 +55,10 @@ const SmartKiddoDashboardData = {
       tabLabel: "Bonus",
       itemType: "video",
       itemCount: 6,
-      filePrefix: "assets/videos/dashboard/bo",
+      filePrefix: "assets/videos/dashboard/bo", 
       fileSuffix: "v.mp4",
+      posterPrefix: "assets/images/dashboard/bonus", 
+      posterSuffix: ".jpg",                           
       launched: false,
       collapsible: true,
     },
