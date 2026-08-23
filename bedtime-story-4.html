@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+  <title>SmartKiddo Universe — Cerita Dodoi Vol 4</title>
+  <meta name="theme-color" content="#0a0714" />
+  
+  <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght=400;600;700;800&display=swap" rel="stylesheet" />
+  
+  <link rel="stylesheet" href="css/base.css" />
+  <style>
+    /* Force scrolling and normalize touch parameters on mobile devices */
+    html, body {
+      overflow: auto !important;
+      overflow-y: auto !important;
+      height: auto !important;
+      min-height: 100vh !important;
+      -webkit-overflow-scrolling: touch !important;
+      touch-action: auto !important;
+    }
+
+    body {
+      background-color: #0a0714;
+      color: #ffffff;
+      font-family: 'Nunito', sans-serif;
+      margin: 0;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-sizing: border-box;
+    }
+    .container {
+      width: 100%;
+      max-width: 960px;
+      margin: 0 auto;
+      position: relative;
+    }
+    
+    /* Layout styling for modern header & control panels */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      width: 100%;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .title {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      margin: 0;
+      color: #ff914d;
+    }
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    /* Custom Modern Select Dropdown */
+    .lang-select {
+      background-color: #1a152e;
+      color: #ffffff;
+      border: 2px solid #3c2a6b;
+      padding: 8px 16px;
+      border-radius: 50px;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      outline: none;
+      transition: all 0.2s ease;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ff914d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      background-size: 14px;
+      padding-right: 38px;
+    }
+    .lang-select:hover {
+      border-color: #ff914d;
+    }
+    
+    .back-btn {
+      background-color: #1a152e;
+      color: #ffffff;
+      border: 2px solid #3c2a6b;
+      padding: 10px 20px;
+      border-radius: 50px;
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+    }
+    .back-btn:hover {
+      background-color: #3c2a6b;
+      border-color: #ff914d;
+      transform: translateY(-2px);
+    }
+    
+    /* Playback Mode Control Segment */
+    .meta-control-panel {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .mode-selector {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .mode-label {
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 600;
+      color: #b0a8c9;
+      font-size: 15px;
+    }
+    .mode-buttons {
+      display: flex;
+      background-color: #1a152e;
+      border: 1px solid #3c2a6b;
+      border-radius: 50px;
+      padding: 4px;
+    }
+    .mode-btn {
+      background: none;
+      border: none;
+      color: #b0a8c9;
+      padding: 6px 16px;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      font-size: 13px;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .mode-btn.active {
+      background-color: #ff914d;
+      color: #0a0714;
+    }
+    
+    /* Presentation Badge/Tag */
+    .lang-tag {
+      background-color: #1a152e;
+      color: #ff914d;
+      border: 1px solid #3c2a6b;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 600;
+      font-size: 13px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    /* Dynamic Notification HUD Banner */
+    .pwa-hint-banner {
+      background: linear-gradient(135deg, #1d143a 0%, #0f0a25 100%);
+      border: 1px solid #3c2a6b;
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      animation: pulseBorder 2.5s infinite ease-in-out;
+    }
+    @keyframes pulseBorder {
+      0%, 100% { border-color: #3c2a6b; }
+      50% { border-color: #ff914d; }
+    }
+    .pwa-hint-icon {
+      font-size: 24px;
+    }
+    .pwa-hint-text {
+      font-size: 14px;
+      line-height: 1.4;
+      color: #d1cbe5;
+    }
+    .pwa-hint-text strong {
+      color: #ff914d;
+    }
+
+    .embed-wrapper {
+      width: 100%;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
+      background-color: #1a152e;
+      border: 2px solid #2d234a;
+    }
+    .attribution-link {
+      display: inline-block;
+      margin-top: 16px;
+      color: #b0a8c9;
+      text-decoration: none;
+      font-size: 14px;
+      transition: color 0.2s;
+    }
+    .attribution-link:hover {
+      color: #ff914d;
+    }
+    
+    /* Responsive styling rules */
+    @media (max-width: 600px) {
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .header-right {
+        width: 100%;
+        justify-content: space-between;
+      }
+      .meta-control-panel {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header class="header">
+      <h1 class="title" id="pageTitle">Cerita Dodoi Vol 4</h1>
+      <div class="header-right">
+        <!-- Sleek Translation Menu Dropdown -->
+        <select id="langSelect" class="lang-select">
+          <option value="ms">Bahasa Melayu</option>
+          <option value="en">English</option>
+          <option value="zh">华语 (Chinese)</option>
+        </select>
+        <a href="home.html" class="back-btn" id="backBtn">
+          <span id="backBtnText">‹ Kembali ke Utama</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- Meta layout options container -->
+    <div class="meta-control-panel">
+      <!-- Widescreen active tag indicator (Configured to reflect MY/Malay Slide Version) -->
+      <div id="langTag" class="lang-tag">🇲🇾 Slaid Versi Melayu</div>
+      
+      <!-- Option segment card design for playback mode selection -->
+      <div class="mode-selector">
+        <span class="mode-label" id="modeTitle">Pilih Mod Tayangan:</span>
+        <div class="mode-buttons">
+          <button id="btnAuto" class="mode-btn active">Auto</button>
+          <button id="btnManual" class="mode-btn">Manual</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Instructions Notification HUD Banner -->
+    <div class="pwa-hint-banner">
+      <span class="pwa-hint-icon">🔊</span>
+      <div class="pwa-hint-text" id="hintText">
+        <strong>PENTING:</strong> Pelayar menyenyapkan bunyi secara lalai. Sila <strong>ketuk ikon pembesar suara</strong> di penjuru video untuk memasang bunyi. Anda boleh <strong>menyapu skrin (swipe)</strong> ke kiri/kanan untuk menukar halaman!
+      </div>
+    </div>
+
+    <!-- Native Canva Embed Container -->
+    <div class="embed-wrapper">
+      <div style="position: relative; width: 100%; height: 0; padding-top: 56.2500%; padding-bottom: 0; overflow: hidden; will-change: transform;">
+        <iframe id="canvaIframe" loading="lazy" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; border: none; padding: 0; margin: 0;"
+          src="" allowfullscreen="allowfullscreen" allow="fullscreen">
+        </iframe>
+      </div>
+    </div>
+
+    <a class="attribution-link" href="https://www.canva.com/design/DAHTGMEO6yQ/Ss8WGUIH24TsONn7_VsOqA/watch?utm_content=DAHTGMEO6yQ&amp;utm_campaign=designshare&amp;utm_medium=embeds&amp;utm_source=link" target="_blank" rel="noopener">
+      Bedtime Story Intro Cover
+    </a> by Tengku Fibo
+  </div>
+
+  <script src="js/sound.js"></script>
+  <script>
+    // Canva Embed Paths configurations (Adjusted specifically to Slide 4 assets)
+    const AUTO_URL = "https://www.canva.com/design/DAHTGMEO6yQ/Ss8WGUIH24TsONn7_VsOqA/watch?embed&autoplay=1&loop=1";
+    const MANUAL_URL = "https://www.canva.com/design/DAHTGMEO6yQ/Ss8WGUIH24TsONn7_VsOqA/view?embed";
+
+    // Dynamic Multi-Language localization definitions
+    const translations = {
+      ms: {
+        title: "Cerita Dodoi Vol 4",
+        backBtn: "‹ Kembali ke Utama",
+        hintText: "<strong>PENTING:</strong> Pelayar menyenyapkan bunyi secara lalai. Sila <strong>ketuk ikon pembesar suara</strong> di penjuru video untuk memasang bunyi. Anda boleh <strong>menyapu skrin (swipe)</strong> ke kiri/kanan untuk menukar halaman!",
+        modeTitle: "Pilih Mod Tayangan:",
+        modeAuto: "Auto",
+        modeManual: "Manual",
+        langTag: "🇲🇾 Slaid Versi Melayu"
+      },
+      en: {
+        title: "Bedtime Story Vol 4",
+        backBtn: "‹ Back to Home",
+        hintText: "<strong>IMPORTANT:</strong> Browsers mute autoplaying sound by default. Please <strong>tap the speaker icon</strong> in the corner of the video to enable audio. You can <strong>swipe left/right</strong> to change pages!",
+        modeTitle: "Select Play Mode:",
+        modeAuto: "Auto",
+        modeManual: "Manual",
+        langTag: "🇲🇾 Malay Slide Version"
+      },
+      zh: {
+        title: "睡前故事 第4册",
+        backBtn: "‹ 返回首页",
+        hintText: "<strong>重要提示：</strong> 浏览器默认会将自动播放的音频静音。请<strong>点击视频角落的扬声器图标</strong>来开启声音。您可以<strong>向左/向右滑动</strong>来切换页面！",
+        modeTitle: "选择播放模式：",
+        modeAuto: "自动",
+        modeManual: "手动",
+        langTag: "🇲🇾 马来语幻灯片版本"
+      }
+    };
+
+    const iframe = document.getElementById('canvaIframe');
+    const btnAuto = document.getElementById('btnAuto');
+    const btnManual = document.getElementById('btnManual');
+    const langSelect = document.getElementById('langSelect');
+
+    const domElements = {
+      title: document.getElementById('pageTitle'),
+      backBtn: document.getElementById('backBtnText'),
+      modeTitle: document.getElementById('modeTitle'),
+      btnAuto: btnAuto,
+      btnManual: btnManual,
+      hint: document.getElementById('hintText'),
+      tag: document.getElementById('langTag')
+    };
+
+    // Swaps player source configuration and styles
+    function setMode(mode) {
+      if (mode === 'auto') {
+        btnAuto.classList.add('active');
+        btnManual.classList.remove('active');
+        iframe.src = AUTO_URL;
+      } else {
+        btnManual.classList.add('active');
+        btnAuto.classList.remove('active');
+        iframe.src = MANUAL_URL;
+      }
+    }
+
+    // Localized layout translations renderer
+    function updateLanguage(lang) {
+      const textMap = translations[lang] || translations.ms;
+      domElements.title.textContent = textMap.title;
+      domElements.backBtn.textContent = textMap.backBtn;
+      domElements.modeTitle.textContent = textMap.modeTitle;
+      domElements.btnAuto.textContent = textMap.modeAuto;
+      domElements.btnManual.textContent = textMap.modeManual;
+      domElements.hint.innerHTML = textMap.hintText;
+      domElements.tag.textContent = textMap.langTag;
+      
+      localStorage.setItem('smartkiddo_preferred_lang', lang);
+    }
+
+    // Language select listener
+    langSelect.addEventListener('change', (e) => {
+      if (typeof SmartKiddoSound !== 'undefined') SmartKiddoSound.playClick();
+      updateLanguage(e.target.value);
+    });
+
+    // Segment mode select listeners
+    btnAuto.addEventListener('click', () => {
+      if (typeof SmartKiddoSound !== 'undefined') SmartKiddoSound.playClick();
+      setMode('auto');
+    });
+
+    btnManual.addEventListener('click', () => {
+      if (typeof SmartKiddoSound !== 'undefined') SmartKiddoSound.playClick();
+      setMode('manual');
+    });
+
+    // System Bootstrapping Initialization
+    window.addEventListener('DOMContentLoaded', () => {
+      // 1. Resolve localized preference values
+      const storedLang = localStorage.getItem('smartkiddo_preferred_lang') || 'ms';
+      langSelect.value = storedLang;
+      updateLanguage(storedLang);
+
+      // 2. Initialize DEFAULT play layout configuration (AUTO)
+      setMode('auto');
+    });
+
+    // Return Navigation Sound configuration
+    const backBtn = document.getElementById('backBtn');
+    if (backBtn) {
+      backBtn.addEventListener('mouseenter', () => {
+        if (typeof SmartKiddoSound !== 'undefined') SmartKiddoSound.playHover();
+      });
+      backBtn.addEventListener('click', (e) => {
+        if (typeof SmartKiddoSound !== 'undefined') {
+          e.preventDefault();
+          SmartKiddoSound.playClick();
+          setTimeout(() => {
+            window.location.href = backBtn.href;
+          }, 150);
+        }
+      });
+    }
+  </script>
+</body>
+</html>
