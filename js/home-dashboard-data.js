@@ -40,13 +40,13 @@ const SmartKiddoDashboardData = {
       filePrefix: "assets/videos/dashboard/bt",
       fileSuffix: "v.mp4",
       posterSuffix: ".jpg",
-      // Unlocks Card 1, Card 2, and Card 3. Only Cards 4, 5, and 6 remain "Coming Soon".
+      // Unlocks Cards 1, 2, 3, and 4. Only Cards 5 and 6 remain "Coming Soon".
       launched: [true, true, true, true, false, false],
       links: [
         "bedtime-story-1.html",  // Routes Card 1
         "bedtime-story-2.html",  // Routes Card 2
         "bedtime-story-3.html",  // Routes Card 3
-        "bedtime-story-4.html"   // Routes Card 4 to the new player
+        "bedtime-story-4.html"   // Routes Card 4
       ],
       collapsible: false,
     },
@@ -61,7 +61,7 @@ const SmartKiddoDashboardData = {
       posterPrefix: "assets/images/dashboard/bonus", 
       posterSuffix: ".jpg",                           
       launched: false,
-      collapsible: true,
+      collapsible: false, // Set to false so it displays directly by default
     },
     {
       id: "shop",
@@ -72,7 +72,7 @@ const SmartKiddoDashboardData = {
       filePrefix: "assets/images/dashboard/sp",
       fileSuffix: ".jpg",
       launched: false,
-      collapsible: true,
+      collapsible: true, // Only Shop remains collapsed under the "Go Shop" toggle
     },
   ],
 };
