@@ -424,6 +424,7 @@ const SmartKiddoPopup = (() => {
   // Helper check: Immediately resolves if the loading stage is already hidden or bypassed
   function isStageCurrentlyHidden(stage) {
     if (!stage) return true; // If the loading screen element is missing entirely, treat it as hidden
+    if (stage.hasAttribute('hidden')) return true; // Evaluates HTML5 hidden attribute explicitly
     
     const style = window.getComputedStyle(stage);
     return (
@@ -511,45 +512,68 @@ const SmartKiddoPopup = (() => {
       }, { passive: true });
     }
 
-    // MODAL ACTIVATOR TRIGGER:
-    // Ensures popup appears only AFTER the full page loading screen ends.
+    // --- PIPELINE LIFECYCLE MANAGEMENT ---
     const triggerPopupSequence = () => {
       if (backdrop.classList.contains("is-active")) return;
       backdrop.classList.add("is-active");
       updateCarousel();
     };
 
-    const videoStage = document.getElementById("homeVideoStage");
+    // Environment-adaptive ID checks (Detects standalone home.html or index.html inline portal)
+    const videoStage = document.getElementById("homeVideoStage") || document.getElementById("homeScreenVideoStage");
+    const welcomeVideo = document.getElementById("homeWelcomeVideo") || document.getElementById("homeScreenVideo");
 
-    // 1. Race-condition check: If the loading screen stage is already hidden or gone on load, trigger immediately
-    if (isStageCurrentlyHidden(videoStage)) {
-      setTimeout(triggerPopupSequence, 1000);
+    const startPopupLifecycle = () => {
+      // 1. Natural transition: wait precisely until the welcome video ends playing (about 20s)
+      if (welcomeVideo) {
+        welcomeVideo.addEventListener("ended", () => {
+          setTimeout(triggerPopupSequence, 800); // 800ms fade buffer
+        });
+      }
+
+      if (videoStage) {
+        // 2. Observer transition: if loading is bypassed, skipped, or video stage style changes mid-process
+        const stageObserver = new MutationObserver(() => {
+          if (isStageCurrentlyHidden(videoStage)) {
+            setTimeout(triggerPopupSequence, 500);
+            stageObserver.disconnect();
+          }
+        });
+        stageObserver.observe(document.body, { attributes: true, childList: true, subtree: true });
+        
+        // 3. Safety timeout fallback: set to 25 seconds to respect the 20-second load screen
+        setTimeout(() => {
+          triggerPopupSequence();
+          stageObserver.disconnect();
+        }, 25000);
+      } else {
+        // Fallback trigger if no loading stage exists
+        setTimeout(triggerPopupSequence, 3000);
+      }
+    };
+
+    // Check if we are on standalone home page
+    const isStandaloneHome = window.location.pathname.endsWith('home.html');
+
+    // On index.html, if the home screen layer is not active yet (user is on the login/gate stage),
+    // wait until the login succeeds and "Mula Sekarang" triggers the home screen loading sequence.
+    if (!isStandaloneHome && isStageCurrentlyHidden(videoStage)) {
+      const activationObserver = new MutationObserver(() => {
+        if (!isStageCurrentlyHidden(videoStage)) {
+          activationObserver.disconnect();
+          startPopupLifecycle(); // Triggers the popup sequence seamlessly!
+        }
+      });
+      // Watch for the unhiding of the inline home stage element
+      activationObserver.observe(videoStage, { attributes: true, attributeFilter: ['hidden', 'style', 'class'] });
       return;
     }
 
-    const welcomeVideo = document.getElementById("homeWelcomeVideo");
-    if (welcomeVideo) {
-      // 2. Natural transition: wait precisely until the welcome video ends playing (about 20s)
-      welcomeVideo.addEventListener("ended", () => {
-        setTimeout(triggerPopupSequence, 800); // 800ms fade buffer
-      });
-    }
-
-    if (videoStage) {
-      // 3. Observer transition: if loading is bypassed, skipped, or video stage style changes mid-process
-      const stageObserver = new MutationObserver(() => {
-        if (isStageCurrentlyHidden(videoStage)) {
-          setTimeout(triggerPopupSequence, 500);
-          stageObserver.disconnect();
-        }
-      });
-      stageObserver.observe(document.body, { attributes: true, childList: true, subtree: true });
-      
-      // 4. Safety timeout fallback: set to 25 seconds to respect the 20-second load screen
-      setTimeout(() => {
-        triggerPopupSequence();
-        stageObserver.disconnect();
-      }, 25000);
+    // Direct launch path: If already on home.html or if the home stage is already bypassed/loaded
+    if (isStageCurrentlyHidden(videoStage)) {
+      setTimeout(triggerPopupSequence, 1000);
+    } else {
+      startPopupLifecycle();
     }
   }
 
