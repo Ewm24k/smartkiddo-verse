@@ -53,7 +53,8 @@ const SmartKiddoPopup = (() => {
           border: 2px solid #3c2a6b;
           border-radius: 16px;
           width: 90%;
-          max-width: 720px; /* Widescreen landscape bounds */
+          max-width: 640px; /* Standard widescreen landscape bounds */
+          max-height: 85vh; /* Mobile viewport safe-zone constraint to prevent notch cutoff */
           box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
           position: relative;
           overflow: hidden;
@@ -107,6 +108,7 @@ const SmartKiddoPopup = (() => {
           position: relative;
           width: 100%;
           aspect-ratio: 16 / 9; /* Enforces perfect 16:9 aspect ratio */
+          max-height: 50vh;     /* Limits height on small/landscape mobile devices */
           background-color: #0d0a1b;
           display: flex;
           justify-content: center;
@@ -189,6 +191,29 @@ const SmartKiddoPopup = (() => {
         .sk-popup-dot.is-active {
           background-color: #ff914d;
           transform: scale(1.2);
+        }
+
+        /* --- LANDSCAPE MOBILE SAFE-ZONE OVERRIDES --- */
+        @media (max-height: 600px) {
+          .sk-popup-modal {
+            max-height: 95vh !important;
+          }
+          .sk-popup-carousel-container {
+            aspect-ratio: auto !important; /* Temporarily suspends aspect-ratio locking in small landscape screens */
+            height: 180px !important;
+          }
+          .sk-popup-header {
+            padding: 8px 16px !important;
+          }
+          .sk-popup-title {
+            font-size: 16px !important;
+          }
+          .sk-popup-close-btn {
+            font-size: 24px !important;
+          }
+          .sk-popup-indicators {
+            padding: 10px !important;
+          }
         }
       </style>
     `;
@@ -367,7 +392,7 @@ const SmartKiddoPopup = (() => {
 
     const welcomeVideo = document.getElementById("homeWelcomeVideo");
     if (welcomeVideo) {
-      // 1. Natural transition: wait precisely until the welcome video ends playing
+      // 1. Natural transition: wait precisely until the welcome video ends playing (about 20s)
       welcomeVideo.addEventListener("ended", () => {
         setTimeout(triggerPopupSequence, 800); // 800ms fade buffer
       });
@@ -386,14 +411,14 @@ const SmartKiddoPopup = (() => {
         });
         stageObserver.observe(document.body, { attributes: true, childList: true, subtree: true });
         
-        // 3. Worst-case safety timeout: triggers popup if loading hangs or halts over 8 seconds
+        // 3. Safety timeout: Only trigger if loading is completely stuck, set to 25 seconds to respect the 20-second load screen
         setTimeout(() => {
           triggerPopupSequence();
           stageObserver.disconnect();
-        }, 8000);
+        }, 25000);
       }
     } else {
-      // Fallback fallback trigger if welcome screen is not present on DOM
+      // Fallback trigger if welcome screen is not present on DOM
       setTimeout(triggerPopupSequence, 3000);
     }
   }
