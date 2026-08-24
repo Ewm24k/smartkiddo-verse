@@ -4,7 +4,7 @@
    
    Supports:
    - Images (.jpg, .png) and Videos (.mp4 with autoplay/loop)
-   - Landscape (16:9) and Portrait (9:16) aspect ratios
+   - Landscape (16:9) aspect ratios matching 1920x1080 format
    - Touch-swiping on Android/iOS and Click navigation on PC
    ========================================================= */
 
@@ -53,7 +53,7 @@ const SmartKiddoPopup = (() => {
           border: 2px solid #3c2a6b;
           border-radius: 16px;
           width: 90%;
-          max-width: 460px; /* Perfect size constraint for both 16:9 and 9:16 media scaling */
+          max-width: 720px; /* Widescreen landscape bounds */
           box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
           position: relative;
           overflow: hidden;
@@ -102,11 +102,11 @@ const SmartKiddoPopup = (() => {
           transform: scale(1.1);
         }
         
-        /* Media Slide area */
+        /* Media Slide area styled to match 1920x1080 (16:9) exactly */
         .sk-popup-carousel-container {
           position: relative;
           width: 100%;
-          height: 440px; /* Golden-ratio viewport height for slides */
+          aspect-ratio: 16 / 9; /* Enforces perfect 16:9 aspect ratio */
           background-color: #0d0a1b;
           display: flex;
           justify-content: center;
@@ -129,9 +129,9 @@ const SmartKiddoPopup = (() => {
           position: relative;
         }
         .sk-popup-media {
-          max-width: 100%;
-          max-height: 100%;
-          object-fit: contain; /* Automatically scales 16:9 (horizontal) and 9:16 (vertical) perfectly without cropping */
+          width: 100% !important;
+          height: 100% !important;
+          object-fit: cover !important; /* Crops & fills the 16:9 boundary perfectly, removing blank top/bottom spaces */
         }
         
         /* Action Arrows (desktop only) */
@@ -357,12 +357,45 @@ const SmartKiddoPopup = (() => {
       }, { passive: true });
     }
 
-    // Modern trigger timer: reveals popup 2.5 seconds after page starts,
-    // allowing the welcome home video standard fade/rendering processes to complete first.
-    setTimeout(() => {
+    // MODAL ACTIVATOR TRIGGER:
+    // Ensures popup appears only AFTER the full page loading screen ends.
+    const triggerPopupSequence = () => {
+      if (backdrop.classList.contains("is-active")) return;
       backdrop.classList.add("is-active");
-      updateCarousel(); // Play the starting video if Slide 1 is a video
-    }, 2500);
+      updateCarousel();
+    };
+
+    const welcomeVideo = document.getElementById("homeWelcomeVideo");
+    if (welcomeVideo) {
+      // 1. Natural transition: wait precisely until the welcome video ends playing
+      welcomeVideo.addEventListener("ended", () => {
+        setTimeout(triggerPopupSequence, 800); // 800ms fade buffer
+      });
+      
+      // 2. Observer transition: if loading is bypassed, skipped, or video stage is hidden early
+      const videoStage = document.getElementById("homeVideoStage");
+      if (videoStage) {
+        const stageObserver = new MutationObserver(() => {
+          const isStageHidden = window.getComputedStyle(videoStage).display === 'none' || 
+                                window.getComputedStyle(videoStage).opacity === '0' || 
+                                !document.body.contains(videoStage);
+          if (isStageHidden) {
+            setTimeout(triggerPopupSequence, 500);
+            stageObserver.disconnect();
+          }
+        });
+        stageObserver.observe(document.body, { attributes: true, childList: true, subtree: true });
+        
+        // 3. Worst-case safety timeout: triggers popup if loading hangs or halts over 8 seconds
+        setTimeout(() => {
+          triggerPopupSequence();
+          stageObserver.disconnect();
+        }, 8000);
+      }
+    } else {
+      // Fallback fallback trigger if welcome screen is not present on DOM
+      setTimeout(triggerPopupSequence, 3000);
+    }
   }
 
   return { init };
