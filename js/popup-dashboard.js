@@ -52,9 +52,9 @@ const SmartKiddoPopup = (() => {
           background-color: #1a152e;
           border: 2px solid #3c2a6b;
           border-radius: 16px;
-          width: 90%;
-          max-width: 640px; /* Standard widescreen landscape bounds */
-          max-height: 85vh; /* Mobile viewport safe-zone constraint to prevent notch cutoff */
+          width: 95%;        /* Increased width to utilize mobile screen boundaries fully on Android/iOS */
+          max-width: 840px;  /* Significantly larger size for desktop/PC viewports */
+          max-height: 85vh;  /* Mobile viewport safe-zone constraint to prevent notch cutoff */
           box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
           position: relative;
           overflow: hidden;
@@ -197,6 +197,7 @@ const SmartKiddoPopup = (() => {
         @media (max-height: 600px) {
           .sk-popup-modal {
             max-height: 95vh !important;
+            width: 90% !important; /* Slightly narrower in landscape mode to accommodate horizontal viewport bounds */
           }
           .sk-popup-carousel-container {
             aspect-ratio: auto !important; /* Temporarily suspends aspect-ratio locking in small landscape screens */
