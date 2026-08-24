@@ -7,6 +7,7 @@
    - Taller layout on Android/iOS mobile devices
    - Pinch-to-zoom and free panning (free move) on touch screens
    - Touch-swiping on Android/iOS and Click navigation on PC
+   - Dismissible, localized gesture hint banner exclusively on mobile
    ========================================================= */
 
 const SmartKiddoPopup = (() => {
@@ -55,7 +56,7 @@ const SmartKiddoPopup = (() => {
           border-radius: 16px;
           width: 95%;        /* Safe horizontal margins on mobile screens */
           max-width: 840px;  /* Prominent layout size for desktop/PC views */
-          max-height: 85vh;  /* Safe height constraint on standard viewports */
+          max-height: 85vh;  /* Mobile viewport safe-zone constraint to prevent notch cutoff */
           box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
           position: relative;
           overflow: hidden;
@@ -175,6 +176,42 @@ const SmartKiddoPopup = (() => {
           right: 12px;
         }
         
+        /* Mobile Touch-Gesture Helper Hint Banner */
+        .sk-popup-hint-bar {
+          display: none; /* Hidden on desktop screens by default */
+          background-color: #130f24;
+          border-top: 1px solid #3c2a6b;
+          padding: 10px 16px;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+          z-index: 11;
+        }
+        .sk-popup-hint-text {
+          font-size: 12px;
+          color: #b0a8c9;
+          line-height: 1.4;
+          margin: 0;
+          flex-grow: 1;
+        }
+        .sk-popup-hint-text strong {
+          color: #ff914d;
+        }
+        .sk-popup-hint-close {
+          background: none;
+          border: none;
+          color: #b0a8c9;
+          font-size: 20px;
+          font-weight: bold;
+          cursor: pointer;
+          padding: 0 4px;
+          line-height: 1;
+          transition: color 0.2s;
+        }
+        .sk-popup-hint-close:hover {
+          color: #ff914d;
+        }
+
         /* Indicators Dots area */
         .sk-popup-indicators {
           display: flex;
@@ -198,7 +235,7 @@ const SmartKiddoPopup = (() => {
           transform: scale(1.2);
         }
 
-        /* --- PORTRAIT MOBILE HEIGHT ENHANCEMENTS --- */
+        /* --- PORTRAIT MOBILE HEIGHT & GESTURE HINT ENHANCEMENTS --- */
         @media (max-width: 768px) {
           .sk-popup-modal {
             max-height: 92vh !important; /* Extended modal safe-zone bounds on portrait mobile */
@@ -206,6 +243,9 @@ const SmartKiddoPopup = (() => {
           .sk-popup-carousel-container {
             aspect-ratio: auto !important; /* Suspends strict 16:9 on mobile to allow taller vertical format */
             height: 55vh !important;       /* Raised vertical height for mobile screens */
+          }
+          .sk-popup-hint-bar {
+            display: flex !important;      /* Forces hint banner visible on iOS & Android mobile devices */
           }
         }
 
@@ -230,6 +270,12 @@ const SmartKiddoPopup = (() => {
           }
           .sk-popup-indicators {
             padding: 10px !important;
+          }
+          .sk-popup-hint-bar {
+            padding: 6px 12px !important;
+          }
+          .sk-popup-hint-text {
+            font-size: 11px !important;
           }
         }
       </style>
@@ -264,6 +310,16 @@ const SmartKiddoPopup = (() => {
       });
     }
 
+    // Dynamic localized mobile gesture translations
+    const hintTranslations = {
+      ms: "💡 Anda boleh <strong>mencubit skrin</strong> untuk zum masuk/keluar dan heret kandungan untuk bergerak bebas.",
+      en: "💡 You can <strong>pinch the screen</strong> to zoom in/out and drag content to move freely.",
+      zh: "💡 您可以<strong>双指捏合</strong>进行缩放，并拖拽内容自由移动。"
+    };
+
+    const userLang = localStorage.getItem('smartkiddo_preferred_lang') || 'ms';
+    const activeHintText = hintTranslations[userLang] || hintTranslations.ms;
+
     return `
       <div id="skPopupBackdrop" class="sk-popup-backdrop">
         <div class="sk-popup-modal">
@@ -278,6 +334,12 @@ const SmartKiddoPopup = (() => {
               ${slidesHtml}
             </div>
             ${hasMultiple ? `<button id="skPopupNext" class="sk-popup-arrow sk-popup-arrow--right" aria-label="Seterusnya">›</button>` : ''}
+          </div>
+
+          <!-- Responsive Dismissible Mobile Gestures Hint Panel -->
+          <div class="sk-popup-hint-bar" id="skPopupHintBar">
+            <p class="sk-popup-hint-text">${activeHintText}</p>
+            <button class="sk-popup-hint-close" id="skPopupHintClose" aria-label="Tutup petunjuk">&times;</button>
           </div>
           
           ${hasMultiple ? `<div class="sk-popup-indicators" id="skPopupIndicators">${dotsHtml}</div>` : ''}
@@ -430,6 +492,8 @@ const SmartKiddoPopup = (() => {
     const backdrop = document.getElementById("skPopupBackdrop");
     const closeBtn = document.getElementById("skPopupClose");
     const carouselContainer = document.getElementById("skPopupCarousel");
+    const hintBar = document.getElementById("skPopupHintBar");
+    const hintCloseBtn = document.getElementById("skPopupHintClose");
 
     // Initialize gesture tracking on images dynamically
     const mediaElements = backdrop.querySelectorAll(".sk-popup-media");
@@ -451,6 +515,14 @@ const SmartKiddoPopup = (() => {
     backdrop.addEventListener("click", (e) => {
       if (e.target === backdrop) closePopup();
     });
+
+    // Dismiss localized mobile gestures hint panel
+    if (hintBar && hintCloseBtn) {
+      hintCloseBtn.addEventListener("click", () => {
+        if (typeof SmartKiddoSound !== 'undefined') SmartKiddoSound.playClick();
+        hintBar.style.display = "none";
+      });
+    }
 
     // Wire up navigation controls if multiple files are loaded
     if (config.files.length > 1) {
