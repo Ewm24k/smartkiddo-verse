@@ -421,6 +421,22 @@ const SmartKiddoPopup = (() => {
     }, { passive: true });
   }
 
+  // Helper check: Immediately resolves if the loading stage is already hidden or bypassed
+  function isStageCurrentlyHidden(stage) {
+    if (!stage) return true; // If the loading screen element is missing entirely, treat it as hidden
+    
+    const style = window.getComputedStyle(stage);
+    return (
+      style.display === 'none' || 
+      style.opacity === '0' || 
+      style.visibility === 'hidden' ||
+      stage.classList.contains('fade-out') ||
+      stage.classList.contains('hidden') ||
+      stage.classList.contains('inactive') ||
+      !document.body.contains(stage)
+    );
+  }
+
   function init() {
     if (!config.files || config.files.length === 0) return;
 
@@ -503,36 +519,37 @@ const SmartKiddoPopup = (() => {
       updateCarousel();
     };
 
+    const videoStage = document.getElementById("homeVideoStage");
+
+    // 1. Race-condition check: If the loading screen stage is already hidden or gone on load, trigger immediately
+    if (isStageCurrentlyHidden(videoStage)) {
+      setTimeout(triggerPopupSequence, 1000);
+      return;
+    }
+
     const welcomeVideo = document.getElementById("homeWelcomeVideo");
     if (welcomeVideo) {
-      // 1. Natural transition: wait precisely until the welcome video ends playing (about 20s)
+      // 2. Natural transition: wait precisely until the welcome video ends playing (about 20s)
       welcomeVideo.addEventListener("ended", () => {
         setTimeout(triggerPopupSequence, 800); // 800ms fade buffer
       });
-      
-      // 2. Observer transition: if loading is bypassed, skipped, or video stage is hidden early
-      const videoStage = document.getElementById("homeVideoStage");
-      if (videoStage) {
-        const stageObserver = new MutationObserver(() => {
-          const isStageHidden = window.getComputedStyle(videoStage).display === 'none' || 
-                                window.getComputedStyle(videoStage).opacity === '0' || 
-                                !document.body.contains(videoStage);
-          if (isStageHidden) {
-            setTimeout(triggerPopupSequence, 500);
-            stageObserver.disconnect();
-          }
-        });
-        stageObserver.observe(document.body, { attributes: true, childList: true, subtree: true });
-        
-        // 3. Safety timeout: Only trigger if loading is completely stuck, set to 25 seconds to respect the 20-second load screen
-        setTimeout(() => {
-          triggerPopupSequence();
+    }
+
+    if (videoStage) {
+      // 3. Observer transition: if loading is bypassed, skipped, or video stage style changes mid-process
+      const stageObserver = new MutationObserver(() => {
+        if (isStageCurrentlyHidden(videoStage)) {
+          setTimeout(triggerPopupSequence, 500);
           stageObserver.disconnect();
-        }, 25000);
-      }
-    } else {
-      // Fallback trigger if welcome screen is not present on DOM
-      setTimeout(triggerPopupSequence, 3000);
+        }
+      });
+      stageObserver.observe(document.body, { attributes: true, childList: true, subtree: true });
+      
+      // 4. Safety timeout fallback: set to 25 seconds to respect the 20-second load screen
+      setTimeout(() => {
+        triggerPopupSequence();
+        stageObserver.disconnect();
+      }, 25000);
     }
   }
 
