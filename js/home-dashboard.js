@@ -124,6 +124,51 @@ const SmartKiddoDashboard = (() => {
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4) !important;
             z-index: 3 !important;
           }
+
+          /* --- UPGRADED DROPDOWN TOGGLE STYLING --- */
+          .dash-rows-toggle-wrap {
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+            margin: 36px 0 20px 0 !important;
+            width: 100% !important;
+          }
+          .dash-rows-toggle {
+            background: linear-gradient(135deg, #1d143a 0%, #0f0a25 100%) !important;
+            border: 2px solid #3c2a6b !important;
+            color: #ffffff !important;
+            font-family: 'Fredoka', sans-serif !important;
+            font-weight: 600 !important;
+            font-size: 15px !important;
+            padding: 12px 32px !important;
+            border-radius: 50px !important;
+            cursor: pointer !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 12px !important;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5) !important;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+            outline: none !important;
+          }
+          .dash-rows-toggle:hover {
+            border-color: #ff914d !important;
+            box-shadow: 0 8px 32px rgba(255, 145, 77, 0.25) !important;
+            transform: translateY(-2px) !important;
+          }
+          .dash-rows-toggle__text {
+            letter-spacing: 0.5px !important;
+          }
+          .dash-rows-toggle__icon {
+            display: inline-block !important;
+            font-size: 16px !important;
+            transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+          }
+          .dash-rows-toggle.is-expanded .dash-rows-toggle__icon {
+            transform: rotate(180deg) !important; /* Smoothly flips the arrow pointing up */
+          }
+          .dash-rows-toggle.is-expanded {
+            border-color: #ff914d !important;
+          }
           
           /* Responsive adjustments for tablets and mobile devices */
           @media (max-width: 1024px) {
@@ -134,6 +179,10 @@ const SmartKiddoDashboard = (() => {
           @media (max-width: 768px) {
             .dash-card {
               flex: 0 0 calc((100% - 16px) / 2) !important; /* Shows 2 cards on mobile viewports */
+            }
+            .dash-rows-toggle {
+              font-size: 13px !important;
+              padding: 10px 24px !important;
             }
           }
         </style>
@@ -359,6 +408,7 @@ const SmartKiddoDashboard = (() => {
     return card;
   }
 
+  // --- UPGRADED MODERN DROPDOWN COMPONENT ---
   function createRowsToggle() {
     const wrap = document.createElement("div");
     wrap.className = "dash-rows-toggle-wrap";
@@ -366,8 +416,13 @@ const SmartKiddoDashboard = (() => {
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "dash-rows-toggle";
-    btn.setAttribute("aria-label", "Tunjuk/sembunyi lebih banyak kategori");
-    btn.innerHTML = `<span class="dash-rows-toggle__icon">⌄</span>`;
+    btn.setAttribute("aria-label", "Tunjuk atau sembunyi lebih banyak kategori");
+    
+    // Initial standard collapsed layout structure
+    btn.innerHTML = `
+      <span class="dash-rows-toggle__text">✨ Terokai Lebih Banyak Kategori / Explore More</span>
+      <span class="dash-rows-toggle__icon">⌄</span>
+    `;
 
     let isExpanded = false;
 
@@ -380,6 +435,14 @@ const SmartKiddoDashboard = (() => {
       isExpanded = !isExpanded;
       extraWrap.hidden = !isExpanded;
       btn.classList.toggle("is-expanded", isExpanded);
+
+      // Dynamic text update based on open/close states
+      const textEl = btn.querySelector(".dash-rows-toggle__text");
+      if (isExpanded) {
+        textEl.textContent = "✨ Sembunyikan Kategori / Show Less";
+      } else {
+        textEl.textContent = "✨ Terokai Lebih Banyak Kategori / Explore More";
+      }
 
       // Collapsing: the content directly above the current scroll
       // position just shrank away, so reset to the top to avoid
