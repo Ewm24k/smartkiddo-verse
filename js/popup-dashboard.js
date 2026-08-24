@@ -78,6 +78,7 @@ const SmartKiddoPopup = (() => {
           align-items: center;
           background-color: #130f24;
           z-index: 12;
+          flex-shrink: 0 !important; /* Force-prevents the header from shrinking or disappearing on mobile */
         }
         .sk-popup-title {
           font-family: 'Fredoka', sans-serif;
@@ -179,37 +180,39 @@ const SmartKiddoPopup = (() => {
         /* Mobile Touch-Gesture Helper Hint Banner */
         .sk-popup-hint-bar {
           display: none; /* Hidden on desktop screens by default */
-          background-color: #130f24;
-          border-top: 1px solid #3c2a6b;
-          padding: 10px 16px;
-          align-items: center;
-          justify-content: space-between;
-          gap: 12px;
-          z-index: 11;
+          background-color: #1d143a !important; /* High-contrast backdrop */
+          border-top: 1px solid #3c2a6b !important;
+          border-bottom: 1px solid #3c2a6b !important;
+          padding: 12px 16px !important;
+          align-items: center !important;
+          justify-content: space-between !important;
+          gap: 12px !important;
+          z-index: 11 !important;
+          flex-shrink: 0 !important; /* Force-prevents the hint bar from shrinking or collapsing to 0 height */
         }
         .sk-popup-hint-text {
-          font-size: 12px;
-          color: #b0a8c9;
-          line-height: 1.4;
-          margin: 0;
-          flex-grow: 1;
+          font-size: 12px !important;
+          color: #ffffff !important; /* High-legibility pure white text */
+          line-height: 1.4 !important;
+          margin: 0 !important;
+          flex-grow: 1 !important;
         }
         .sk-popup-hint-text strong {
-          color: #ff914d;
+          color: #ff914d !important;
         }
         .sk-popup-hint-close {
-          background: none;
-          border: none;
-          color: #b0a8c9;
-          font-size: 20px;
-          font-weight: bold;
-          cursor: pointer;
-          padding: 0 4px;
-          line-height: 1;
-          transition: color 0.2s;
+          background: none !important;
+          border: none !important;
+          color: #b0a8c9 !important;
+          font-size: 22px !important;
+          font-weight: bold !important;
+          cursor: pointer !important;
+          padding: 0 4px !important;
+          line-height: 1 !important;
+          transition: color 0.2s !important;
         }
         .sk-popup-hint-close:hover {
-          color: #ff914d;
+          color: #ff914d !important;
         }
 
         /* Indicators Dots area */
@@ -221,6 +224,7 @@ const SmartKiddoPopup = (() => {
           background-color: #130f24;
           border-top: 1px solid #3c2a6b;
           z-index: 12;
+          flex-shrink: 0 !important; /* Prevents dot panel from collapsing on mobile */
         }
         .sk-popup-dot {
           width: 10px;
@@ -312,7 +316,7 @@ const SmartKiddoPopup = (() => {
 
     // Dynamic localized mobile gesture translations
     const hintTranslations = {
-      ms: "💡 Anda boleh <strong>mencubit skrin</strong> untuk zum masuk/keluar dan heret kandungan untuk bergerak bebas.",
+      ms: "💡 Anda boleh <strong>mencubit skrin</strong> untuk zum masuk/keluar dan heret kandungan untuk heret bergerak bebas.",
       en: "💡 You can <strong>pinch the screen</strong> to zoom in/out and drag content to move freely.",
       zh: "💡 您可以<strong>双指捏合</strong>进行缩放，并拖拽内容自由移动。"
     };
