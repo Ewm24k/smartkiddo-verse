@@ -125,7 +125,7 @@ const SmartKiddoDashboard = (() => {
             z-index: 3 !important;
           }
 
-          /* --- UPGRADED DROPDOWN TOGGLE STYLING --- */
+          /* --- UPGRADED MODERN RECTANGLE DROPDOWN STYLING --- */
           .dash-rows-toggle-wrap {
             display: flex !important;
             justify-content: center !important;
@@ -140,31 +140,39 @@ const SmartKiddoDashboard = (() => {
             font-family: 'Fredoka', sans-serif !important;
             font-weight: 600 !important;
             font-size: 15px !important;
-            padding: 12px 32px !important;
-            border-radius: 50px !important;
+            padding: 12px 36px !important;
+            border-radius: 6px !important; /* Sharp, modern rectangle style */
             cursor: pointer !important;
             display: inline-flex !important;
             align-items: center !important;
             gap: 12px !important;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5) !important;
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4) !important;
+            transition: all 0.25s ease-in-out !important;
             outline: none !important;
           }
+          
+          /* Hover Animation with high contrast neon accent styling */
           .dash-rows-toggle:hover {
             border-color: #ff914d !important;
-            box-shadow: 0 8px 32px rgba(255, 145, 77, 0.25) !important;
+            background: #ff914d !important; /* Elegant orange solid-state trigger */
+            color: #0a0714 !important;      /* Sharp contrast dark text */
+            box-shadow: 0 6px 24px rgba(255, 145, 77, 0.4) !important;
             transform: translateY(-2px) !important;
           }
+          .dash-rows-toggle:hover .dash-rows-toggle__icon {
+            color: #0a0714 !important;
+          }
+          
           .dash-rows-toggle__text {
             letter-spacing: 0.5px !important;
           }
           .dash-rows-toggle__icon {
             display: inline-block !important;
             font-size: 16px !important;
-            transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+            transition: transform 0.25s ease-in-out !important;
           }
           .dash-rows-toggle.is-expanded .dash-rows-toggle__icon {
-            transform: rotate(180deg) !important; /* Smoothly flips the arrow pointing up */
+            transform: rotate(180deg) !important; /* Flips arrow up */
           }
           .dash-rows-toggle.is-expanded {
             border-color: #ff914d !important;
@@ -408,7 +416,7 @@ const SmartKiddoDashboard = (() => {
     return card;
   }
 
-  // --- UPGRADED MODERN DROPDOWN COMPONENT ---
+  // --- UPGRADED RECTANGLE DROPDOWN COMPONENT ---
   function createRowsToggle() {
     const wrap = document.createElement("div");
     wrap.className = "dash-rows-toggle-wrap";
@@ -416,11 +424,11 @@ const SmartKiddoDashboard = (() => {
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "dash-rows-toggle";
-    btn.setAttribute("aria-label", "Tunjuk atau sembunyi lebih banyak kategori");
+    btn.setAttribute("aria-label", "Terokai bahagian kedai");
     
-    // Initial standard collapsed layout structure
+    // Configured with clean "Go Shop" text representation
     btn.innerHTML = `
-      <span class="dash-rows-toggle__text">✨ Terokai Lebih Banyak Kategori / Explore More</span>
+      <span class="dash-rows-toggle__text">Go Shop</span>
       <span class="dash-rows-toggle__icon">⌄</span>
     `;
 
@@ -439,14 +447,12 @@ const SmartKiddoDashboard = (() => {
       // Dynamic text update based on open/close states
       const textEl = btn.querySelector(".dash-rows-toggle__text");
       if (isExpanded) {
-        textEl.textContent = "✨ Sembunyikan Kategori / Show Less";
+        textEl.textContent = "Close Shop";
       } else {
-        textEl.textContent = "✨ Terokai Lebih Banyak Kategori / Explore More";
+        textEl.textContent = "Go Shop";
       }
 
-      // Collapsing: the content directly above the current scroll
-      // position just shrank away, so reset to the top to avoid
-      // leaving a blank leftover gap where the hidden rows used to be.
+      // Collapsing: scroll gracefully
       if (!isExpanded) {
         const scrollEl = document.querySelector(".dash-content");
         if (scrollEl) scrollEl.scrollTo({ top: 0, behavior: "smooth" });
@@ -601,12 +607,12 @@ const SmartKiddoDashboard = (() => {
     data.categories.forEach((category, idx) => {
       const row = createRow(category);
       if (!category.collapsible) {
-        // Visible categories: Selected Ages, Bedtime Story
+        // Visible categories: Selected Ages, Bedtime Story, Bonus
         rowsContainer.appendChild(row);
       } else {
-        // Collapsible categories: Bonus, Shop
-        if (idx === 2) {
-          // After first 2 categories, add toggle and wrapper
+        // Collapsible categories: Shop
+        if (idx === 3) {
+          // After first 3 default categories, add the "Go Shop" toggle and wrapper
           rowsContainer.appendChild(createRowsToggle());
           const extraWrap = document.createElement("div");
           extraWrap.id = "dashRowsExtra";
