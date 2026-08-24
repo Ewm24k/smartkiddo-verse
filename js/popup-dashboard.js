@@ -4,7 +4,8 @@
    
    Supports:
    - Images (.jpg, .png) and Videos (.mp4 with autoplay/loop)
-   - Landscape (16:9) aspect ratios matching 1920x1080 format
+   - Taller layout on Android/iOS mobile devices
+   - Pinch-to-zoom and free panning (free move) on touch screens
    - Touch-swiping on Android/iOS and Click navigation on PC
    ========================================================= */
 
@@ -52,9 +53,9 @@ const SmartKiddoPopup = (() => {
           background-color: #1a152e;
           border: 2px solid #3c2a6b;
           border-radius: 16px;
-          width: 95%;        /* Increased width to utilize mobile screen boundaries fully on Android/iOS */
-          max-width: 840px;  /* Significantly larger size for desktop/PC viewports */
-          max-height: 85vh;  /* Mobile viewport safe-zone constraint to prevent notch cutoff */
+          width: 95%;        /* Safe horizontal margins on mobile screens */
+          max-width: 840px;  /* Prominent layout size for desktop/PC views */
+          max-height: 85vh;  /* Safe height constraint on standard viewports */
           box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
           position: relative;
           overflow: hidden;
@@ -75,6 +76,7 @@ const SmartKiddoPopup = (() => {
           justify-content: space-between;
           align-items: center;
           background-color: #130f24;
+          z-index: 12;
         }
         .sk-popup-title {
           font-family: 'Fredoka', sans-serif;
@@ -103,12 +105,12 @@ const SmartKiddoPopup = (() => {
           transform: scale(1.1);
         }
         
-        /* Media Slide area styled to match 1920x1080 (16:9) exactly */
+        /* Media Slide area */
         .sk-popup-carousel-container {
           position: relative;
           width: 100%;
-          aspect-ratio: 16 / 9; /* Enforces perfect 16:9 aspect ratio */
-          max-height: 50vh;     /* Limits height on small/landscape mobile devices */
+          aspect-ratio: 16 / 9; /* Enforces 16:9 widescreen layout on desktop */
+          max-height: 50vh;     
           background-color: #0d0a1b;
           display: flex;
           justify-content: center;
@@ -129,11 +131,13 @@ const SmartKiddoPopup = (() => {
           align-items: center;
           box-sizing: border-box;
           position: relative;
+          overflow: hidden;
         }
         .sk-popup-media {
           width: 100% !important;
           height: 100% !important;
-          object-fit: cover !important; /* Crops & fills the 16:9 boundary perfectly, removing blank top/bottom spaces */
+          object-fit: contain !important; /* Contain layout to prevent vertical cropping on standard view */
+          touch-action: none !important;   /* Disables default browser pan/zoom so custom script controls pan flawlessly */
         }
         
         /* Action Arrows (desktop only) */
@@ -179,6 +183,7 @@ const SmartKiddoPopup = (() => {
           padding: 16px;
           background-color: #130f24;
           border-top: 1px solid #3c2a6b;
+          z-index: 12;
         }
         .sk-popup-dot {
           width: 10px;
@@ -193,14 +198,25 @@ const SmartKiddoPopup = (() => {
           transform: scale(1.2);
         }
 
+        /* --- PORTRAIT MOBILE HEIGHT ENHANCEMENTS --- */
+        @media (max-width: 768px) {
+          .sk-popup-modal {
+            max-height: 92vh !important; /* Extended modal safe-zone bounds on portrait mobile */
+          }
+          .sk-popup-carousel-container {
+            aspect-ratio: auto !important; /* Suspends strict 16:9 on mobile to allow taller vertical format */
+            height: 55vh !important;       /* Raised vertical height for mobile screens */
+          }
+        }
+
         /* --- LANDSCAPE MOBILE SAFE-ZONE OVERRIDES --- */
         @media (max-height: 600px) {
           .sk-popup-modal {
             max-height: 95vh !important;
-            width: 90% !important; /* Slightly narrower in landscape mode to accommodate horizontal viewport bounds */
+            width: 90% !important; /* Slightly narrower in landscape mode to accommodate horizontal bounds */
           }
           .sk-popup-carousel-container {
-            aspect-ratio: auto !important; /* Temporarily suspends aspect-ratio locking in small landscape screens */
+            aspect-ratio: auto !important;
             height: 180px !important;
           }
           .sk-popup-header {
@@ -315,6 +331,94 @@ const SmartKiddoPopup = (() => {
     }
   }
 
+  // --- MULTI-TOUCH GESTURE CONTROLLER (Pinch-to-zoom & Free Drag/Pan) ---
+  function makeZoomableAndPannable(mediaEl) {
+    if (mediaEl.tagName.toLowerCase() === 'video') return; // Bypass videos
+
+    let currentScale = 1;
+    let startScale = 1;
+    let pointX = 0;
+    let pointY = 0;
+    let startX = 0;
+    let startY = 0;
+    let isDragging = false;
+    let initialTouchDist = 0;
+
+    mediaEl.style.transformOrigin = "center center";
+    mediaEl.style.transition = "transform 0.15s ease-out";
+
+    mediaEl.addEventListener("touchstart", (e) => {
+      if (e.touches.length === 1) {
+        if (currentScale > 1) {
+          isDragging = true;
+          startX = e.touches[0].clientX - pointX;
+          startY = e.touches[0].clientY - pointY;
+          mediaEl.style.transition = "none"; // Disables transform transition delay during active drag panning
+        }
+      } else if (e.touches.length === 2) {
+        isDragging = false;
+        initialTouchDist = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
+        );
+        startScale = currentScale;
+        mediaEl.style.transition = "none";
+      }
+    }, { passive: false });
+
+    mediaEl.addEventListener("touchmove", (e) => {
+      if (e.touches.length === 1 && isDragging) {
+        // Prevent default browser viewport scrolling and pan
+        e.preventDefault();
+        e.stopPropagation();
+
+        pointX = e.touches[0].clientX - startX;
+        pointY = e.touches[0].clientY - startY;
+
+        // Visual panning safe bounds relative to scaling size
+        const maxPanX = (currentScale - 1) * (mediaEl.clientWidth / 2);
+        const maxPanY = (currentScale - 1) * (mediaEl.clientHeight / 2);
+        pointX = Math.min(Math.max(pointX, -maxPanX), maxPanX);
+        pointY = Math.min(Math.max(pointY, -maxPanY), maxPanY);
+
+        mediaEl.style.transform = `translate(${pointX}px, ${pointY}px) scale(${currentScale})`;
+      } else if (e.touches.length === 2) {
+        // Prevent default browser viewport zoom
+        e.preventDefault();
+        e.stopPropagation();
+
+        const currentDist = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
+        );
+        const factor = currentDist / initialTouchDist;
+        currentScale = Math.min(Math.max(startScale * factor, 1), 4); // Scale constraint: 1x to 4x
+
+        if (currentScale === 1) {
+          pointX = 0;
+          pointY = 0;
+        }
+
+        mediaEl.style.transform = `translate(${pointX}px, ${pointY}px) scale(${currentScale})`;
+      }
+    }, { passive: false });
+
+    mediaEl.addEventListener("touchend", (e) => {
+      isDragging = false;
+      mediaEl.style.transition = "transform 0.2s ease-out";
+      
+      if (e.touches.length < 2) {
+        if (currentScale <= 1.05) {
+          // Reset alignment variables if scaled down to default
+          currentScale = 1;
+          pointX = 0;
+          pointY = 0;
+          mediaEl.style.transform = `translate(0px, 0px) scale(1)`;
+        }
+      }
+    }, { passive: true });
+  }
+
   function init() {
     if (!config.files || config.files.length === 0) return;
 
@@ -326,6 +430,12 @@ const SmartKiddoPopup = (() => {
     const backdrop = document.getElementById("skPopupBackdrop");
     const closeBtn = document.getElementById("skPopupClose");
     const carouselContainer = document.getElementById("skPopupCarousel");
+
+    // Initialize gesture tracking on images dynamically
+    const mediaElements = backdrop.querySelectorAll(".sk-popup-media");
+    mediaElements.forEach(mediaEl => {
+      makeZoomableAndPannable(mediaEl);
+    });
 
     // Close actions
     const closePopup = () => {
