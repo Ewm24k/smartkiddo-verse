@@ -250,14 +250,20 @@ const SmartKiddoDashboard = (() => {
     }
   }
 
+  // Resolves the file source path dynamically per item or falls back to category defaults
   function buildItemSrc(category, index) {
-    return `${category.filePrefix}${index}${category.fileSuffix}`;
+    const itemConfig = (category.items && category.items[index - 1]) || {};
+    const suffix = itemConfig.suffix || category.fileSuffix;
+    return `${category.filePrefix}${index}${suffix}`;
   }
 
+  // Resolves poster source dynamically for video cards
   function buildPosterSrc(category, index) {
-    if (!category.posterSuffix) return null;
+    const itemConfig = (category.items && category.items[index - 1]) || {};
+    const posterSuffix = itemConfig.posterSuffix || category.posterSuffix;
+    if (!posterSuffix) return null;
     const prefix = category.posterPrefix || category.filePrefix;
-    return `${prefix}${index}${category.posterSuffix}`;
+    return `${prefix}${index}${posterSuffix}`;
   }
 
   // Shared observer: only actually play a card's video while it's near
@@ -310,7 +316,11 @@ const SmartKiddoDashboard = (() => {
       }
     }
 
-    if (category.itemType === "video") {
+    // Determine item media type dynamically (individually or fall back to category level)
+    const itemConfig = (category.items && category.items[index - 1]) || {};
+    const currentItemType = itemConfig.type || category.itemType;
+
+    if (currentItemType === "video") {
       const video = document.createElement("video");
       video.className = "dash-card__media";
       video.src = buildItemSrc(category, index);
@@ -359,9 +369,7 @@ const SmartKiddoDashboard = (() => {
     }
 
     // Center overlay shown on hover — "Masuk Kelas" for launched
-    // categories (Selected Ages, for now), "Very Soon Launching" for everything
-    // still in progress. Flip a category's "launched" flag in
-    // home-dashboard-data.js once its real content is ready.
+    // categories, "Very Soon Launching" for everything else.
     const overlay = document.createElement("div");
     overlay.className = "dash-card__overlay";
 
@@ -604,30 +612,29 @@ const SmartKiddoDashboard = (() => {
     const rowsContainer = container.querySelector("#dashRows");
     renderTabs(tabsContainer);
 
-    data.categories.forEach((category, idx) => {
+    data.categories.forEach((category) => {
       const row = createRow(category);
       if (!category.collapsible) {
-        // Visible categories: Selected Ages, Bedtime Story, Bonus
+        // Normal display
         rowsContainer.appendChild(row);
       } else {
-        // Collapsible categories: Shop
-        if (idx === 3) {
-          // After first 3 default categories, add the "Go Shop" toggle and wrapper
+        // Collapsible display logic (Improved to auto-inject the toggle wrap dynamically)
+        let extraWrap = document.getElementById("dashRowsExtra");
+        if (!extraWrap) {
           rowsContainer.appendChild(createRowsToggle());
-          const extraWrap = document.createElement("div");
+          extraWrap = document.createElement("div");
           extraWrap.id = "dashRowsExtra";
           extraWrap.className = "dash-rows-extra";
           extraWrap.hidden = true;
           rowsContainer.appendChild(extraWrap);
         }
-        document.getElementById("dashRowsExtra").appendChild(row);
+        extraWrap.appendChild(row);
       }
     });
 
     runHero2TextLoop(container);
 
-    // AI button is a placeholder for now — future feature, not wired
-    // to anything yet beyond feedback that it was tapped.
+    // AI button interaction setup
     const aiFab = document.getElementById("aiFab");
     if (aiFab) {
       aiFab.addEventListener("mouseenter", () => SmartKiddoSound.playHover());
