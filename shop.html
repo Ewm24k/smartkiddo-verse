@@ -364,6 +364,31 @@
       color: #2ec4b6;
     }
 
+    /* DIBAWAH HARGA: Butang Beli Sekarang premium */
+    .pricing-card__btn {
+      background: #ff914d;
+      border: none;
+      color: #0a0714;
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 700;
+      font-size: 18px;
+      padding: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 6px 20px rgba(255, 145, 77, 0.3);
+    }
+
+    .pricing-card__btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(255, 145, 77, 0.5);
+      background: #ffa46b;
+    }
+
     /* E-commerce Vouchers Section */
     .voucher-strip {
       background: rgba(255, 145, 77, 0.08);
@@ -715,180 +740,107 @@
       margin: 8px 0;
     }
 
-    /* Checkout Popup Modal */
-    .checkout-modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(10, 7, 20, 0.9);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      z-index: 1000;
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-      padding: 30px 16px;
-      box-sizing: border-box;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s ease;
-      overflow-y: auto !important;
-    }
-
-    .checkout-modal.is-active {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .checkout-card {
-      background: #120e24;
-      border: 2px solid #3c2a6b;
-      border-radius: 16px;
-      width: 100%;
-      max-width: 480px;
-      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.6);
-      overflow: hidden;
-      transform: translateY(20px);
-      transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-      margin-top: auto;
-      margin-bottom: auto;
-    }
-
-    .checkout-modal.is-active .checkout-card {
-      transform: translateY(0);
-    }
-
-    .checkout-header {
-      background: linear-gradient(135deg, #1d143a 0%, #0f0a25 100%);
-      padding: 16px 20px;
-      border-bottom: 1px solid rgba(60, 42, 107, 0.4);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .checkout-header__title {
-      font-family: 'Fredoka', sans-serif;
-      font-size: 18px;
-      font-weight: 700;
-      margin: 0;
-      color: #ffffff;
-    }
-
-    .checkout-header__close {
-      background: none;
-      border: none;
-      color: rgba(255, 255, 255, 0.5);
-      font-size: 28px;
-      cursor: pointer;
-      line-height: 1;
-      padding: 0;
-    }
-
-    .checkout-body {
-      padding: 20px;
+    /* =========================================================
+       MOCKUP PAYMENT SELECTION BADGE STYLING (FPX / TnG)
+       ========================================================= */
+    .payment-methods {
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 8px;
+      margin: 6px 0 10px 0;
     }
 
-    .payment-summary {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px dashed rgba(60, 42, 107, 0.5);
-      border-radius: 8px;
-      padding: 12px 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    .payment-methods__list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
     }
 
-    .payment-summary__label {
-      font-size: 14px;
-      color: rgba(255, 255, 255, 0.7);
-    }
-
-    .payment-summary__price {
-      font-family: 'Fredoka', sans-serif;
-      font-size: 22px;
-      font-weight: 700;
-      color: #ff914d;
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .form-group__label {
-      font-size: 13px;
-      font-weight: 600;
-      color: rgba(255, 255, 255, 0.7);
-    }
-
-    .form-group__input {
+    .pay-badge {
       background: rgba(10, 7, 20, 0.6);
       border: 1.5px solid #3c2a6b;
-      border-radius: 6px;
-      color: #ffffff;
-      padding: 10px 12px;
-      font-size: 14px;
-      outline: none;
-    }
-
-    .form-group__input:focus {
-      border-color: #ff914d;
-    }
-
-    .yottibpayz-gateway {
-      border: 1.5px solid #3c2a6b;
       border-radius: 8px;
       padding: 12px;
-      background: rgba(29, 20, 58, 0.4);
       display: flex;
-      align-items: center;
-      gap: 10px;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
+      position: relative;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      box-sizing: border-box;
     }
 
-    .yottibpayz-gateway__badge {
-      background: #00df89;
-      color: #0a0714;
-      font-size: 10px;
+    /* FPX Online Banking - Active */
+    .pay-badge--active {
+      border-color: #ff914d !important;
+      background: rgba(255, 145, 77, 0.08) !important;
+      box-shadow: 0 0 10px rgba(255, 145, 77, 0.2);
+    }
+
+    /* Touch n Go eWallet - Disabled */
+    .pay-badge--disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      border-color: rgba(60, 42, 107, 0.3);
+      background: rgba(10, 7, 20, 0.3);
+    }
+
+    .pay-badge__name {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .pay-badge__status {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 9px;
       font-weight: 800;
       text-transform: uppercase;
-      padding: 3px 6px;
+      padding: 2px 6px;
       border-radius: 4px;
+      letter-spacing: 0.5px;
     }
 
-    .yottibpayz-gateway__info {
-      font-size: 11px;
-      color: rgba(255, 255, 255, 0.8);
-      flex: 1;
-    }
-
-    .checkout-btn {
-      background: #ff914d;
-      border: none;
+    .pay-badge__status--active {
+      background: #00df89;
       color: #0a0714;
-      font-family: 'Fredoka', sans-serif;
-      font-weight: 700;
-      font-size: 16px;
-      padding: 12px;
-      border-radius: 8px;
-      cursor: pointer;
+    }
+
+    .pay-badge__status--disabled {
+      background: rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    /* Selected Payment Badge Dot indicator */
+    .pay-badge__indicator {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 1.5px solid #3c2a6b;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
     }
 
-    /* =========================================================
-       RESPONSIVE & ORIENTATION MEDIA QUERIES
-       ========================================================= */
+    .pay-badge--active .pay-badge__indicator {
+      border-color: #ff914d;
+      background: #ff914d;
+    }
 
-    /* 1. Mod Potret (9:16 Viewport Aspect Ratio) */
+    .pay-badge--active .pay-badge__indicator::after {
+      content: "";
+      width: 6px;
+      height: 6px;
+      background: #0a0714;
+      border-radius: 50%;
+    }
+
+    /* Responsive Views */
     @media (orientation: portrait) {
       .product-grid {
         grid-template-columns: 1fr !important;
@@ -896,7 +848,6 @@
       }
     }
 
-    /* 2. Mod Landskap (16:9 Viewport Aspect Ratio) */
     @media (orientation: landscape) and (max-width: 1024px) {
       .shop-container {
         padding-top: 85px;
@@ -913,20 +864,17 @@
     }
 
     @media (max-width: 768px) {
-      .shop-topbar__brand {
-        display: none;
-      }
+      .shop-topbar__brand { display: none; }
     }
 
     @media (max-width: 600px) {
       .shop-container {
         padding: 85px 16px 40px 16px;
       }
-      .product-title {
-        font-size: 22px;
-      }
-      .pricing-card__price-myr {
-        font-size: 32px;
+      .product-title { font-size: 22px; }
+      .pricing-card__price-myr { font-size: 32px; }
+      .payment-methods__list {
+        grid-template-columns: 1fr; /* Stack badges vertically on small screens */
       }
     }
   </style>
@@ -953,7 +901,7 @@
   <main class="shop-container">
     <div class="product-grid">
       
-      <!-- Left Column: Carousel & Ratings/Reviews (Packed Info) -->
+      <!-- Left Column: Carousel & Ratings/Reviews -->
       <div class="media-container">
         
         <!-- Interactive Media Slider -->
@@ -964,7 +912,7 @@
           <div class="media-carousel__dots" id="carouselDots"></div>
         </div>
 
-        <!-- NEW: Seller Profile (No Empty Space) -->
+        <!-- Seller Profile Block -->
         <div class="seller-profile">
           <div class="seller-profile__details">
             <div class="seller-profile__avatar">Z</div>
@@ -976,7 +924,7 @@
           <button class="seller-profile__btn" id="followSellerBtn" data-i18n="follow">Follow</button>
         </div>
 
-        <!-- NEW: Shopee-Style Customer Ratings Section -->
+        <!-- Shopee-Style Customer Ratings Section -->
         <div class="ratings-section" id="ratingsSection">
           <h3 class="content-section__title" data-i18n="reviewsTitle">Customer Reviews</h3>
           
@@ -1077,12 +1025,13 @@
             </div>
           </div>
 
+          <!-- PEMASANGAN BUTANG CHECKOUT: Berada tepat di bawah harga sekor e-dagang -->
           <button type="button" class="pricing-card__btn" id="openCheckoutBtn" data-i18n="buyBtn">
             <span>🛒</span> Beli Sekarang
           </button>
         </div>
 
-        <!-- Store Voucher Widget (Fits the empty spaces) -->
+        <!-- Store Voucher Widget -->
         <div class="voucher-strip">
           <div>
             <span class="voucher-strip__title" data-i18n="voucherTitle">SmartKiddo Welcome Voucher</span>
@@ -1091,7 +1040,7 @@
           <button class="voucher-strip__badge" onclick="alert('Voucher Claimed!')" data-i18n="claim">Claim</button>
         </div>
 
-        <!-- NEW: Product Specifications Table -->
+        <!-- Product Specifications Table -->
         <div class="content-section">
           <h2 class="content-section__title" data-i18n="specsTitle">Specifications</h2>
           <table class="specs-table">
@@ -1201,6 +1150,28 @@
             <span class="payment-summary__price">RM 64.00</span>
           </div>
 
+          <!-- NEW: Payment Method Selector Badges (Active FPX & Disabled TnG) -->
+          <div class="payment-methods">
+            <label class="form-group__label" data-i18n="payMethodLabel">Kaedah Pembayaran:</label>
+            <div class="payment-methods__list">
+              
+              <!-- FPX Online Banking Badge (Active Option) -->
+              <div class="pay-badge pay-badge--active" onclick="selectPaymentMethod('fpx')">
+                <span class="pay-badge__name">FPX Online Banking</span>
+                <span class="pay-badge__status pay-badge__status--active" id="lblPayActive" data-i18n="payActive">FPX Saja</span>
+                <div class="pay-badge__indicator"></div>
+              </div>
+
+              <!-- Touch n Go eWallet Badge (Coming Soon Option) -->
+              <div class="pay-badge pay-badge--disabled" onclick="selectPaymentMethod('tng')">
+                <span class="pay-badge__name">Touch 'n Go eWallet</span>
+                <span class="pay-badge__status pay-badge__status--disabled" id="lblPaySoon" data-i18n="paySoon">Coming Soon</span>
+                <div class="pay-badge__indicator"></div>
+              </div>
+
+            </div>
+          </div>
+
           <div class="form-group">
             <label class="form-group__label" for="custName" id="lblCustName" data-i18n="custName">Nama Penuh</label>
             <input class="form-group__input" type="text" id="custName" placeholder="Contoh: Muhammad Ali" required />
@@ -1293,7 +1264,12 @@
         specLevel: "Tahap Cadangan",
         specPlatform: "Sokongan Peranti",
         comment1: "Sangat bagus! Anak saya suka sangat belajar matematik pakai modul Canva ni. Visual oren-ungu dia cantik sangat. Recommended seller!",
-        comment2: "Penghantaran pantas ke emel. Zuraiman buat kerja yang hebat mengumpul kuiz interaktif di sini. Mudah dibuka di telefon dan tablet."
+        comment2: "Penghantaran pantas ke emel. Zuraiman buat kerja yang hebat mengumpul kuiz interaktif di sini. Mudah dibuka di telefon dan tablet.",
+        
+        // Badges translations
+        payMethodLabel: "Kaedah Pembayaran:",
+        payActive: "FPX Sahaja",
+        paySoon: "Akan Datang"
       },
       en: {
         back: "← Back",
@@ -1349,7 +1325,12 @@
         specLevel: "Recommended Level",
         specPlatform: "Platform Support",
         comment1: "Excellent! My child loves learning math with this Canva module. Visuals are super stunning. Recommended seller!",
-        comment2: "Instant delivery to my email. Zuraiman did a great job compiling interactive quizzes here. Easily opened on both my phone and tablet."
+        comment2: "Instant delivery to my email. Zuraiman did a great job compiling interactive quizzes here. Easily opened on both my phone and tablet.",
+
+        // Badges translations
+        payMethodLabel: "Payment Method:",
+        payActive: "FPX Only",
+        paySoon: "Coming Soon"
       },
       zh: {
         back: "← 返回",
@@ -1361,7 +1342,7 @@
         aboutText: "此链接指向内置于 Canva 平台中的数字数学学习应用或互动式多媒体教学模组。该模组由专业教育工作者 Zuraiman 创作，旨在通过极具视觉吸引力和高度互动的数字化格式（如互动演示、数字练习册或电子化模组）辅助学生学习和温习数学概念。",
         benefitsTitle: "核心优势",
         b1Title: "互动与趣味性",
-        b1Desc: "摒弃了传统枯燥的纯文本数学教科书，利用 Canva 强大的视觉图形排版，让数学变得生动有趣，从而降低学习门槛。",
+        b1Desc: "退避了传统枯燥的纯文本数学教科书，利用 Canva 强大的视觉图形排版，让数学变得生动有趣，从而降低学习门槛。",
         b2Title: "直观视觉学习",
         b2Desc: "通过结构化的图标、图表以及创意设计排版，帮助学生轻松将抽象的数学公式、等式或几何图形具象化。",
         b3Title: "便捷使用",
@@ -1405,7 +1386,12 @@
         specLevel: "推荐适用阶段",
         specPlatform: "设备兼容性",
         comment1: "非常棒！我的孩子很喜欢用这个 Canva 模组学数学。紫色和橙色的视觉效果很美，极力推荐商家！",
-        comment2: "系统直接发到我的邮箱。Zuraiman 在这里整理的互动测验非常棒，在手机和平板上打开都很顺畅。"
+        comment2: "系统直接发到我的邮箱。Zuraiman 在这里整理的互动测验非常棒，在手机和平板上打开都很顺畅。",
+
+        // Badges translations
+        payMethodLabel: "支付方式:",
+        payActive: "仅限 FPX",
+        paySoon: "敬请期待"
       }
     };
 
@@ -1593,6 +1579,15 @@
         checkoutModal.classList.remove("is-active");
       }
     });
+
+    // Selection helper for payment method badges
+    function selectPaymentMethod(method) {
+      if (typeof SmartKiddoSound !== 'undefined') SmartKiddoSound.playClick();
+      if (method === 'tng') {
+        const soonMsg = currentLang === 'ms' ? 'Touch \'n Go eWallet akan datang tidak lama lagi! Sila gunakan FPX buat masa ini.' : (currentLang === 'zh' ? 'Touch \'n Go 电子钱包即将上线！请暂时使用 FPX 支付。' : 'Touch \'n Go eWallet is coming soon! Please use FPX for now.');
+        alert(soonMsg);
+      }
+    }
 
     // Simulasi Pembayaran Yottibpayz (Mock Gateway)
     function handleMockPayment(event) {
