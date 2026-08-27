@@ -17,8 +17,6 @@
     /* =========================================================
        DYNAMIC PORTRAIT (9:16) & LANDSCAPE (16:9) OVERRIDES
        ========================================================= */
-    
-    /* Paksa fungsi tatalan diaktifkan pada semua platform (iOS/Android) */
     html, body {
       overflow-y: auto !important;
       overflow-x: hidden !important;
@@ -29,7 +27,7 @@
       font-family: 'Nunito', sans-serif;
       margin: 0;
       padding: 0;
-      -webkit-overflow-scrolling: touch !important; /* Tatalan lancar iOS webview */
+      -webkit-overflow-scrolling: touch !important;
     }
 
     .shop-container {
@@ -91,7 +89,7 @@
       color: #ff914d;
     }
 
-    /* PREMIUM MEDIUM LANGUAGE DROPDOWN */
+    /* Premium Language Dropdown */
     .lang-dropdown {
       position: relative;
       display: inline-block;
@@ -125,8 +123,8 @@
     }
 
     .lang-dropdown::after {
-      content: "▾";
-      font-size: 12px;
+      content: "▼";
+      font-size: 10px;
       color: #ff914d;
       position: absolute;
       right: 12px;
@@ -135,12 +133,19 @@
       pointer-events: none;
     }
 
-    /* Grid Asal (Default/Desktop) */
+    /* Shopee / Lazada Dual Column Layout */
     .product-grid {
       display: grid;
-      grid-template-columns: 1.2fr 1fr;
-      gap: 40px;
+      grid-template-columns: 1fr 1fr;
+      gap: 36px;
       align-items: start;
+    }
+
+    /* Media Container */
+    .media-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
     }
 
     /* Media Carousel Container */
@@ -150,7 +155,7 @@
       border-radius: 16px;
       overflow: hidden;
       position: relative;
-      aspect-ratio: 16 / 9; /* Nisbah aspek landskap standard */
+      aspect-ratio: 16 / 9;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     }
 
@@ -171,7 +176,6 @@
       justify-content: center;
     }
 
-    /* object-fit contain memastikan kedua-dua media 16:9 dan 9:16 dipaparkan sepenuhnya tanpa terpotong */
     .media-carousel__media {
       width: 100% !important;
       height: 100% !important;
@@ -232,34 +236,65 @@
       transform: scale(1.2);
     }
 
-    /* Product Info / Details */
+    /* Product Info Area */
     .product-details {
       display: flex;
       flex-direction: column;
-      gap: 24px;
+      gap: 20px;
     }
 
     .product-title {
       font-family: 'Fredoka', sans-serif;
-      font-size: 32px;
+      font-size: 30px;
       font-weight: 700;
       margin: 0;
       color: #ffffff;
-      line-height: 1.2;
+      line-height: 1.25;
     }
 
-    /* MEMBAIKI KEDUDUKAN: Menukar margin-top negatif ke margin-top positif supaya teks lebih rendah */
-    .product-creator {
-      font-size: 15px;
+    /* Shopee-style ratings & stats strip */
+    .product-stats {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 14px;
       color: rgba(255, 255, 255, 0.6);
-      margin-top: 12px; /* Diturunkan sedikit dari tajuk */
-      margin-bottom: 0;
+      flex-wrap: wrap;
+    }
+
+    .product-stats__rating {
+      color: #ff914d;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .product-stats__stars {
+      color: #f1c40f;
+    }
+
+    .product-stats__divider {
+      color: rgba(255, 255, 255, 0.2);
+    }
+
+    .product-stats__link {
+      text-decoration: underline;
+      cursor: pointer;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .product-creator {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.6);
+      margin: 4px 0 0 0;
     }
 
     .product-creator strong {
       color: #ff914d;
     }
 
+    /* Price Section (Lazada/Shopee Style) */
     .pricing-card {
       background: linear-gradient(135deg, #1d143a 0%, #0f0a25 100%);
       border: 2px solid #3c2a6b;
@@ -271,54 +306,88 @@
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
     }
 
-    .pricing-card__price-row {
+    .price-container {
       display: flex;
-      flex-direction: column;
+      align-items: baseline;
+      gap: 12px;
+      flex-wrap: wrap;
     }
 
-    .pricing-card__label {
-      font-size: 13px;
-      color: rgba(255, 255, 255, 0.5);
+    .price-discount-tag {
+      background-color: #ff3838;
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 4px;
       text-transform: uppercase;
-      letter-spacing: 1px;
+    }
+
+    .price-original {
+      text-decoration: line-through;
+      color: rgba(255, 255, 255, 0.4);
+      font-size: 16px;
     }
 
     .pricing-card__price-myr {
       font-family: 'Fredoka', sans-serif;
-      font-size: 40px;
+      font-size: 42px;
       font-weight: 700;
       color: #ff914d;
       line-height: 1;
-      margin: 4px 0;
     }
 
     .pricing-card__price-usd {
-      font-size: 15px;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.6);
+      margin-top: -6px;
+    }
+
+    /* Product trust details */
+    .product-trust-tags {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      border-top: 1.5px dashed rgba(60, 42, 107, 0.5);
+      padding-top: 14px;
+      font-size: 12px;
       color: rgba(255, 255, 255, 0.7);
     }
 
-    .pricing-card__btn {
-      background: #ff914d;
-      border: none;
-      color: #0a0714;
-      font-family: 'Fredoka', sans-serif;
-      font-weight: 700;
-      font-size: 18px;
-      padding: 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.25s ease;
+    .trust-tag {
       display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 10px;
-      box-shadow: 0 6px 20px rgba(255, 145, 77, 0.3);
+      gap: 8px;
     }
 
-    .pricing-card__btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(255, 145, 77, 0.5);
-      background: #ffa46b;
+    .trust-tag__icon {
+      color: #2ec4b6;
+    }
+
+    /* E-commerce Vouchers Section */
+    .voucher-strip {
+      background: rgba(255, 145, 77, 0.08);
+      border: 1px dashed #ff914d;
+      border-radius: 8px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+    }
+
+    .voucher-strip__title {
+      font-weight: 700;
+      color: #ff914d;
+    }
+
+    .voucher-strip__badge {
+      background: #ff914d;
+      color: #0a0714;
+      font-weight: 800;
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 4px;
     }
 
     /* Content Sections */
@@ -331,10 +400,10 @@
 
     .content-section__title {
       font-family: 'Fredoka', sans-serif;
-      font-size: 20px;
+      font-size: 18px;
       font-weight: 600;
       margin-top: 0;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       color: #ff914d;
       border-left: 4px solid #3c2a6b;
       padding-left: 12px;
@@ -343,14 +412,36 @@
     .content-section__p {
       margin: 0 0 16px 0;
       line-height: 1.6;
-      font-size: 15px;
+      font-size: 14.5px;
       color: rgba(255, 255, 255, 0.85);
+    }
+
+    /* Specifications Table */
+    .specs-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+    }
+
+    .specs-table td {
+      padding: 8px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .specs-table td:first-child {
+      color: rgba(255, 255, 255, 0.5);
+      width: 35%;
+      font-weight: 600;
+    }
+
+    .specs-table td:last-child {
+      color: #ffffff;
     }
 
     .benefits-list {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 14px;
     }
 
     .benefit-item {
@@ -362,27 +453,25 @@
     .benefit-item__icon {
       background: rgba(255, 145, 77, 0.15);
       color: #ff914d;
-      min-width: 28px;
-      height: 28px;
+      min-width: 24px;
+      height: 24px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 700;
-      font-size: 14px;
+      font-size: 12px;
     }
-
-    .benefit-item__text { flex: 1; }
 
     .benefit-item__title {
       font-weight: 700;
-      margin-bottom: 4px;
-      font-size: 15px;
+      margin-bottom: 2px;
+      font-size: 14px;
       color: #ffffff;
     }
 
     .benefit-item__desc {
-      font-size: 13.5px;
+      font-size: 13px;
       color: rgba(255, 255, 255, 0.7);
       line-height: 1.4;
     }
@@ -390,13 +479,13 @@
     .outline-list {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
     }
 
     .outline-item {
       background: rgba(60, 42, 107, 0.15);
       border: 1px solid rgba(60, 42, 107, 0.3);
-      padding: 12px 16px;
+      padding: 10px 14px;
       border-radius: 8px;
       display: flex;
       align-items: center;
@@ -410,8 +499,220 @@
     }
 
     .outline-item__text {
-      font-size: 14px;
+      font-size: 13.5px;
       font-weight: 600;
+    }
+
+    /* Seller Info Profile Block */
+    .seller-profile {
+      background: #120e24;
+      border: 1px solid #3c2a6b;
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .seller-profile__details {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .seller-profile__avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ff914d 0%, #3c2a6b 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 700;
+      color: #0a0714;
+      font-size: 20px;
+    }
+
+    .seller-profile__name {
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 600;
+      font-size: 15px;
+      margin: 0 0 2px 0;
+    }
+
+    .seller-profile__badge {
+      background: rgba(255, 145, 77, 0.15);
+      color: #ff914d;
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+
+    .seller-profile__btn {
+      background: none;
+      border: 1.5px solid #ff914d;
+      color: #ff914d;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 12.5px;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.25s ease;
+    }
+
+    .seller-profile__btn:hover {
+      background: #ff914d;
+      color: #0a0714;
+    }
+
+    /* Shopee-style reviews / ratings card */
+    .ratings-section {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(60, 42, 107, 0.3);
+      border-radius: 12px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .ratings-summary {
+      background: rgba(29, 20, 58, 0.4);
+      border: 1.5px solid #3c2a6b;
+      border-radius: 10px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 30px;
+      flex-wrap: wrap;
+    }
+
+    .ratings-summary__score-box {
+      text-align: center;
+    }
+
+    .ratings-summary__score {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 36px;
+      font-weight: 700;
+      color: #ff914d;
+      line-height: 1;
+    }
+
+    .ratings-summary__stars {
+      color: #f1c40f;
+      font-size: 18px;
+      margin: 4px 0;
+    }
+
+    .ratings-summary__count {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .ratings-filter-tags {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      flex: 1;
+    }
+
+    .ratings-filter-tag {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1.5px solid rgba(60, 42, 107, 0.5);
+      color: #ffffff;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .ratings-filter-tag.is-active {
+      border-color: #ff914d;
+      color: #ff914d;
+      background: rgba(255, 145, 77, 0.1);
+    }
+
+    /* Review Comments list */
+    .reviews-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .review-card {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding-bottom: 16px;
+    }
+
+    .review-card:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .review-card__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .review-card__user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .review-card__avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #3c2a6b;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .review-card__username {
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .review-card__badge-verified {
+      background: rgba(46, 196, 182, 0.15);
+      color: #2ec4b6;
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-weight: 700;
+      margin-left: 6px;
+    }
+
+    .review-card__stars {
+      color: #f1c40f;
+      font-size: 12px;
+    }
+
+    .review-card__date {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    .review-card__comment {
+      font-size: 13.5px;
+      line-height: 1.5;
+      color: rgba(255, 255, 255, 0.9);
+      margin: 8px 0;
     }
 
     /* Checkout Popup Modal */
@@ -426,14 +727,14 @@
       -webkit-backdrop-filter: blur(8px);
       z-index: 1000;
       display: flex;
-      align-items: flex-start; /* Sejajarkan ke atas supaya selamat ditatal pada orientasi landskap */
+      align-items: flex-start;
       justify-content: center;
       padding: 30px 16px;
       box-sizing: border-box;
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.3s ease;
-      overflow-y: auto !important; /* Membolehkan overlay keseluruhan ditatal */
+      overflow-y: auto !important;
     }
 
     .checkout-modal.is-active {
@@ -452,7 +753,7 @@
       transform: translateY(20px);
       transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
       margin-top: auto;
-      margin-bottom: auto; /* Memusatkan kedudukan jika skrin tinggi */
+      margin-bottom: auto;
     }
 
     .checkout-modal.is-active .checkout-card {
@@ -584,17 +885,14 @@
     }
 
     /* =========================================================
-       RESPONSIVE & ORIENTATION MEDIA QUERIES (iOS & Android)
+       RESPONSIVE & ORIENTATION MEDIA QUERIES
        ========================================================= */
 
     /* 1. Mod Potret (9:16 Viewport Aspect Ratio) */
     @media (orientation: portrait) {
       .product-grid {
-        grid-template-columns: 1fr !important; /* Susunan menegak satu kolum */
+        grid-template-columns: 1fr !important;
         gap: 24px;
-      }
-      .media-carousel {
-        aspect-ratio: 16 / 9; /* Kekalkan bentuk landskap karousel di atas */
       }
     }
 
@@ -605,24 +903,18 @@
         padding-bottom: 30px;
       }
       .product-grid {
-        grid-template-columns: 1.1fr 0.9fr !important; /* Susunan sebelah-menyebelah */
-        gap: 20px;
+        grid-template-columns: 1.1fr 0.9fr !important;
+        gap: 24px;
       }
       .media-carousel {
-        aspect-ratio: 16 / 9;
         position: sticky;
         top: 85px;
       }
-      .checkout-card {
-        margin-top: 10px;
-        margin-bottom: 10px;
-      }
     }
 
-    /* Larasan Skrin Telefon Kecil */
     @media (max-width: 768px) {
       .shop-topbar__brand {
-        display: none; /* Sembunyikan jenama tengah pada skrin kecil untuk mengelakkan pelanggaran */
+        display: none;
       }
     }
 
@@ -631,7 +923,7 @@
         padding: 85px 16px 40px 16px;
       }
       .product-title {
-        font-size: 24px;
+        font-size: 22px;
       }
       .pricing-card__price-myr {
         font-size: 32px;
@@ -648,7 +940,6 @@
     </a>
     <span class="shop-topbar__brand">SmartKiddo <span class="shop-topbar__accent">Universe</span></span>
     
-    <!-- Medium-sized premium dropdown selector -->
     <div class="lang-dropdown">
       <select id="langSelect" class="lang-dropdown__select" aria-label="Tukar Bahasa">
         <option value="ms" selected>🇲🇾 Melayu</option>
@@ -662,36 +953,165 @@
   <main class="shop-container">
     <div class="product-grid">
       
-      <!-- Left / Top Column: Media Player -->
+      <!-- Left Column: Carousel & Ratings/Reviews (Packed Info) -->
       <div class="media-container">
+        
+        <!-- Interactive Media Slider -->
         <div class="media-carousel" id="productCarousel">
-          <div class="media-carousel__track" id="carouselTrack">
-            <!-- Populated dynamically via JavaScript below -->
-          </div>
+          <div class="media-carousel__track" id="carouselTrack"></div>
           <button class="media-carousel__arrow media-carousel__arrow--left" id="prevSlide" aria-label="Sebelumnya">&lsaquo;</button>
           <button class="media-carousel__arrow media-carousel__arrow--right" id="nextSlide" aria-label="Seterusnya">&rsaquo;</button>
           <div class="media-carousel__dots" id="carouselDots"></div>
         </div>
+
+        <!-- NEW: Seller Profile (No Empty Space) -->
+        <div class="seller-profile">
+          <div class="seller-profile__details">
+            <div class="seller-profile__avatar">Z</div>
+            <div>
+              <h4 class="seller-profile__name">Zuraiman</h4>
+              <span class="seller-profile__badge" data-i18n="sellerBadge">Verified Educator</span>
+            </div>
+          </div>
+          <button class="seller-profile__btn" id="followSellerBtn" data-i18n="follow">Follow</button>
+        </div>
+
+        <!-- NEW: Shopee-Style Customer Ratings Section -->
+        <div class="ratings-section" id="ratingsSection">
+          <h3 class="content-section__title" data-i18n="reviewsTitle">Customer Reviews</h3>
+          
+          <div class="ratings-summary">
+            <div class="ratings-summary__score-box">
+              <span class="ratings-summary__score">4.9</span>
+              <div class="ratings-summary__stars">★★★★★</div>
+              <span class="ratings-summary__count" data-i18n="reviewCount">128 Ratings</span>
+            </div>
+            
+            <div class="ratings-filter-tags">
+              <button class="ratings-filter-tag is-active" data-i18n="filterAll">All (128)</button>
+              <button class="ratings-filter-tag">5 Star (122)</button>
+              <button class="ratings-filter-tag">4 Star (5)</button>
+              <button class="ratings-filter-tag" data-i18n="filterMedia">With Media (45)</button>
+            </div>
+          </div>
+
+          <!-- Customer Comments List -->
+          <div class="reviews-list">
+            
+            <div class="review-card">
+              <div class="review-card__header">
+                <div class="review-card__user">
+                  <div class="review-card__avatar">A</div>
+                  <div>
+                    <span class="review-card__username">a*****n</span>
+                    <span class="review-card__badge-verified" data-i18n="verifiedBadge">Verified Purchase</span>
+                  </div>
+                </div>
+                <span class="review-card__date">2026-08-12</span>
+              </div>
+              <div class="review-card__stars">★★★★★</div>
+              <p class="review-card__comment" data-i18n="comment1">Sangat bagus! Anak saya suka sangat belajar matematik pakai modul Canva ni. Visual oren-ungu dia cantik sangat. Recommended seller!</p>
+            </div>
+
+            <div class="review-card">
+              <div class="review-card__header">
+                <div class="review-card__user">
+                  <div class="review-card__avatar">J</div>
+                  <div>
+                    <span class="review-card__username">j*****y</span>
+                    <span class="review-card__badge-verified" data-i18n="verifiedBadge">Verified Purchase</span>
+                  </div>
+                </div>
+                <span class="review-card__date">2026-08-05</span>
+              </div>
+              <div class="review-card__stars">★★★★★</div>
+              <p class="review-card__comment" data-i18n="comment2">Instant delivery to my email. Zuraiman did a great job compiling interactive quizzes here. Easily opened on both my phone and tablet.</p>
+            </div>
+
+          </div>
+        </div>
+
       </div>
 
-      <!-- Right / Bottom Column: Document Details, Price & Checkout -->
+      <!-- Right Column: Product Specs, Vouchers & Description -->
       <div class="product-details">
         
         <div>
+          <!-- Title & Sub-Details (E-commerce format) -->
           <h1 class="product-title" data-i18n="title">Interactive Canva Math Module</h1>
           <p class="product-creator" id="productCreator" data-i18n="creator">Ditulis & Direka oleh <strong>Zuraiman</strong></p>
+          
+          <div class="product-stats" style="margin-top: 12px;">
+            <span class="product-stats__rating">
+              <span>4.9</span>
+              <span class="product-stats__stars">★★★★★</span>
+            </span>
+            <span class="product-stats__divider">|</span>
+            <span class="product-stats__link" onclick="scrollToReviews()" data-i18n="statReviews">128 Reviews</span>
+            <span class="product-stats__divider">|</span>
+            <span><strong style="color: #ffffff;">542</strong> <span data-i18n="statSold">Sold</span></span>
+          </div>
         </div>
 
-        <!-- Pricing Widget -->
+        <!-- Checkout / Pricing Card (Shopee Format) -->
         <div class="pricing-card">
           <div class="pricing-card__price-row">
             <span class="pricing-card__label" data-i18n="priceLabel">Harga</span>
-            <span class="pricing-card__price-myr">RM 64.00</span>
+            <div class="price-container">
+              <span class="price-original">RM 89.00</span>
+              <span class="pricing-card__price-myr">RM 64.00</span>
+              <span class="price-discount-tag">28% OFF</span>
+            </div>
             <span class="pricing-card__price-usd">Sekitar ~$14.50 USD</span>
           </div>
+
+          <!-- Product Trust Specifications -->
+          <div class="product-trust-tags">
+            <div class="trust-tag">
+              <span class="trust-tag__icon">✔</span>
+              <span data-i18n="trustInstant">Instant Digital Access</span>
+            </div>
+            <div class="trust-tag">
+              <span class="trust-tag__icon">✔</span>
+              <span data-i18n="trustSecured">100% Secured Payment</span>
+            </div>
+          </div>
+
           <button type="button" class="pricing-card__btn" id="openCheckoutBtn" data-i18n="buyBtn">
             <span>🛒</span> Beli Sekarang
           </button>
+        </div>
+
+        <!-- Store Voucher Widget (Fits the empty spaces) -->
+        <div class="voucher-strip">
+          <div>
+            <span class="voucher-strip__title" data-i18n="voucherTitle">SmartKiddo Welcome Voucher</span>
+            <div style="font-size: 11px; color: rgba(255, 255, 255, 0.6); margin-top: 2px;" data-i18n="voucherDesc">Spend min RM50 to enjoy RM5 discount</div>
+          </div>
+          <button class="voucher-strip__badge" onclick="alert('Voucher Claimed!')" data-i18n="claim">Claim</button>
+        </div>
+
+        <!-- NEW: Product Specifications Table -->
+        <div class="content-section">
+          <h2 class="content-section__title" data-i18n="specsTitle">Specifications</h2>
+          <table class="specs-table">
+            <tr>
+              <td data-i18n="specFormat">File Format</td>
+              <td>Canva Interactive Template Link</td>
+            </tr>
+            <tr>
+              <td data-i18n="specLanguage">Language</td>
+              <td>Malay / English</td>
+            </tr>
+            <tr>
+              <td data-i18n="specLevel">Recommended Level</td>
+              <td>Primary Math (Ages 6 - 12)</td>
+            </tr>
+            <tr>
+              <td data-i18n="specPlatform">Platform Support</td>
+              <td>Web, iOS, Android, Tablet</td>
+            </tr>
+          </table>
         </div>
 
         <!-- Details Section 1: What it is About -->
@@ -850,7 +1270,30 @@
         gatewayInfo: "Transaksi diproses dengan selamat melalui sistem gerbang Yottibpayz. (Mod Ujian Aktif)",
         submitBtn: "Sahkan & Bayar",
         successMsg: "Terima kasih! Pembayaran anda melalui Yottibpayz berjaya disimulasikan.",
-        processing: "Memproses bayaran..."
+        processing: "Memproses bayaran...",
+        
+        // New translations
+        statReviews: "128 Ulasan",
+        statSold: "Terjual",
+        trustInstant: "Akses Digital Segera",
+        trustSecured: "Pembayaran 100% Selamat",
+        voucherTitle: "Baucar Selamat Datang SmartKiddo",
+        voucherDesc: "Belanja min RM50 untuk nikmati diskaun RM5",
+        claim: "Tuntut",
+        follow: "Ikuti",
+        sellerBadge: "Pendidik Disahkan",
+        reviewsTitle: "Penilaian Pelanggan",
+        reviewCount: "128 Penilaian",
+        filterAll: "Semua (128)",
+        filterMedia: "Dengan Media (45)",
+        verifiedBadge: "Pembelian Disahkan",
+        specsTitle: "Spesifikasi",
+        specFormat: "Format Fail",
+        specLanguage: "Bahasa",
+        specLevel: "Tahap Cadangan",
+        specPlatform: "Sokongan Peranti",
+        comment1: "Sangat bagus! Anak saya suka sangat belajar matematik pakai modul Canva ni. Visual oren-ungu dia cantik sangat. Recommended seller!",
+        comment2: "Penghantaran pantas ke emel. Zuraiman buat kerja yang hebat mengumpul kuiz interaktif di sini. Mudah dibuka di telefon dan tablet."
       },
       en: {
         back: "← Back",
@@ -883,7 +1326,30 @@
         gatewayInfo: "Transactions are processed securely via Yottibpayz gateway system. (Sandbox Mode active)",
         submitBtn: "Confirm & Pay",
         successMsg: "Thank you! Your payment through Yottibpayz was successfully simulated.",
-        processing: "Processing payment..."
+        processing: "Processing payment...",
+
+        // New translations
+        statReviews: "128 Reviews",
+        statSold: "Sold",
+        trustInstant: "Instant Digital Access",
+        trustSecured: "100% Secured Payment",
+        voucherTitle: "SmartKiddo Welcome Voucher",
+        voucherDesc: "Spend min RM50 to enjoy RM5 discount",
+        claim: "Claim",
+        follow: "Follow",
+        sellerBadge: "Verified Educator",
+        reviewsTitle: "Customer Reviews",
+        reviewCount: "128 Ratings",
+        filterAll: "All (128)",
+        filterMedia: "With Media (45)",
+        verifiedBadge: "Verified Purchase",
+        specsTitle: "Specifications",
+        specFormat: "File Format",
+        specLanguage: "Language",
+        specLevel: "Recommended Level",
+        specPlatform: "Platform Support",
+        comment1: "Excellent! My child loves learning math with this Canva module. Visuals are super stunning. Recommended seller!",
+        comment2: "Instant delivery to my email. Zuraiman did a great job compiling interactive quizzes here. Easily opened on both my phone and tablet."
       },
       zh: {
         back: "← 返回",
@@ -916,7 +1382,30 @@
         gatewayInfo: "交易已通过 Yottibpayz 支付网关安全处理。（已启用沙盒测试模式）",
         submitBtn: "确认付款",
         successMsg: "谢谢！您的 Yottibpayz 网关模拟交易付款成功完成。",
-        processing: "付款处理中..."
+        processing: "付款处理中...",
+
+        // New translations
+        statReviews: "128 条评论",
+        statSold: "已售出",
+        trustInstant: "立即数字获取",
+        trustSecured: "100% 安全支付保障",
+        voucherTitle: "SmartKiddo 迎新特惠券",
+        voucherDesc: "最低消费满 RM50 即可享受 RM5 立减",
+        claim: "领取",
+        follow: "关注",
+        sellerBadge: "已认证教育家",
+        reviewsTitle: "买家评价",
+        reviewCount: "128 条评分",
+        filterAll: "全部 (128)",
+        filterMedia: "含媒体 (45)",
+        verifiedBadge: "已验证购买",
+        specsTitle: "产品规格",
+        specFormat: "文件格式",
+        specLanguage: "语言限制",
+        specLevel: "推荐适用阶段",
+        specPlatform: "设备兼容性",
+        comment1: "非常棒！我的孩子很喜欢用这个 Canva 模组学数学。紫色和橙色的视觉效果很美，极力推荐商家！",
+        comment2: "系统直接发到我的邮箱。Zuraiman 在这里整理的互动测验非常棒，在手机和平板上打开都很顺畅。"
       }
     };
 
@@ -938,7 +1427,7 @@
         }
       });
       
-      // Update custom input placeholders dynamically based on language
+      // Update inputs placeholders
       const nameInput = document.getElementById("custName");
       const emailInput = document.getElementById("custEmail");
       const phoneInput = document.getElementById("custPhone");
@@ -963,6 +1452,14 @@
       applyTranslations(e.target.value);
     });
 
+    // Helper to scroll to reviews
+    function scrollToReviews() {
+      const section = document.getElementById("ratingsSection");
+      if (section) {
+        section.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+
     // =========================================================
     // MULTI-MEDIA CAROUSEL LOGIC
     // =========================================================
@@ -975,7 +1472,7 @@
     const track = document.getElementById("carouselTrack");
     const dotsContainer = document.getElementById("carouselDots");
     
-    // Bina Slaid Secara Dinamik
+    // Bina Slaid
     carouselMediaList.forEach((media, idx) => {
       const slide = document.createElement("div");
       slide.className = "media-carousel__slide";
@@ -1037,7 +1534,7 @@
       });
       
       const videos = track.querySelectorAll("video");
-      videos.forEach(v => v.pause()); // Jeda semua video dahulu
+      videos.forEach(v => v.pause());
       
       const activeSlide = track.children[index];
       const activeVideo = activeSlide.querySelector("video");
@@ -1054,6 +1551,24 @@
     document.getElementById("nextSlide").addEventListener("click", () => {
       if (typeof SmartKiddoSound !== 'undefined') SmartKiddoSound.playClick();
       goToSlide(currentSlideIndex + 1);
+    });
+
+    // Follow Seller Interactivity
+    const followSellerBtn = document.getElementById("followSellerBtn");
+    let isFollowing = false;
+    followSellerBtn.addEventListener("click", () => {
+      if (typeof SmartKiddoSound !== 'undefined') SmartKiddoSound.playClick();
+      isFollowing = !isFollowing;
+      
+      if (isFollowing) {
+        followSellerBtn.textContent = currentLang === "ms" ? "Mengikuti" : (currentLang === "zh" ? "已关注" : "Following");
+        followSellerBtn.style.background = "#ff914d";
+        followSellerBtn.style.color = "#0a0714";
+      } else {
+        followSellerBtn.textContent = currentLang === "ms" ? "Ikuti" : (currentLang === "zh" ? "关注" : "Follow");
+        followSellerBtn.style.background = "none";
+        followSellerBtn.style.color = "#ff914d";
+      }
     });
 
     // =========================================================
