@@ -133,7 +133,7 @@
       pointer-events: none;
     }
 
-    /* Shopee / Lazada Dual Column Layout */
+    /* Dual Column Layout */
     .product-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -141,7 +141,6 @@
       align-items: start;
     }
 
-    /* Media Container */
     .media-container {
       display: flex;
       flex-direction: column;
@@ -252,7 +251,6 @@
       line-height: 1.25;
     }
 
-    /* Shopee-style ratings & stats strip */
     .product-stats {
       display: flex;
       align-items: center;
@@ -343,7 +341,6 @@
       margin-top: -6px;
     }
 
-    /* Product trust details */
     .product-trust-tags {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -364,9 +361,8 @@
       color: #2ec4b6;
     }
 
-    /* Butang Beli Sekarang premium di bawah harga */
     .pricing-card__btn {
-      background: #ff914d;
+      background: linear-gradient(135deg, #ff914d 0%, #ff6b35 100%);
       border: none;
       color: #0a0714;
       font-family: 'Fredoka', sans-serif;
@@ -380,16 +376,15 @@
       align-items: center;
       justify-content: center;
       gap: 10px;
-      box-shadow: 0 6px 20px rgba(255, 145, 77, 0.3);
+      box-shadow: 0 6px 20px rgba(255, 145, 77, 0.35);
     }
 
     .pricing-card__btn:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(255, 145, 77, 0.5);
-      background: #ffa46b;
+      box-shadow: 0 8px 25px rgba(255, 145, 77, 0.55);
+      background: linear-gradient(135deg, #ffa46b 0%, #ff834f 100%);
     }
 
-    /* E-commerce Vouchers Section */
     .voucher-strip {
       background: rgba(255, 145, 77, 0.08);
       border: 1px dashed #ff914d;
@@ -413,9 +408,10 @@
       font-size: 11px;
       padding: 4px 8px;
       border-radius: 4px;
+      border: none;
+      cursor: pointer;
     }
 
-    /* Content Sections */
     .content-section {
       background: rgba(255, 255, 255, 0.02);
       border: 1px solid rgba(60, 42, 107, 0.3);
@@ -441,7 +437,6 @@
       color: rgba(255, 255, 255, 0.85);
     }
 
-    /* Specifications Table */
     .specs-table {
       width: 100%;
       border-collapse: collapse;
@@ -528,7 +523,6 @@
       font-weight: 600;
     }
 
-    /* Seller Info Profile Block */
     .seller-profile {
       background: #120e24;
       border: 1px solid #3c2a6b;
@@ -595,7 +589,6 @@
       color: #0a0714;
     }
 
-    /* Shopee-style reviews / ratings card */
     .ratings-section {
       background: rgba(255, 255, 255, 0.02);
       border: 1px solid rgba(60, 42, 107, 0.3);
@@ -664,7 +657,6 @@
       background: rgba(255, 145, 77, 0.1);
     }
 
-    /* Review Comments list */
     .reviews-list {
       display: flex;
       flex-direction: column;
@@ -740,103 +732,8 @@
       margin: 8px 0;
     }
 
-    /* Mockup Payment Selection Badge Styling */
-    .payment-methods {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin: 6px 0 10px 0;
-    }
-
-    .payment-methods__list {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .pay-badge {
-      background: rgba(10, 7, 20, 0.6);
-      border: 1.5px solid #3c2a6b;
-      border-radius: 8px;
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 6px;
-      position: relative;
-      cursor: pointer;
-      transition: all 0.25s ease;
-      box-sizing: border-box;
-    }
-
-    .pay-badge--active {
-      border-color: #ff914d !important;
-      background: rgba(255, 145, 77, 0.08) !important;
-      box-shadow: 0 0 10px rgba(255, 145, 77, 0.2);
-    }
-
-    .pay-badge--disabled {
-      opacity: 0.55;
-      cursor: not-allowed;
-      border-color: rgba(60, 42, 107, 0.3);
-      background: rgba(10, 7, 20, 0.3);
-    }
-
-    .pay-badge__name {
-      font-family: 'Fredoka', sans-serif;
-      font-size: 12.5px;
-      font-weight: 700;
-      color: #ffffff;
-    }
-
-    .pay-badge__status {
-      font-family: 'Fredoka', sans-serif;
-      font-size: 9px;
-      font-weight: 800;
-      text-transform: uppercase;
-      padding: 2px 6px;
-      border-radius: 4px;
-      letter-spacing: 0.5px;
-    }
-
-    .pay-badge__status--active {
-      background: #00df89;
-      color: #0a0714;
-    }
-
-    .pay-badge__status--disabled {
-      background: rgba(255, 255, 255, 0.1);
-      color: rgba(255, 255, 255, 0.6);
-    }
-
-    .pay-badge__indicator {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      border: 1.5px solid #3c2a6b;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .pay-badge--active .pay-badge__indicator {
-      border-color: #ff914d;
-      background: #ff914d;
-    }
-
-    .pay-badge--active .pay-badge__indicator::after {
-      content: "";
-      width: 6px;
-      height: 6px;
-      background: #0a0714;
-      border-radius: 50%;
-    }
-
     /* =========================================================
-       CHECKOUT MODAL — SOLVING THE BOTTOM ALIGNMENT BUG
+       MODERN ADVANCED CHECKOUT DRAWER / SHEET (SHOPEE & LAZADA TIER)
        ========================================================= */
     .checkout-modal {
       position: fixed !important;
@@ -844,33 +741,496 @@
       left: 0 !important;
       right: 0 !important;
       bottom: 0 !important;
-      background: rgba(10, 7, 20, 0.9) !important;
-      backdrop-filter: blur(8px) !important;
-      -webkit-backdrop-filter: blur(8px) !important;
-      z-index: 10000 !important; /* Di atas segalanya, termasuk bar atas */
+      background: rgba(5, 3, 10, 0.82) !important;
+      backdrop-filter: blur(14px) !important;
+      -webkit-backdrop-filter: blur(14px) !important;
+      z-index: 10000 !important;
       display: flex !important;
       align-items: center !important;
       justify-content: center !important;
-      padding: 30px 16px !important;
+      padding: 20px !important;
       box-sizing: border-box !important;
-      
-      /* SEMBUNYIKAN SEPENUHNYA DARIPADA LAYOUT APABILA TIDAK AKTIF */
       opacity: 0 !important;
       visibility: hidden !important;
       pointer-events: none !important;
-      
-      transition: opacity 0.3s ease, visibility 0.3s ease !important;
-      overflow-y: auto !important;
+      transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s ease !important;
     }
 
-    /* Aktifkan hanya apabila dipanggil */
     .checkout-modal.is-active {
       opacity: 1 !important;
       visibility: visible !important;
       pointer-events: auto !important;
     }
 
-    /* Responsive Views */
+    /* Modern Checkout Sheet Surface */
+    .checkout-sheet {
+      background: linear-gradient(180deg, #16102b 0%, #0c081a 100%);
+      border: 1.5px solid #4a347d;
+      border-radius: 20px;
+      width: 100%;
+      max-width: 520px;
+      max-height: 90vh;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.75), 0 0 30px rgba(255, 145, 77, 0.1);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transform: translateY(25px) scale(0.97);
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .checkout-modal.is-active .checkout-sheet {
+      transform: translateY(0) scale(1);
+    }
+
+    /* Mobile Sheet Drag Handle Pill */
+    .checkout-sheet__handle {
+      display: none;
+      width: 44px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+      margin: 10px auto 2px auto;
+    }
+
+    /* Header Bar */
+    .checkout-sheet__header {
+      padding: 18px 24px;
+      border-bottom: 1px solid rgba(74, 52, 125, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(22, 16, 43, 0.6);
+    }
+
+    .checkout-sheet__badge {
+      font-size: 10px;
+      font-weight: 800;
+      color: #00df89;
+      background: rgba(0, 223, 137, 0.12);
+      border: 1px solid rgba(0, 223, 137, 0.3);
+      padding: 2px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      display: inline-block;
+      margin-bottom: 4px;
+    }
+
+    .checkout-sheet__title {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      margin: 0;
+      color: #ffffff;
+      letter-spacing: 0.2px;
+    }
+
+    .checkout-sheet__close {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.7);
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      line-height: 1;
+    }
+
+    .checkout-sheet__close:hover {
+      background: #ff914d;
+      color: #0a0714;
+      border-color: #ff914d;
+    }
+
+    /* Scrollable Container */
+    .checkout-sheet__form {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .checkout-sheet__scrollable {
+      padding: 20px 24px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      max-height: calc(90vh - 165px);
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* 1. Shopee / Lazada Product Mini Recap */
+    .checkout-product-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(74, 52, 125, 0.4);
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .checkout-product-card__thumb {
+      width: 64px;
+      height: 64px;
+      border-radius: 8px;
+      object-fit: cover;
+      background: #05030a;
+      border: 1px solid #3c2a6b;
+      flex-shrink: 0;
+    }
+
+    .checkout-product-card__info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .checkout-product-card__title {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      margin: 0 0 2px 0;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .checkout-product-card__author {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.6);
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .checkout-product-card__author strong {
+      color: #ff914d;
+    }
+
+    .checkout-product-card__pricing {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+
+    .checkout-product-card__price {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: #ff914d;
+    }
+
+    .checkout-product-card__orig {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.35);
+      text-decoration: line-through;
+    }
+
+    /* Section Headers inside Sheet */
+    .checkout-section {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .checkout-section__title-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .checkout-section__icon {
+      color: #ff914d;
+      font-size: 14px;
+    }
+
+    /* 2. Modern Inputs with Leading Icons */
+    .modern-input-field {
+      position: relative;
+      display: flex;
+      align-items: center;
+      background: rgba(10, 7, 20, 0.6);
+      border: 1.5px solid rgba(74, 52, 125, 0.5);
+      border-radius: 10px;
+      transition: all 0.25s ease;
+      padding: 0 14px;
+    }
+
+    .modern-input-field:focus-within {
+      border-color: #ff914d;
+      background: rgba(20, 14, 38, 0.7);
+      box-shadow: 0 0 0 3px rgba(255, 145, 77, 0.15);
+    }
+
+    .modern-input-field__icon {
+      font-size: 15px;
+      color: rgba(255, 255, 255, 0.4);
+      margin-right: 10px;
+      flex-shrink: 0;
+    }
+
+    .modern-input-field__input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #ffffff;
+      font-family: 'Nunito', sans-serif;
+      font-size: 14px;
+      padding: 13px 0;
+    }
+
+    .modern-input-field__input::placeholder {
+      color: rgba(255, 255, 255, 0.28);
+    }
+
+    /* 3. Modern Payment Channel Tiles (Shopee/Lazada Selection) */
+    .payment-channels {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .payment-channel {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1.5px solid rgba(74, 52, 125, 0.4);
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      position: relative;
+    }
+
+    .payment-channel--active {
+      border-color: #ff914d !important;
+      background: rgba(255, 145, 77, 0.06) !important;
+      box-shadow: 0 4px 14px rgba(255, 145, 77, 0.15);
+    }
+
+    .payment-channel--disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      border-color: rgba(255, 255, 255, 0.06);
+    }
+
+    /* Radio Circle Indicator */
+    .payment-channel__radio {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255, 255, 255, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.2s ease;
+    }
+
+    .payment-channel--active .payment-channel__radio {
+      border-color: #ff914d;
+      background: #ff914d;
+    }
+
+    .payment-channel--active .payment-channel__radio::after {
+      content: "";
+      width: 8px;
+      height: 8px;
+      background: #0a0714;
+      border-radius: 50%;
+    }
+
+    .payment-channel__logo-wrap {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: rgba(60, 42, 107, 0.35);
+      border: 1px solid rgba(74, 52, 125, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .payment-channel__text {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .payment-channel__name-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .payment-channel__name {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .payment-channel__chip {
+      font-size: 9.5px;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 4px;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+
+    .payment-channel__chip--rec {
+      background: #00df89;
+      color: #0a0714;
+    }
+
+    .payment-channel__chip--soon {
+      background: rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .payment-channel__sub {
+      font-size: 11.5px;
+      color: rgba(255, 255, 255, 0.5);
+      margin-top: 2px;
+      display: block;
+    }
+
+    /* 4. Shopee / Lazada Bill Breakdown */
+    .checkout-bill {
+      background: rgba(10, 7, 20, 0.45);
+      border: 1px dashed rgba(74, 52, 125, 0.5);
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 13px;
+    }
+
+    .checkout-bill__row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .checkout-bill__val--free {
+      color: #00df89;
+      font-weight: 700;
+    }
+
+    .checkout-bill__divider {
+      height: 1px;
+      background: rgba(255, 255, 255, 0.08);
+      margin: 4px 0;
+    }
+
+    .checkout-bill__row--total {
+      color: #ffffff;
+    }
+
+    .checkout-bill__label--total {
+      font-size: 13.5px;
+      font-weight: 700;
+    }
+
+    .checkout-bill__usd {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.45);
+      margin-top: 1px;
+    }
+
+    .checkout-bill__total-val {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: #ff914d;
+    }
+
+    /* Trust & Security Tag */
+    .checkout-trust {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.45);
+      padding: 0 4px;
+    }
+
+    /* 5. Sticky Bottom Action Bar (Shopee / Lazada Checkout Bar) */
+    .checkout-sheet__footer {
+      padding: 14px 24px;
+      background: #0f0a21;
+      border-top: 1px solid rgba(74, 52, 125, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .checkout-sheet__footer-price {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .checkout-sheet__footer-label {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.5);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .checkout-sheet__footer-amount {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 24px;
+      font-weight: 700;
+      color: #ff914d;
+      line-height: 1.1;
+    }
+
+    .checkout-sheet__cta-btn {
+      background: linear-gradient(135deg, #ff914d 0%, #ff6b35 100%);
+      border: none;
+      color: #0a0714;
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      padding: 13px 26px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 18px rgba(255, 145, 77, 0.4);
+      transition: all 0.25s ease;
+      white-space: nowrap;
+    }
+
+    .checkout-sheet__cta-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 22px rgba(255, 145, 77, 0.6);
+      background: linear-gradient(135deg, #ffa46b 0%, #ff834f 100%);
+    }
+
+    /* =========================================================
+       RESPONSIVE & MOBILE BOTTOM-SHEET MODES
+       ========================================================= */
     @media (orientation: portrait) {
       .product-grid {
         grid-template-columns: 1fr !important;
@@ -897,14 +1257,47 @@
       .shop-topbar__brand { display: none; }
     }
 
+    /* Mobile Bottom Sheet Adaptation (Shopee/Lazada Native Feel) */
     @media (max-width: 600px) {
       .shop-container {
         padding: 85px 16px 40px 16px;
       }
       .product-title { font-size: 22px; }
       .pricing-card__price-myr { font-size: 32px; }
-      .payment-methods__list {
-        grid-template-columns: 1fr;
+
+      .checkout-modal {
+        padding: 0 !important;
+        align-items: flex-end !important;
+      }
+
+      .checkout-sheet {
+        max-width: 100%;
+        max-height: 88vh;
+        border-radius: 22px 22px 0 0;
+        border-bottom: none;
+        transform: translateY(100%);
+      }
+
+      .checkout-modal.is-active .checkout-sheet {
+        transform: translateY(0);
+      }
+
+      .checkout-sheet__handle {
+        display: block;
+      }
+
+      .checkout-sheet__scrollable {
+        padding: 16px;
+        max-height: calc(88vh - 150px);
+      }
+
+      .checkout-sheet__footer {
+        padding: 12px 16px;
+      }
+
+      .checkout-sheet__cta-btn {
+        padding: 12px 18px;
+        font-size: 15px;
       }
     }
   </style>
@@ -1015,7 +1408,7 @@
       <div class="product-details">
         
         <div>
-          <!-- Title & Sub-Details (E-commerce format) -->
+          <!-- Title & Sub-Details -->
           <h1 class="product-title" data-i18n="title">Interactive Canva Math Module</h1>
           <p class="product-creator" id="productCreator" data-i18n="creator">Ditulis & Direka oleh <strong>Zuraiman</strong></p>
           
@@ -1031,7 +1424,7 @@
           </div>
         </div>
 
-        <!-- Checkout / Pricing Card (Shopee Format) -->
+        <!-- Checkout / Pricing Card -->
         <div class="pricing-card">
           <div class="pricing-card__price-row">
             <span class="pricing-card__label" data-i18n="priceLabel">Harga</span>
@@ -1043,7 +1436,6 @@
             <span class="pricing-card__price-usd">Sekitar ~$14.50 USD</span>
           </div>
 
-          <!-- Product Trust Specifications -->
           <div class="product-trust-tags">
             <div class="trust-tag">
               <span class="trust-tag__icon">✔</span>
@@ -1055,7 +1447,6 @@
             </div>
           </div>
 
-          <!-- PEMASANGAN BUTANG CHECKOUT: Berada tepat di bawah harga sekor e-dagang -->
           <button type="button" class="pricing-card__btn" id="openCheckoutBtn" data-i18n="buyBtn">
             <span>🛒</span> Beli Sekarang
           </button>
@@ -1166,69 +1557,138 @@
     </div>
   </main>
 
-  <!-- Checkout Popup Dialog (Yottibpayz Mockup) -->
+  <!-- =========================================================
+       ADVANCED SHOPEE/LAZADA STYLE CHECKOUT BOTTOM-SHEET / MODAL
+       ========================================================= -->
   <div class="checkout-modal" id="checkoutModal">
-    <div class="checkout-card">
-      <div class="checkout-header">
-        <h3 class="checkout-header__title" id="checkoutTitle" data-i18n="checkoutTitle">Sistem Checkout</h3>
-        <button class="checkout-header__close" id="closeCheckoutBtn" type="button">&times;</button>
+    <div class="checkout-sheet">
+      
+      <!-- Mobile drag handle pill -->
+      <div class="checkout-sheet__handle"></div>
+
+      <!-- Sheet Header Bar -->
+      <div class="checkout-sheet__header">
+        <div>
+          <span class="checkout-sheet__badge">Yottibpayz Checkout</span>
+          <h3 class="checkout-sheet__title" data-i18n="checkoutTitle">Sahkan Pembelian</h3>
+        </div>
+        <button class="checkout-sheet__close" id="closeCheckoutBtn" type="button" aria-label="Tutup">&times;</button>
       </div>
-      <form id="checkoutForm" onsubmit="handleMockPayment(event)">
-        <div class="checkout-body">
-          <div class="payment-summary">
-            <span class="payment-summary__label" data-i18n="amountLabel">Jumlah Bayaran:</span>
-            <span class="payment-summary__price">RM 64.00</span>
-          </div>
 
-          <!-- Payment Method Selector Badges -->
-          <div class="payment-methods">
-            <label class="form-group__label" data-i18n="payMethodLabel">Kaedah Pembayaran:</label>
-            <div class="payment-methods__list">
-              
-              <!-- FPX Online Banking Badge (Active Option) -->
-              <div class="pay-badge pay-badge--active" onclick="selectPaymentMethod('fpx')">
-                <span class="pay-badge__name">FPX Online Banking</span>
-                <span class="pay-badge__status pay-badge__status--active" id="lblPayActive" data-i18n="payActive">FPX Saja</span>
-                <div class="pay-badge__indicator"></div>
+      <form id="checkoutForm" onsubmit="handleMockPayment(event)" class="checkout-sheet__form">
+        <div class="checkout-sheet__scrollable">
+
+          <!-- 1. Product Mini Recap Card -->
+          <div class="checkout-product-card">
+            <img src="assets/images/dashboard/shop/carousel1/slide1.jpg" alt="Thumbnail" class="checkout-product-card__thumb" onerror="this.src='assets/icons/favicon.svg'" />
+            <div class="checkout-product-card__info">
+              <h4 class="checkout-product-card__title" data-i18n="title">Interactive Canva Math Module</h4>
+              <span class="checkout-product-card__author">Oleh <strong>Zuraiman</strong></span>
+              <div class="checkout-product-card__pricing">
+                <span class="checkout-product-card__price">RM 64.00</span>
+                <span class="checkout-product-card__orig">RM 89.00</span>
               </div>
-
-              <!-- Touch n Go eWallet Badge (Coming Soon Option) -->
-              <div class="pay-badge pay-badge--disabled" onclick="selectPaymentMethod('tng')">
-                <span class="pay-badge__name">Touch 'n Go eWallet</span>
-                <span class="pay-badge__status pay-badge__status--disabled" id="lblPaySoon" data-i18n="paySoon">Coming Soon</span>
-                <div class="pay-badge__indicator"></div>
-              </div>
-
             </div>
           </div>
 
-          <div class="form-group">
-            <label class="form-group__label" for="custName" id="lblCustName" data-i18n="custName">Nama Penuh</label>
-            <input class="form-group__input" type="text" id="custName" placeholder="Contoh: Muhammad Ali" required />
-          </div>
+          <!-- 2. Customer Form Section -->
+          <div class="checkout-section">
+            <div class="checkout-section__title-row">
+              <span class="checkout-section__icon">👤</span>
+              <span data-i18n="sectionCustomer">Maklumat Pembeli</span>
+            </div>
+            
+            <div class="modern-input-field">
+              <span class="modern-input-field__icon">📝</span>
+              <input class="modern-input-field__input" type="text" id="custName" placeholder="Nama Penuh (Contoh: Muhammad Ali)" required />
+            </div>
 
-          <div class="form-group">
-            <label class="form-group__label" for="custEmail" id="lblCustEmail" data-i18n="custEmail">Emel Pembeli</label>
-            <input class="form-group__input" type="email" id="custEmail" placeholder="contoh@gmail.com" required />
-          </div>
+            <div class="modern-input-field">
+              <span class="modern-input-field__icon">✉️</span>
+              <input class="modern-input-field__input" type="email" id="custEmail" placeholder="Emel Pembeli (contoh@gmail.com)" required />
+            </div>
 
-          <div class="form-group">
-            <label class="form-group__label" for="custPhone" id="lblCustPhone" data-i18n="custPhone">Nombor Telefon</label>
-            <input class="form-group__input" type="tel" id="custPhone" placeholder="0123456789" required />
-          </div>
-
-          <!-- Yottibpayz Gateway Info -->
-          <div class="yottibpayz-gateway">
-            <div class="yottibpayz-gateway__badge">Yottibpayz</div>
-            <div class="yottibpayz-gateway__info" id="gatewayInfo" data-i18n="gatewayInfo">
-              Transaksi diproses dengan selamat melalui sistem gerbang Yottibpayz. (Mod Ujian Aktif)
+            <div class="modern-input-field">
+              <span class="modern-input-field__icon">📱</span>
+              <input class="modern-input-field__input" type="tel" id="custPhone" placeholder="Nombor Telefon (0123456789)" required />
             </div>
           </div>
 
-          <button type="submit" class="checkout-btn" id="submitPaymentBtn" data-i18n="submitBtn">
-            Sahkan & Bayar
+          <!-- 3. Payment Method Selection (Shopee/Lazada Channels) -->
+          <div class="checkout-section">
+            <div class="checkout-section__title-row">
+              <span class="checkout-section__icon">💳</span>
+              <span data-i18n="payMethodLabel">Kaedah Pembayaran</span>
+            </div>
+
+            <div class="payment-channels">
+              <!-- FPX Active Tile -->
+              <div class="payment-channel payment-channel--active" onclick="selectPaymentMethod('fpx')">
+                <div class="payment-channel__radio"></div>
+                <div class="payment-channel__logo-wrap">🏦</div>
+                <div class="payment-channel__text">
+                  <div class="payment-channel__name-row">
+                    <span class="payment-channel__name">FPX Online Banking</span>
+                    <span class="payment-channel__chip payment-channel__chip--rec" data-i18n="chipRecommended">Disyorkan</span>
+                  </div>
+                  <span class="payment-channel__sub" data-i18n="fpxDesc">Maybank2u, CIMB Clicks, Bank Islam & lain-lain</span>
+                </div>
+              </div>
+
+              <!-- Touch 'n Go Tile -->
+              <div class="payment-channel payment-channel--disabled" onclick="selectPaymentMethod('tng')">
+                <div class="payment-channel__radio"></div>
+                <div class="payment-channel__logo-wrap">📲</div>
+                <div class="payment-channel__text">
+                  <div class="payment-channel__name-row">
+                    <span class="payment-channel__name">Touch 'n Go eWallet</span>
+                    <span class="payment-channel__chip payment-channel__chip--soon" data-i18n="paySoon">Coming Soon</span>
+                  </div>
+                  <span class="payment-channel__sub" data-i18n="tngDesc">Imbas kod QR & bayar dalam aplikasi</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. Transparent Bill Breakdown -->
+          <div class="checkout-bill">
+            <div class="checkout-bill__row">
+              <span data-i18n="billSubtotal">Subjumlah Produk</span>
+              <span>RM 64.00</span>
+            </div>
+            <div class="checkout-bill__row">
+              <span data-i18n="billDelivery">Penghantaran Digital</span>
+              <span class="checkout-bill__val--free" data-i18n="billFree">PERCUMA</span>
+            </div>
+            <div class="checkout-bill__divider"></div>
+            <div class="checkout-bill__row checkout-bill__row--total">
+              <div>
+                <span class="checkout-bill__label--total" data-i18n="amountLabel">Jumlah Bayaran</span>
+                <div class="checkout-bill__usd">Sekitar ~$14.50 USD</div>
+              </div>
+              <span class="checkout-bill__total-val">RM 64.00</span>
+            </div>
+          </div>
+
+          <!-- Trust Badge -->
+          <div class="checkout-trust">
+            <span>🔒</span>
+            <span data-i18n="gatewayInfo">Dilindungi dengan penyulitan 256-bit SSL & Gerbang Yottibpayz</span>
+          </div>
+
+        </div>
+
+        <!-- 5. Sticky Bottom Action Bar -->
+        <div class="checkout-sheet__footer">
+          <div class="checkout-sheet__footer-price">
+            <span class="checkout-sheet__footer-label" data-i18n="lblTotalToPay">Jumlah Bayaran:</span>
+            <span class="checkout-sheet__footer-amount">RM 64.00</span>
+          </div>
+          <button type="submit" class="checkout-sheet__cta-btn" id="submitPaymentBtn" data-i18n="submitBtn">
+            <span>🔒</span> Bayar Sekarang
           </button>
         </div>
+
       </form>
     </div>
   </div>
@@ -1263,17 +1723,25 @@
         step2: "Core Lesson / Step-by-step breaks of rules",
         step3: "Interactive Practice / Exercises & Worksheets",
         step4: "Quizzes or Games (Fun review sections to reinforce learning)",
-        checkoutTitle: "Sistem Checkout",
-        amountLabel: "Jumlah Bayaran:",
-        custName: "Nama Penuh",
-        custEmail: "Emel Pembeli",
-        custPhone: "Nombor Telefon",
-        gatewayInfo: "Transaksi diproses dengan selamat melalui sistem gerbang Yottibpayz. (Mod Ujian Aktif)",
-        submitBtn: "Sahkan & Bayar",
+        
+        // Checkout Sheet texts
+        checkoutTitle: "Sahkan Pembelian",
+        sectionCustomer: "Maklumat Pembeli",
+        amountLabel: "Jumlah Bayaran",
+        lblTotalToPay: "Jumlah Bayaran:",
+        payMethodLabel: "Kaedah Pembayaran",
+        chipRecommended: "Disyorkan",
+        fpxDesc: "Maybank2u, CIMB Clicks, Bank Islam & lain-lain",
+        tngDesc: "Imbas kod QR & bayar dalam aplikasi",
+        paySoon: "Akan Datang",
+        billSubtotal: "Subjumlah Produk",
+        billDelivery: "Penghantaran Digital",
+        billFree: "PERCUMA",
+        gatewayInfo: "Dilindungi dengan penyulitan 256-bit SSL & Gerbang Yottibpayz",
+        submitBtn: "Bayar Sekarang",
         successMsg: "Terima kasih! Pembayaran anda melalui Yottibpayz berjaya disimulasikan.",
         processing: "Memproses bayaran...",
         
-        // New translations
         statReviews: "128 Ulasan",
         statSold: "Terjual",
         trustInstant: "Akses Digital Segera",
@@ -1294,12 +1762,7 @@
         specLevel: "Tahap Cadangan",
         specPlatform: "Sokongan Peranti",
         comment1: "Sangat bagus! Anak saya suka sangat belajar matematik pakai modul Canva ni. Visual oren-ungu dia cantik sangat. Recommended seller!",
-        comment2: "Penghantaran pantas ke emel. Zuraiman buat kerja yang hebat mengumpul kuiz interaktif di sini. Mudah dibuka di telefon dan tablet.",
-        
-        // Badges translations
-        payMethodLabel: "Kaedah Pembayaran:",
-        payActive: "FPX Sahaja",
-        paySoon: "Akan Datang"
+        comment2: "Penghantaran pantas ke emel. Zuraiman buat kerja yang hebat mengumpul kuiz interaktif di sini. Mudah dibuka di telefon dan tablet."
       },
       en: {
         back: "← Back",
@@ -1324,17 +1787,25 @@
         step2: "Core Lesson / Step-by-step breaks of rules",
         step3: "Interactive Practice / Exercises & Worksheets",
         step4: "Quizzes or Games (Fun review sections to reinforce learning)",
-        checkoutTitle: "Checkout System",
-        amountLabel: "Total Amount:",
-        custName: "Full Name",
-        custEmail: "Email Address",
-        custPhone: "Phone Number",
-        gatewayInfo: "Transactions are processed securely via Yottibpayz gateway system. (Sandbox Mode active)",
-        submitBtn: "Confirm & Pay",
+        
+        // Checkout Sheet texts
+        checkoutTitle: "Confirm Order",
+        sectionCustomer: "Customer Information",
+        amountLabel: "Total Amount",
+        lblTotalToPay: "Total Payment:",
+        payMethodLabel: "Payment Method",
+        chipRecommended: "Recommended",
+        fpxDesc: "Maybank2u, CIMB Clicks, Public Bank & more",
+        tngDesc: "Scan QR & pay via app",
+        paySoon: "Coming Soon",
+        billSubtotal: "Item Subtotal",
+        billDelivery: "Digital Delivery",
+        billFree: "FREE",
+        gatewayInfo: "Protected with 256-bit SSL encryption & Yottibpayz Gateway",
+        submitBtn: "Place Order & Pay",
         successMsg: "Thank you! Your payment through Yottibpayz was successfully simulated.",
         processing: "Processing payment...",
 
-        // New translations
         statReviews: "128 Reviews",
         statSold: "Sold",
         trustInstant: "Instant Digital Access",
@@ -1355,12 +1826,7 @@
         specLevel: "Recommended Level",
         specPlatform: "Platform Support",
         comment1: "Excellent! My child loves learning math with this Canva module. Visuals are super stunning. Recommended seller!",
-        comment2: "Instant delivery to my email. Zuraiman did a great job compiling interactive quizzes here. Easily opened on both my phone and tablet.",
-
-        // Badges translations
-        payMethodLabel: "Payment Method:",
-        payActive: "FPX Only",
-        paySoon: "Coming Soon"
+        comment2: "Instant delivery to my email. Zuraiman did a great job compiling interactive quizzes here. Easily opened on both my phone and tablet."
       },
       zh: {
         back: "← 返回",
@@ -1385,17 +1851,25 @@
         step2: "核心课程讲解 / 公式与定理的分步解析",
         step3: "互动练习板块 / 随堂测验与工作表",
         step4: "测验或小游戏 (旨在强化学习成果的趣味性回顾环节)",
-        checkoutTitle: "结账系统",
-        amountLabel: "应付总额:",
-        custName: "真实姓名",
-        custEmail: "电子邮箱",
-        custPhone: "联系电话",
-        gatewayInfo: "交易已通过 Yottibpayz 支付网关安全处理。（已启用沙盒测试模式）",
-        submitBtn: "确认付款",
+        
+        // Checkout Sheet texts
+        checkoutTitle: "确认购买",
+        sectionCustomer: "买家信息",
+        amountLabel: "实付总额",
+        lblTotalToPay: "应付总额:",
+        payMethodLabel: "支付方式",
+        chipRecommended: "推荐",
+        fpxDesc: "支持 Maybank2u、CIMB 等主流网银",
+        tngDesc: "扫码并于应用内快捷支付",
+        paySoon: "敬请期待",
+        billSubtotal: "商品小计",
+        billDelivery: "电子交付",
+        billFree: "免费",
+        gatewayInfo: "受 256 位 SSL 加密与 Yottibpayz 支付网关安全保护",
+        submitBtn: "立即付款",
         successMsg: "谢谢！您的 Yottibpayz 网关模拟交易付款成功完成。",
         processing: "付款处理中...",
 
-        // New translations
         statReviews: "128 条评论",
         statSold: "已售出",
         trustInstant: "立即数字获取",
@@ -1416,12 +1890,7 @@
         specLevel: "推荐适用阶段",
         specPlatform: "设备兼容性",
         comment1: "非常棒！我的孩子很喜欢用这个 Canva 模组学数学。紫色和橙色的视觉效果很美，极力推荐商家！",
-        comment2: "系统直接发到我的邮箱。Zuraiman 在这里整理的互动测验非常棒，在手机和平板上打开都很顺畅。",
-
-        // Badges translations
-        payMethodLabel: "支付方式:",
-        payActive: "仅限 FPX",
-        paySoon: "敬请期待"
+        comment2: "系统直接发到我的邮箱。Zuraiman 在这里整理的互动测验非常棒，在手机和平板上打开都很顺畅。"
       }
     };
 
@@ -1443,23 +1912,22 @@
         }
       });
       
-      // Update inputs placeholders
       const nameInput = document.getElementById("custName");
       const emailInput = document.getElementById("custEmail");
       const phoneInput = document.getElementById("custPhone");
       
       if (lang === "en") {
-        nameInput.placeholder = "e.g., John Doe";
-        emailInput.placeholder = "john@example.com";
-        phoneInput.placeholder = "+123456789";
+        nameInput.placeholder = "Full Name (e.g. John Doe)";
+        emailInput.placeholder = "Email Address (john@example.com)";
+        phoneInput.placeholder = "Phone Number (+60123456789)";
       } else if (lang === "zh") {
-        nameInput.placeholder = "例如：张小明";
-        emailInput.placeholder = "xiaoming@example.com";
-        phoneInput.placeholder = "13800000000";
+        nameInput.placeholder = "真实姓名 (例如：张小明)";
+        emailInput.placeholder = "电子邮箱 (xiaoming@example.com)";
+        phoneInput.placeholder = "联系电话 (0123456789)";
       } else {
-        nameInput.placeholder = "Contoh: Muhammad Ali";
-        emailInput.placeholder = "contoh@gmail.com";
-        phoneInput.placeholder = "0123456789";
+        nameInput.placeholder = "Nama Penuh (Contoh: Muhammad Ali)";
+        emailInput.placeholder = "Emel Pembeli (contoh@gmail.com)";
+        phoneInput.placeholder = "Nombor Telefon (0123456789)";
       }
     }
 
@@ -1468,7 +1936,6 @@
       applyTranslations(e.target.value);
     });
 
-    // Helper to scroll to reviews
     function scrollToReviews() {
       const section = document.getElementById("ratingsSection");
       if (section) {
@@ -1488,7 +1955,6 @@
     const track = document.getElementById("carouselTrack");
     const dotsContainer = document.getElementById("carouselDots");
     
-    // Bina Slaid
     carouselMediaList.forEach((media, idx) => {
       const slide = document.createElement("div");
       slide.className = "media-carousel__slide";
@@ -1524,7 +1990,6 @@
       }
       track.appendChild(slide);
 
-      // Bina Navigasi Titik (Dots Nav)
       const dot = document.createElement("button");
       dot.className = "media-carousel__dot" + (idx === 0 ? " is-active" : "");
       dot.setAttribute("aria-label", `Pergi ke slide ${idx + 1}`);
@@ -1588,7 +2053,7 @@
     });
 
     // =========================================================
-    // CHECKOUT MODAL LOGIC
+    // ADVANCED CHECKOUT SHEET CONTROLLER
     // =========================================================
     const checkoutModal = document.getElementById("checkoutModal");
     const openBtn = document.getElementById("openCheckoutBtn");
@@ -1610,7 +2075,6 @@
       }
     });
 
-    // Selection helper for payment method badges
     function selectPaymentMethod(method) {
       if (typeof SmartKiddoSound !== 'undefined') SmartKiddoSound.playClick();
       if (method === 'tng') {
@@ -1619,25 +2083,23 @@
       }
     }
 
-    // Simulasi Pembayaran Yottibpayz (Mock Gateway)
     function handleMockPayment(event) {
       event.preventDefault();
       const submitBtn = document.getElementById("submitPaymentBtn");
       const dict = translations[currentLang];
       
-      submitBtn.textContent = dict.processing;
+      submitBtn.innerHTML = `<span>⏳</span> ${dict.processing}`;
       submitBtn.disabled = true;
 
       setTimeout(() => {
         alert(dict.successMsg);
         checkoutModal.classList.remove("is-active");
-        submitBtn.textContent = dict.submitBtn;
+        submitBtn.innerHTML = `<span>🔒</span> ${dict.submitBtn}`;
         submitBtn.disabled = false;
         document.getElementById("checkoutForm").reset();
       }, 2000);
     }
 
-    // Laraskan permulaan slaid pertama dan bahasa asal
     window.addEventListener("DOMContentLoaded", () => {
       applyTranslations("ms");
       setTimeout(() => goToSlide(0), 400);
