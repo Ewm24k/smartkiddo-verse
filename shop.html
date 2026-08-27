@@ -6,7 +6,7 @@
   <title>SmartKiddo Universe — Shop Item 1</title>
   <meta name="theme-color" content="#0a0714" />
 
-  <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg" />
+  <link class="favicon" rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
@@ -782,7 +782,6 @@
       transform: translateY(0) scale(1);
     }
 
-    /* Mobile Sheet Drag Handle Pill */
     .checkout-sheet__handle {
       display: none;
       width: 44px;
@@ -865,7 +864,7 @@
       -webkit-overflow-scrolling: touch;
     }
 
-    /* 1. Shopee / Lazada Product Mini Recap */
+    /* Product Mini Recap Card */
     .checkout-product-card {
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid rgba(74, 52, 125, 0.4);
@@ -955,7 +954,7 @@
       font-size: 14px;
     }
 
-    /* 2. Modern Inputs with Leading Icons */
+    /* Modern Inputs with Leading Icons */
     .modern-input-field {
       position: relative;
       display: flex;
@@ -995,7 +994,7 @@
       color: rgba(255, 255, 255, 0.28);
     }
 
-    /* 3. Modern Payment Channel Tiles (Shopee/Lazada Selection) */
+    /* Modern Payment Channel Tiles */
     .payment-channels {
       display: flex;
       flex-direction: column;
@@ -1110,7 +1109,7 @@
       display: block;
     }
 
-    /* 4. Shopee / Lazada Bill Breakdown */
+    /* Shopee / Lazada Bill Breakdown */
     .checkout-bill {
       background: rgba(10, 7, 20, 0.45);
       border: 1px dashed rgba(74, 52, 125, 0.5);
@@ -1173,7 +1172,36 @@
       padding: 0 4px;
     }
 
-    /* 5. Sticky Bottom Action Bar (Shopee / Lazada Checkout Bar) */
+    /* Secure Checkout Info Tile (Removes old hardcoded naming) */
+    .secure-gateway-info {
+      border: 1.5px solid #3c2a6b;
+      border-radius: 8px;
+      padding: 12px;
+      background: rgba(29, 20, 58, 0.4);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .secure-gateway-info__badge {
+      background: #00df89;
+      color: #0a0714;
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      padding: 3px 6px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    .secure-gateway-info__text {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.8);
+      flex: 1;
+      line-height: 1.4;
+    }
+
+    /* Sticky Bottom Action Bar */
     .checkout-sheet__footer {
       padding: 14px 24px;
       background: #0f0a21;
@@ -1257,7 +1285,7 @@
       .shop-topbar__brand { display: none; }
     }
 
-    /* Mobile Bottom Sheet Adaptation (Shopee/Lazada Native Feel) */
+    /* Mobile Bottom Sheet Adaptation */
     @media (max-width: 600px) {
       .shop-container {
         padding: 85px 16px 40px 16px;
@@ -1408,7 +1436,7 @@
       <div class="product-details">
         
         <div>
-          <!-- Title & Sub-Details -->
+          <!-- Title & Sub-Details (E-commerce format) -->
           <h1 class="product-title" data-i18n="title">Interactive Canva Math Module</h1>
           <p class="product-creator" id="productCreator" data-i18n="creator">Ditulis & Direka oleh <strong>Zuraiman</strong></p>
           
@@ -1436,6 +1464,7 @@
             <span class="pricing-card__price-usd">Sekitar ~$14.50 USD</span>
           </div>
 
+          <!-- Product Trust Specifications -->
           <div class="product-trust-tags">
             <div class="trust-tag">
               <span class="trust-tag__icon">✔</span>
@@ -1569,7 +1598,7 @@
       <!-- Sheet Header Bar -->
       <div class="checkout-sheet__header">
         <div>
-          <span class="checkout-sheet__badge">Yottibpayz Checkout</span>
+          <span class="checkout-sheet__badge" data-i18n="checkoutBadge">Sistem Checkout</span>
           <h3 class="checkout-sheet__title" data-i18n="checkoutTitle">Sahkan Pembelian</h3>
         </div>
         <button class="checkout-sheet__close" id="closeCheckoutBtn" type="button" aria-label="Tutup">&times;</button>
@@ -1614,7 +1643,7 @@
             </div>
           </div>
 
-          <!-- 3. Payment Method Selection (Shopee/Lazada Channels) -->
+          <!-- 3. Payment Method Selection -->
           <div class="checkout-section">
             <div class="checkout-section__title-row">
               <span class="checkout-section__icon">💳</span>
@@ -1670,10 +1699,12 @@
             </div>
           </div>
 
-          <!-- Trust Badge -->
-          <div class="checkout-trust">
-            <span>🔒</span>
-            <span data-i18n="gatewayInfo">Dilindungi dengan penyulitan 256-bit SSL & Gerbang Yottibpayz</span>
+          <!-- Secure Payment Info (Removed old hardcoded naming) -->
+          <div class="secure-gateway-info">
+            <span class="secure-gateway-info__badge" data-i18n="sslLabel">Selamat</span>
+            <span class="secure-gateway-info__text" id="gatewayInfo" data-i18n="gatewayInfo">
+              Transaksi dilindungi secara selamat dengan penyulitan SSL 256-bit.
+            </span>
           </div>
 
         </div>
@@ -1726,6 +1757,7 @@
         
         // Checkout Sheet texts
         checkoutTitle: "Sahkan Pembelian",
+        checkoutBadge: "Sistem Checkout",
         sectionCustomer: "Maklumat Pembeli",
         amountLabel: "Jumlah Bayaran",
         lblTotalToPay: "Jumlah Bayaran:",
@@ -1737,9 +1769,10 @@
         billSubtotal: "Subjumlah Produk",
         billDelivery: "Penghantaran Digital",
         billFree: "PERCUMA",
-        gatewayInfo: "Dilindungi dengan penyulitan 256-bit SSL & Gerbang Yottibpayz",
+        sslLabel: "Selamat",
+        gatewayInfo: "Transaksi dilindungi secara selamat dengan penyulitan SSL 256-bit. (Mod Sandbox)",
         submitBtn: "Bayar Sekarang",
-        successMsg: "Terima kasih! Pembayaran anda melalui Yottibpayz berjaya disimulasikan.",
+        successMsg: "Terima kasih! Pembayaran anda berjaya disimulasikan.",
         processing: "Memproses bayaran...",
         
         statReviews: "128 Ulasan",
@@ -1790,6 +1823,7 @@
         
         // Checkout Sheet texts
         checkoutTitle: "Confirm Order",
+        checkoutBadge: "Secure Checkout",
         sectionCustomer: "Customer Information",
         amountLabel: "Total Amount",
         lblTotalToPay: "Total Payment:",
@@ -1801,9 +1835,10 @@
         billSubtotal: "Item Subtotal",
         billDelivery: "Digital Delivery",
         billFree: "FREE",
-        gatewayInfo: "Protected with 256-bit SSL encryption & Yottibpayz Gateway",
+        sslLabel: "Secure",
+        gatewayInfo: "Transactions are safely protected with 256-bit SSL encryption. (Sandbox Mode)",
         submitBtn: "Place Order & Pay",
-        successMsg: "Thank you! Your payment through Yottibpayz was successfully simulated.",
+        successMsg: "Thank you! Your payment was successfully simulated.",
         processing: "Processing payment...",
 
         statReviews: "128 Reviews",
@@ -1840,7 +1875,7 @@
         b1Title: "互动与趣味性",
         b1Desc: "退避了传统枯燥的纯文本数学教科书，利用 Canva 强大的视觉图形排版，让数学变得生动有趣，从而降低学习门槛。",
         b2Title: "直观视觉学习",
-        b2Desc: "通过结构化的图标、图表以及创意设计排版，帮助学生轻松将抽象的数学公式、等式或几何图形具象化。",
+        b2Desc: "通过结构化的图标、图表以及创意设计排版，帮助学生轻松将抽象的数学概念（如公式、方程式或几何图形具象化。",
         b3Title: "便捷使用",
         b3Desc: "作为基于 Canva 链接的数字工具，学生或教师只需使用手机、平板或电脑的浏览器即可轻松访问，无需安装任何专用软件。",
         b4Title: "自主控制进度",
@@ -1854,6 +1889,7 @@
         
         // Checkout Sheet texts
         checkoutTitle: "确认购买",
+        checkoutBadge: "安全结账",
         sectionCustomer: "买家信息",
         amountLabel: "实付总额",
         lblTotalToPay: "应付总额:",
@@ -1865,9 +1901,10 @@
         billSubtotal: "商品小计",
         billDelivery: "电子交付",
         billFree: "免费",
-        gatewayInfo: "受 256 位 SSL 加密与 Yottibpayz 支付网关安全保护",
+        sslLabel: "安全",
+        gatewayInfo: "交易受到 256 位 SSL 加密的安全保护。（沙盒测试模式）",
         submitBtn: "立即付款",
-        successMsg: "谢谢！您的 Yottibpayz 网关模拟交易付款成功完成。",
+        successMsg: "谢谢！您的模拟付款已成功完成。",
         processing: "付款处理中...",
 
         statReviews: "128 条评论",
@@ -1890,7 +1927,7 @@
         specLevel: "推荐适用阶段",
         specPlatform: "设备兼容性",
         comment1: "非常棒！我的孩子很喜欢用这个 Canva 模组学数学。紫色和橙色的视觉效果很美，极力推荐商家！",
-        comment2: "系统直接发到我的邮箱。Zuraiman 在这里整理的互动测验非常棒，在手机和平板上打开都很顺畅。"
+        comment2: "系统直接发到我的邮箱。Zuraiman 在这里整理 of 互动测试非常棒，在手机平板上打开都很顺畅。"
       }
     };
 
