@@ -14,20 +14,29 @@
   <link rel="stylesheet" href="css/base.css" />
   
   <style>
-    /* Styling khusus untuk halaman produk Shop */
-    body {
-      background-color: #0a0714;
+    /* =========================================================
+       DYNAMIC PORTRAIT (9:16) & LANDSCAPE (16:9) OVERRIDES
+       ========================================================= */
+    
+    /* Paksa fungsi tatalan diaktifkan pada semua platform (iOS/Android) */
+    html, body {
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+      height: auto !important;
+      min-height: 100vh !important;
+      background-color: #0a0714 !important;
       color: #ffffff;
       font-family: 'Nunito', sans-serif;
       margin: 0;
       padding: 0;
-      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch !important; /* Tatalan lancar iOS webview */
     }
 
     .shop-container {
       max-width: 1200px;
       margin: 0 auto;
-      padding: 100px 24px 60px 24px;
+      padding: 90px 24px 60px 24px;
+      box-sizing: border-box;
     }
 
     /* Top Bar */
@@ -37,7 +46,7 @@
       left: 0;
       right: 0;
       height: 70px;
-      background: rgba(10, 7, 20, 0.9);
+      background: rgba(10, 7, 20, 0.95);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       z-index: 100;
@@ -46,6 +55,7 @@
       align-items: center;
       justify-content: space-between;
       padding: 0 24px;
+      box-sizing: border-box;
     }
 
     .shop-topbar__back {
@@ -81,7 +91,7 @@
       color: #ff914d;
     }
 
-    /* Layout Split */
+    /* Grid Asal (Default/Desktop) */
     .product-grid {
       display: grid;
       grid-template-columns: 1.2fr 1fr;
@@ -89,14 +99,14 @@
       align-items: start;
     }
 
-    /* Carousel Premium */
+    /* Media Carousel Container */
     .media-carousel {
-      background: #120e24;
+      background: #05030a;
       border: 2px solid #3c2a6b;
       border-radius: 16px;
       overflow: hidden;
       position: relative;
-      aspect-ratio: 16 / 9;
+      aspect-ratio: 16 / 9; /* Nisbah aspek landskap standard */
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     }
 
@@ -111,20 +121,25 @@
       flex: 0 0 100%;
       height: 100%;
       position: relative;
-      background: #000;
+      background: #05030a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
+    /* PENTING: object-fit contain memastikan kedua-dua media 16:9 dan 9:16 dipaparkan sepenuhnya tanpa terpotong */
     .media-carousel__media {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: contain !important;
+      background-color: #05030a !important;
     }
 
     .media-carousel__arrow {
       position: absolute;
       top: 50%;
       transform: translateY(-50%);
-      background: rgba(10, 7, 20, 0.8);
+      background: rgba(10, 7, 20, 0.85);
       border: 1px solid #3c2a6b;
       color: #ffffff;
       font-size: 24px;
@@ -145,13 +160,8 @@
       border-color: #ff914d;
     }
 
-    .media-carousel__arrow--left {
-      left: 16px;
-    }
-
-    .media-carousel__arrow--right {
-      right: 16px;
-    }
+    .media-carousel__arrow--left { left: 16px; }
+    .media-carousel__arrow--right { right: 16px; }
 
     .media-carousel__dots {
       position: absolute;
@@ -197,7 +207,7 @@
     .product-creator {
       font-size: 15px;
       color: rgba(255, 255, 255, 0.6);
-      margin-top: -16px;
+      margin-top: -12px;
     }
 
     .product-creator strong {
@@ -291,10 +301,6 @@
       color: rgba(255, 255, 255, 0.85);
     }
 
-    .content-section__p:last-child {
-      margin-bottom: 0;
-    }
-
     .benefits-list {
       display: flex;
       flex-direction: column;
@@ -320,9 +326,7 @@
       font-size: 14px;
     }
 
-    .benefit-item__text {
-      flex: 1;
-    }
+    .benefit-item__text { flex: 1; }
 
     .benefit-item__title {
       font-weight: 700;
@@ -364,24 +368,26 @@
       font-weight: 600;
     }
 
-    /* Checkout Popup Modal */
+    /* Checkout Popup Modal - Dipertingkat untuk sokongan tatalan menegak */
     .checkout-modal {
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(10, 7, 20, 0.85);
+      background: rgba(10, 7, 20, 0.9);
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
       z-index: 1000;
       display: flex;
-      align-items: center;
+      align-items: flex-start; /* Sejajarkan ke atas supaya selamat ditatal pada orientasi landskap */
       justify-content: center;
-      padding: 20px;
+      padding: 30px 16px;
+      box-sizing: border-box;
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.3s ease;
+      overflow-y: auto !important; /* Membolehkan overlay keseluruhan ditatal */
     }
 
     .checkout-modal.is-active {
@@ -399,6 +405,8 @@
       overflow: hidden;
       transform: translateY(20px);
       transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+      margin-top: auto;
+      margin-bottom: auto; /* Memusatkan kedudukan jika skrin tinggi */
     }
 
     .checkout-modal.is-active .checkout-card {
@@ -407,7 +415,7 @@
 
     .checkout-header {
       background: linear-gradient(135deg, #1d143a 0%, #0f0a25 100%);
-      padding: 20px 24px;
+      padding: 16px 20px;
       border-bottom: 1px solid rgba(60, 42, 107, 0.4);
       display: flex;
       align-items: center;
@@ -432,22 +440,18 @@
       padding: 0;
     }
 
-    .checkout-header__close:hover {
-      color: #ff914d;
-    }
-
     .checkout-body {
-      padding: 24px;
+      padding: 20px;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 14px;
     }
 
     .payment-summary {
       background: rgba(255, 255, 255, 0.03);
       border: 1px dashed rgba(60, 42, 107, 0.5);
       border-radius: 8px;
-      padding: 16px;
+      padding: 12px 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -482,26 +486,23 @@
       border: 1.5px solid #3c2a6b;
       border-radius: 6px;
       color: #ffffff;
-      padding: 12px;
+      padding: 10px 12px;
       font-size: 14px;
       outline: none;
-      transition: all 0.25s ease;
     }
 
     .form-group__input:focus {
       border-color: #ff914d;
-      box-shadow: 0 0 8px rgba(255, 145, 77, 0.25);
     }
 
     .yottibpayz-gateway {
       border: 1.5px solid #3c2a6b;
       border-radius: 8px;
-      padding: 14px;
+      padding: 12px;
       background: rgba(29, 20, 58, 0.4);
       display: flex;
       align-items: center;
-      gap: 12px;
-      margin-top: 8px;
+      gap: 10px;
     }
 
     .yottibpayz-gateway__badge {
@@ -510,13 +511,12 @@
       font-size: 10px;
       font-weight: 800;
       text-transform: uppercase;
-      padding: 3px 8px;
+      padding: 3px 6px;
       border-radius: 4px;
-      letter-spacing: 0.5px;
     }
 
     .yottibpayz-gateway__info {
-      font-size: 12px;
+      font-size: 11px;
       color: rgba(255, 255, 255, 0.8);
       flex: 1;
     }
@@ -528,40 +528,59 @@
       font-family: 'Fredoka', sans-serif;
       font-weight: 700;
       font-size: 16px;
-      padding: 14px;
+      padding: 12px;
       border-radius: 8px;
       cursor: pointer;
-      transition: all 0.25s ease;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      margin-top: 12px;
+      gap: 8px;
     }
 
-    .checkout-btn:hover {
-      background: #ffa46b;
-      transform: translateY(-1px);
-    }
+    /* =========================================================
+       RESPONSIVE & ORIENTATION MEDIA QUERIES (iOS & Android)
+       ========================================================= */
 
-    /* Tablet responsive views */
-    @media (max-width: 900px) {
+    /* 1. APABILA PERANTI BERADA PADA MOD POTRET (9:16 Viewport Aspect Ratio) */
+    @media (orientation: portrait) {
       .product-grid {
-        grid-template-columns: 1fr;
-        gap: 30px;
+        grid-template-columns: 1fr !important; /* Susunan menegak satu kolum */
+        gap: 24px;
       }
-      .shop-container {
-        padding-top: 90px;
+      .media-carousel {
+        aspect-ratio: 16 / 9; /* Kekalkan bentuk landskap karousel di atas */
       }
     }
 
-    /* Mobile view optimizations */
+    /* 2. APABILA PERANTI BERADA PADA MOD LANDSKAP (16:9 Viewport Aspect Ratio) */
+    @media (orientation: landscape) and (max-width: 1024px) {
+      .shop-container {
+        padding-top: 85px;
+        padding-bottom: 30px;
+      }
+      .product-grid {
+        grid-template-columns: 1.1fr 0.9fr !important; /* Susunan sebelah-menyebelah untuk memanfaatkan ruang melintang */
+        gap: 20px;
+      }
+      .media-carousel {
+        aspect-ratio: 16 / 9;
+        position: sticky; /* Karousel kekal statik di kedudukan atas semasa menatal butiran sebelah kanan */
+        top: 85px;
+      }
+      /* Laraskan kedudukan modal bayaran supaya muat dalam skrin landskap yang pendek */
+      .checkout-card {
+        margin-top: 10px;
+        margin-bottom: 10px;
+      }
+    }
+
+    /* Larasan Skrin Telefon Kecil */
     @media (max-width: 600px) {
       .shop-container {
         padding: 85px 16px 40px 16px;
       }
       .product-title {
-        font-size: 26px;
+        font-size: 24px;
       }
       .pricing-card__price-myr {
         font-size: 32px;
@@ -571,7 +590,7 @@
 </head>
 <body>
 
-  <!-- Top Bar -->
+  <!-- Top Navigation Bar -->
   <header class="shop-topbar">
     <a href="home.html" class="shop-topbar__back">
       <span>&larr;</span> Kembali
@@ -579,15 +598,15 @@
     <span class="shop-topbar__brand">SmartKiddo <span class="shop-topbar__accent">Universe</span></span>
   </header>
 
-  <!-- Main Content Area -->
+  <!-- Main Scrollable Content Container -->
   <main class="shop-container">
     <div class="product-grid">
       
-      <!-- Left Column: Carousel & Media Elements -->
+      <!-- Left / Top Column: Media Player (Supports standard 16:9 and portrait 9:16 assets) -->
       <div class="media-container">
         <div class="media-carousel" id="productCarousel">
           <div class="media-carousel__track" id="carouselTrack">
-            <!-- Sliders will be dynamically populated from the JS arrays below -->
+            <!-- Populated dynamically via JavaScript below -->
           </div>
           <button class="media-carousel__arrow media-carousel__arrow--left" id="prevSlide" aria-label="Sebelumnya">&lsaquo;</button>
           <button class="media-carousel__arrow media-carousel__arrow--right" id="nextSlide" aria-label="Seterusnya">&rsaquo;</button>
@@ -595,7 +614,7 @@
         </div>
       </div>
 
-      <!-- Right Column: Content Details and Pricing -->
+      <!-- Right / Bottom Column: Document Details, Price & Checkout -->
       <div class="product-details">
         
         <div>
@@ -603,7 +622,7 @@
           <p class="product-creator">Ditulis & Direka oleh <strong>Zuraiman</strong></p>
         </div>
 
-        <!-- Checkout / pricing widget -->
+        <!-- Pricing Widget -->
         <div class="pricing-card">
           <div class="pricing-card__price-row">
             <span class="pricing-card__label">Harga / Price</span>
@@ -615,7 +634,7 @@
           </button>
         </div>
 
-        <!-- Section 1: What it is About -->
+        <!-- Details Section 1: What it is About -->
         <div class="content-section">
           <h2 class="content-section__title">What it is About</h2>
           <p class="content-section__p">
@@ -623,7 +642,7 @@
           </p>
         </div>
 
-        <!-- Section 2: The Benefits -->
+        <!-- Details Section 2: The Benefits -->
         <div class="content-section">
           <h2 class="content-section__title">The Benefits</h2>
           <div class="benefits-list">
@@ -658,7 +677,7 @@
           </div>
         </div>
 
-        <!-- Section 3: Contents and Summary -->
+        <!-- Details Section 3: Contents and Summary -->
         <div class="content-section">
           <h2 class="content-section__title">Contents and Summary</h2>
           <p class="content-section__p">
@@ -693,7 +712,7 @@
     <div class="checkout-card">
       <div class="checkout-header">
         <h3 class="checkout-header__title">Sistem Checkout</h3>
-        <button class="checkout-header__close" id="closeCheckoutBtn">&times;</button>
+        <button class="checkout-header__close" id="closeCheckoutBtn" type="button">&times;</button>
       </div>
       <form id="checkoutForm" onsubmit="handleMockPayment(event)">
         <div class="checkout-body">
@@ -736,20 +755,19 @@
   <script src="js/sound.js"></script>
   
   <script>
-    // Configured paths for Carousel 1 media files (image & video support)
-    // Place all corresponding files inside: assets/images/dashboard/shop/carousel1/
+    // Konfigurasi Fail Media Karousel (Menyokong Gambar Dan Video Secara Dinamik)
+    // Sila letakkan semua fail berkaitan di dalam: assets/images/dashboard/shop/carousel1/
     const carouselMediaList = [
       { type: "image", src: "assets/images/dashboard/shop/carousel1/slide1.jpg" },
       { type: "video", src: "assets/images/dashboard/shop/carousel1/slide2.mp4", poster: "assets/images/dashboard/shop/carousel1/slide2.jpg" },
       { type: "image", src: "assets/images/dashboard/shop/carousel1/slide3.jpg" }
     ];
 
-    // Build Slide Elements Dynamically
     const track = document.getElementById("carouselTrack");
     const dotsContainer = document.getElementById("carouselDots");
     
+    // Bina Sliders Secara Automatik
     carouselMediaList.forEach((media, idx) => {
-      // 1. Create Slides
       const slide = document.createElement("div");
       slide.className = "media-carousel__slide";
       
@@ -761,7 +779,7 @@
         video.muted = true;
         video.loop = true;
         video.playsInline = true;
-        video.controls = true; // allow playback control
+        video.controls = true; // Benarkan pengguna mengawal mainan/jeda video
         
         video.addEventListener("error", () => {
           if (media.poster) {
@@ -784,7 +802,7 @@
       }
       track.appendChild(slide);
 
-      // 2. Create Dot Nav
+      // Bina Navigasi Titik (Dots Nav)
       const dot = document.createElement("button");
       dot.className = "media-carousel__dot" + (idx === 0 ? " is-active" : "");
       dot.setAttribute("aria-label", `Pergi ke slide ${idx + 1}`);
@@ -795,7 +813,6 @@
       dotsContainer.appendChild(dot);
     });
 
-    // Carousel Logic
     let currentSlideIndex = 0;
     const totalSlides = carouselMediaList.length;
 
@@ -806,14 +823,13 @@
       
       track.style.transform = `translateX(-${index * 100}%)`;
       
-      // Update dots
       document.querySelectorAll(".media-carousel__dot").forEach((dot, idx) => {
         dot.classList.toggle("is-active", idx === index);
       });
       
-      // Control video playback based on active slide
+      // Mengawal tumpuan automasi mainan video berdasarkan slaid yang aktif
       const videos = track.querySelectorAll("video");
-      videos.forEach(v => v.pause()); // Pause all first
+      videos.forEach(v => v.pause()); // Jeda semua video dahulu
       
       const activeSlide = track.children[index];
       const activeVideo = activeSlide.querySelector("video");
@@ -832,7 +848,7 @@
       goToSlide(currentSlideIndex + 1);
     });
 
-    // Checkout Popup controls
+    // Kawalan Dialog Checkout (Popup)
     const checkoutModal = document.getElementById("checkoutModal");
     const openBtn = document.getElementById("openCheckoutBtn");
     const closeBtn = document.getElementById("closeCheckoutBtn");
@@ -847,14 +863,13 @@
       checkoutModal.classList.remove("is-active");
     });
 
-    // Close checkout when clicking overlay backdrop
     checkoutModal.addEventListener("click", (e) => {
       if (e.target === checkoutModal) {
         checkoutModal.classList.remove("is-active");
       }
     });
 
-    // Mock Yottibpayz checkout submission
+    // Simulasi Pembayaran Yottibpayz
     function handleMockPayment(event) {
       event.preventDefault();
       const submitBtn = document.getElementById("submitPaymentBtn");
@@ -870,7 +885,7 @@
       }, 2000);
     }
 
-    // Auto-play first slide video if exists on load
+    // Laraskan permulaan slaid pertama
     window.addEventListener("DOMContentLoaded", () => {
       setTimeout(() => goToSlide(0), 400);
     });
