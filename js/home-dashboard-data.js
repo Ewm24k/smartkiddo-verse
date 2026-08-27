@@ -71,7 +71,19 @@ const SmartKiddoDashboardData = {
       itemCount: 6,
       filePrefix: "assets/images/dashboard/shop/sp", // UPDATED PATH: assets/images/dashboard/shop/
       fileSuffix: ".jpg", // Default fallback suffix
-      launched: false,
+      
+      // AKTIFKAN ITEM PERTAMA (LAUNCHED): Set true pada item pertama, dan selebihnya false
+      launched: [true, false, false, false, false, false], 
+      
+      // PAUTAN HALAMAN DETIL (LINKS): Pautkan item pertama ke 'shop.html'
+      links: [
+        "shop.html",
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
       collapsible: true, // Only Shop remains collapsed under the "Go Shop" toggle
       
       /* 
@@ -81,8 +93,8 @@ const SmartKiddoDashboardData = {
          Jika dibiarkan kosong, ia secara automatik menggunakan parameter lalai di atas.
       */
       items: [
-        { type: "image", suffix: ".jpg" },                              // Item 1: assets/images/dashboard/shop/sp1.jpg
-        { type: "video", suffix: "v.mp4", posterSuffix: ".jpg" },       // Item 2: assets/images/dashboard/shop/sp2v.mp4 & poster: assets/images/dashboard/shop/sp2.jpg
+        { type: "image", suffix: ".jpg" },                              // Item 1: assets/images/dashboard/shop/sp1.jpg (Akan memaut ke shop.html apabila ditekan)
+        { type: "video", suffix: "v.mp4", posterSuffix: ".jpg" },       // Item 2: assets/images/dashboard/shop/sp2v.mp4
         { type: "image", suffix: ".jpg" },                              // Item 3: assets/images/dashboard/shop/sp3.jpg
         { type: "image", suffix: ".jpg" },                              // Item 4: assets/images/dashboard/shop/sp4.jpg
         { type: "image", suffix: ".jpg" },                              // Item 5: assets/images/dashboard/shop/sp5.jpg
