@@ -35,7 +35,7 @@
     .shop-container {
       max-width: 1200px;
       margin: 0 auto;
-      padding: 90px 24px 60px 24px;
+      padding: 100px 24px 60px 24px;
       box-sizing: border-box;
     }
 
@@ -84,11 +84,55 @@
     .shop-topbar__brand {
       font-family: 'Fredoka', sans-serif;
       font-weight: 700;
-      font-size: 20px;
+      font-size: 18px;
     }
 
     .shop-topbar__accent {
       color: #ff914d;
+    }
+
+    /* PREMIUM MEDIUM LANGUAGE DROPDOWN */
+    .lang-dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .lang-dropdown__select {
+      background: linear-gradient(135deg, #1d143a 0%, #0f0a25 100%);
+      border: 1.5px solid #3c2a6b;
+      color: #ffffff;
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 600;
+      font-size: 13.5px;
+      padding: 8px 32px 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      outline: none;
+      transition: all 0.25s ease;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    .lang-dropdown__select:hover, 
+    .lang-dropdown__select:focus {
+      border-color: #ff914d;
+      color: #ff914d;
+    }
+
+    .lang-dropdown__select option {
+      background-color: #120e24;
+      color: #ffffff;
+    }
+
+    .lang-dropdown::after {
+      content: "▾";
+      font-size: 12px;
+      color: #ff914d;
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
     }
 
     /* Grid Asal (Default/Desktop) */
@@ -127,7 +171,7 @@
       justify-content: center;
     }
 
-    /* PENTING: object-fit contain memastikan kedua-dua media 16:9 dan 9:16 dipaparkan sepenuhnya tanpa terpotong */
+    /* object-fit contain memastikan kedua-dua media 16:9 dan 9:16 dipaparkan sepenuhnya tanpa terpotong */
     .media-carousel__media {
       width: 100% !important;
       height: 100% !important;
@@ -204,10 +248,12 @@
       line-height: 1.2;
     }
 
+    /* MEMBAIKI KEDUDUKAN: Menukar margin-top negatif ke margin-top positif supaya teks lebih rendah */
     .product-creator {
       font-size: 15px;
       color: rgba(255, 255, 255, 0.6);
-      margin-top: -12px;
+      margin-top: 12px; /* Diturunkan sedikit dari tajuk */
+      margin-bottom: 0;
     }
 
     .product-creator strong {
@@ -368,7 +414,7 @@
       font-weight: 600;
     }
 
-    /* Checkout Popup Modal - Dipertingkat untuk sokongan tatalan menegak */
+    /* Checkout Popup Modal */
     .checkout-modal {
       position: fixed;
       top: 0;
@@ -541,7 +587,7 @@
        RESPONSIVE & ORIENTATION MEDIA QUERIES (iOS & Android)
        ========================================================= */
 
-    /* 1. APABILA PERANTI BERADA PADA MOD POTRET (9:16 Viewport Aspect Ratio) */
+    /* 1. Mod Potret (9:16 Viewport Aspect Ratio) */
     @media (orientation: portrait) {
       .product-grid {
         grid-template-columns: 1fr !important; /* Susunan menegak satu kolum */
@@ -552,22 +598,21 @@
       }
     }
 
-    /* 2. APABILA PERANTI BERADA PADA MOD LANDSKAP (16:9 Viewport Aspect Ratio) */
+    /* 2. Mod Landskap (16:9 Viewport Aspect Ratio) */
     @media (orientation: landscape) and (max-width: 1024px) {
       .shop-container {
         padding-top: 85px;
         padding-bottom: 30px;
       }
       .product-grid {
-        grid-template-columns: 1.1fr 0.9fr !important; /* Susunan sebelah-menyebelah untuk memanfaatkan ruang melintang */
+        grid-template-columns: 1.1fr 0.9fr !important; /* Susunan sebelah-menyebelah */
         gap: 20px;
       }
       .media-carousel {
         aspect-ratio: 16 / 9;
-        position: sticky; /* Karousel kekal statik di kedudukan atas semasa menatal butiran sebelah kanan */
+        position: sticky;
         top: 85px;
       }
-      /* Laraskan kedudukan modal bayaran supaya muat dalam skrin landskap yang pendek */
       .checkout-card {
         margin-top: 10px;
         margin-bottom: 10px;
@@ -575,6 +620,12 @@
     }
 
     /* Larasan Skrin Telefon Kecil */
+    @media (max-width: 768px) {
+      .shop-topbar__brand {
+        display: none; /* Sembunyikan jenama tengah pada skrin kecil untuk mengelakkan pelanggaran */
+      }
+    }
+
     @media (max-width: 600px) {
       .shop-container {
         padding: 85px 16px 40px 16px;
@@ -590,19 +641,28 @@
 </head>
 <body>
 
-  <!-- Top Navigation Bar -->
+  <!-- Top Navigation Bar (With Language Selector) -->
   <header class="shop-topbar">
-    <a href="home.html" class="shop-topbar__back">
+    <a href="home.html" class="shop-topbar__back" id="backBtn" data-i18n="back">
       <span>&larr;</span> Kembali
     </a>
     <span class="shop-topbar__brand">SmartKiddo <span class="shop-topbar__accent">Universe</span></span>
+    
+    <!-- Medium-sized premium dropdown selector -->
+    <div class="lang-dropdown">
+      <select id="langSelect" class="lang-dropdown__select" aria-label="Tukar Bahasa">
+        <option value="ms" selected>🇲🇾 Melayu</option>
+        <option value="en">🇬🇧 English</option>
+        <option value="zh">🇨🇳 中文</option>
+      </select>
+    </div>
   </header>
 
   <!-- Main Scrollable Content Container -->
   <main class="shop-container">
     <div class="product-grid">
       
-      <!-- Left / Top Column: Media Player (Supports standard 16:9 and portrait 9:16 assets) -->
+      <!-- Left / Top Column: Media Player -->
       <div class="media-container">
         <div class="media-carousel" id="productCarousel">
           <div class="media-carousel__track" id="carouselTrack">
@@ -618,60 +678,60 @@
       <div class="product-details">
         
         <div>
-          <h1 class="product-title">Interactive Canva Math Module</h1>
-          <p class="product-creator">Ditulis & Direka oleh <strong>Zuraiman</strong></p>
+          <h1 class="product-title" data-i18n="title">Interactive Canva Math Module</h1>
+          <p class="product-creator" id="productCreator" data-i18n="creator">Ditulis & Direka oleh <strong>Zuraiman</strong></p>
         </div>
 
         <!-- Pricing Widget -->
         <div class="pricing-card">
           <div class="pricing-card__price-row">
-            <span class="pricing-card__label">Harga / Price</span>
+            <span class="pricing-card__label" data-i18n="priceLabel">Harga</span>
             <span class="pricing-card__price-myr">RM 64.00</span>
             <span class="pricing-card__price-usd">Sekitar ~$14.50 USD</span>
           </div>
-          <button type="button" class="pricing-card__btn" id="openCheckoutBtn">
+          <button type="button" class="pricing-card__btn" id="openCheckoutBtn" data-i18n="buyBtn">
             <span>🛒</span> Beli Sekarang
           </button>
         </div>
 
         <!-- Details Section 1: What it is About -->
         <div class="content-section">
-          <h2 class="content-section__title">What it is About</h2>
-          <p class="content-section__p">
+          <h2 class="content-section__title" data-i18n="aboutTitle">What it is About</h2>
+          <p class="content-section__p" data-i18n="aboutText">
             This link points to a digital mathematics learning application or interactive module built inside Canva. Created by an educator or content creator named Zuraiman, it is designed to help students learn or practice math concepts in a visually engaging, interactive digital format (such as an interactive presentation, digital worksheet, or e-module).
           </p>
         </div>
 
         <!-- Details Section 2: The Benefits -->
         <div class="content-section">
-          <h2 class="content-section__title">The Benefits</h2>
+          <h2 class="content-section__title" data-i18n="benefitsTitle">The Benefits</h2>
           <div class="benefits-list">
             <div class="benefit-item">
               <span class="benefit-item__icon">★</span>
               <div class="benefit-item__text">
-                <div class="benefit-item__title">Interactive & Engaging</div>
-                <div class="benefit-item__desc">Instead of traditional, text-heavy math textbooks, it uses Canva’s graphic layout capabilities to make math colorful, fun, and less intimidating.</div>
+                <div class="benefit-item__title" data-i18n="b1Title">Interactive & Engaging</div>
+                <div class="benefit-item__desc" data-i18n="b1Desc">Instead of traditional, text-heavy math textbooks, it uses Canva’s graphic layout capabilities to make math colorful, fun, and less intimidating.</div>
               </div>
             </div>
             <div class="benefit-item">
               <span class="benefit-item__icon">★</span>
               <div class="benefit-item__text">
-                <div class="benefit-item__title">Visual Learning</div>
-                <div class="benefit-item__desc">Helps students visualize abstract mathematical concepts (like formulas, equations, or geometric shapes) through structured diagrams and creative layouts.</div>
+                <div class="benefit-item__title" data-i18n="b2Title">Visual Learning</div>
+                <div class="benefit-item__desc" data-i18n="b2Desc">Helps students visualize abstract mathematical concepts (like formulas, equations, or geometric shapes) through structured diagrams and creative layouts.</div>
               </div>
             </div>
             <div class="benefit-item">
               <span class="benefit-item__icon">★</span>
               <div class="benefit-item__text">
-                <div class="benefit-item__title">Accessibility</div>
-                <div class="benefit-item__desc">Being a Canva-linked tool, students or teachers can easily access it via a web browser on phones, tablets, or computers without needing specialized software installation.</div>
+                <div class="benefit-item__title" data-i18n="b3Title">Accessibility</div>
+                <div class="benefit-item__desc" data-i18n="b3Desc">Being a Canva-linked tool, students or teachers can easily access it via a web browser on phones, tablets, or computers without needing specialized software installation.</div>
               </div>
             </div>
             <div class="benefit-item">
               <span class="benefit-item__icon">★</span>
               <div class="benefit-item__text">
-                <div class="benefit-item__title">Self-Paced Practice</div>
-                <div class="benefit-item__desc">Often allows students to navigate through math problems, quizzes, or instructional steps at their own pace.</div>
+                <div class="benefit-item__title" data-i18n="b4Title">Self-Paced Practice</div>
+                <div class="benefit-item__desc" data-i18n="b4Desc">Often allows students to navigate through math problems, quizzes, or instructional steps at their own pace.</div>
               </div>
             </div>
           </div>
@@ -679,26 +739,26 @@
 
         <!-- Details Section 3: Contents and Summary -->
         <div class="content-section">
-          <h2 class="content-section__title">Contents and Summary</h2>
-          <p class="content-section__p">
+          <h2 class="content-section__title" data-i18n="summaryTitle">Contents and Summary</h2>
+          <p class="content-section__p" data-i18n="summaryIntro">
             While the exact syllabus topic (e.g., basic arithmetic, fractions, algebra, or geometry) depends on the specific grade level it targets, a typical "Math Aplikasi" template by educators on Canva generally contains:
           </p>
           <div class="outline-list">
             <div class="outline-item">
               <span class="outline-item__num">1</span>
-              <span class="outline-item__text">Introduction/Objective Page (Topics & formulas covered)</span>
+              <span class="outline-item__text" data-i18n="step1">Introduction/Objective Page (Topics & formulas covered)</span>
             </div>
             <div class="outline-item">
               <span class="outline-item__num">2</span>
-              <span class="outline-item__text">Core Lesson / Step-by-step breaks of rules</span>
+              <span class="outline-item__text" data-i18n="step2">Core Lesson / Step-by-step breaks of rules</span>
             </div>
             <div class="outline-item">
               <span class="outline-item__num">3</span>
-              <span class="outline-item__text">Interactive Practice / Exercises & Worksheets</span>
+              <span class="outline-item__text" data-i18n="step3">Interactive Practice / Exercises & Worksheets</span>
             </div>
             <div class="outline-item">
               <span class="outline-item__num">4</span>
-              <span class="outline-item__text">Quizzes or Games (Fun review sections to reinforce learning)</span>
+              <span class="outline-item__text" data-i18n="step4">Quizzes or Games (Fun review sections to reinforce learning)</span>
             </div>
           </div>
         </div>
@@ -711,40 +771,40 @@
   <div class="checkout-modal" id="checkoutModal">
     <div class="checkout-card">
       <div class="checkout-header">
-        <h3 class="checkout-header__title">Sistem Checkout</h3>
+        <h3 class="checkout-header__title" id="checkoutTitle" data-i18n="checkoutTitle">Sistem Checkout</h3>
         <button class="checkout-header__close" id="closeCheckoutBtn" type="button">&times;</button>
       </div>
       <form id="checkoutForm" onsubmit="handleMockPayment(event)">
         <div class="checkout-body">
           <div class="payment-summary">
-            <span class="payment-summary__label">Jumlah Bayaran:</span>
+            <span class="payment-summary__label" data-i18n="amountLabel">Jumlah Bayaran:</span>
             <span class="payment-summary__price">RM 64.00</span>
           </div>
 
           <div class="form-group">
-            <label class="form-group__label" for="custName">Nama Penuh</label>
+            <label class="form-group__label" for="custName" id="lblCustName" data-i18n="custName">Nama Penuh</label>
             <input class="form-group__input" type="text" id="custName" placeholder="Contoh: Muhammad Ali" required />
           </div>
 
           <div class="form-group">
-            <label class="form-group__label" for="custEmail">Emel Pembeli</label>
+            <label class="form-group__label" for="custEmail" id="lblCustEmail" data-i18n="custEmail">Emel Pembeli</label>
             <input class="form-group__input" type="email" id="custEmail" placeholder="contoh@gmail.com" required />
           </div>
 
           <div class="form-group">
-            <label class="form-group__label" for="custPhone">Nombor Telefon</label>
+            <label class="form-group__label" for="custPhone" id="lblCustPhone" data-i18n="custPhone">Nombor Telefon</label>
             <input class="form-group__input" type="tel" id="custPhone" placeholder="0123456789" required />
           </div>
 
           <!-- Yottibpayz Gateway Info -->
           <div class="yottibpayz-gateway">
             <div class="yottibpayz-gateway__badge">Yottibpayz</div>
-            <div class="yottibpayz-gateway__info">
+            <div class="yottibpayz-gateway__info" id="gatewayInfo" data-i18n="gatewayInfo">
               Transaksi diproses dengan selamat melalui sistem gerbang Yottibpayz. (Mod Ujian Aktif)
             </div>
           </div>
 
-          <button type="submit" class="checkout-btn" id="submitPaymentBtn">
+          <button type="submit" class="checkout-btn" id="submitPaymentBtn" data-i18n="submitBtn">
             Sahkan & Bayar
           </button>
         </div>
@@ -755,8 +815,157 @@
   <script src="js/sound.js"></script>
   
   <script>
-    // Konfigurasi Fail Media Karousel (Menyokong Gambar Dan Video Secara Dinamik)
-    // Sila letakkan semua fail berkaitan di dalam: assets/images/dashboard/shop/carousel1/
+    // =========================================================
+    // MULTI-LANGUAGE SYSTEM (TERJEMAHAN TANPA REBOUT)
+    // =========================================================
+    const translations = {
+      ms: {
+        back: "← Kembali",
+        title: "Interactive Canva Math Module",
+        creator: "Ditulis & Direka oleh <strong>Zuraiman</strong>",
+        priceLabel: "Harga",
+        buyBtn: "🛒 Beli Sekarang",
+        aboutTitle: "What it is About",
+        aboutText: "This link points to a digital mathematics learning application or interactive module built inside Canva. Created by an educator or content creator named Zuraiman, it is designed to help students learn or practice math concepts in a visually engaging, interactive digital format (such as an interactive presentation, digital worksheet, or e-module).",
+        benefitsTitle: "The Benefits",
+        b1Title: "Interactive & Engaging",
+        b1Desc: "Instead of traditional, text-heavy math textbooks, it uses Canva’s graphic layout capabilities to make math colorful, fun, and less intimidating.",
+        b2Title: "Visual Learning",
+        b2Desc: "Helps students visualize abstract mathematical concepts (like formulas, equations, or geometric shapes) through structured diagrams and creative layouts.",
+        b3Title: "Accessibility",
+        b3Desc: "Being a Canva-linked tool, students or teachers can easily access it via a web browser on phones, tablets, or computers without needing specialized software installation.",
+        b4Title: "Self-Paced Practice",
+        b4Desc: "Often allows students to navigate through math problems, quizzes, or instructional steps at their own pace.",
+        summaryTitle: "Contents and Summary",
+        summaryIntro: "While the exact syllabus topic (e.g., basic arithmetic, fractions, algebra, or geometry) depends on the specific grade level it targets, a typical \"Math Aplikasi\" template by educators on Canva generally contains:",
+        step1: "Introduction/Objective Page (Topics & formulas covered)",
+        step2: "Core Lesson / Step-by-step breaks of rules",
+        step3: "Interactive Practice / Exercises & Worksheets",
+        step4: "Quizzes or Games (Fun review sections to reinforce learning)",
+        checkoutTitle: "Sistem Checkout",
+        amountLabel: "Jumlah Bayaran:",
+        custName: "Nama Penuh",
+        custEmail: "Emel Pembeli",
+        custPhone: "Nombor Telefon",
+        gatewayInfo: "Transaksi diproses dengan selamat melalui sistem gerbang Yottibpayz. (Mod Ujian Aktif)",
+        submitBtn: "Sahkan & Bayar",
+        successMsg: "Terima kasih! Pembayaran anda melalui Yottibpayz berjaya disimulasikan.",
+        processing: "Memproses bayaran..."
+      },
+      en: {
+        back: "← Back",
+        title: "Interactive Canva Math Module",
+        creator: "Written & Designed by <strong>Zuraiman</strong>",
+        priceLabel: "Price",
+        buyBtn: "🛒 Buy Now",
+        aboutTitle: "What it is About",
+        aboutText: "This link points to a digital mathematics learning application or interactive module built inside Canva. Created by an educator or content creator named Zuraiman, it is designed to help students learn or practice math concepts in a visually engaging, interactive digital format (such as an interactive presentation, digital worksheet, or e-module).",
+        benefitsTitle: "The Benefits",
+        b1Title: "Interactive & Engaging",
+        b1Desc: "Instead of traditional, text-heavy math textbooks, it uses Canva’s graphic layout capabilities to make math colorful, fun, and less intimidating.",
+        b2Title: "Visual Learning",
+        b2Desc: "Helps students visualize abstract mathematical concepts (like formulas, equations, or geometric shapes) through structured diagrams and creative layouts.",
+        b3Title: "Accessibility",
+        b3Desc: "Being a Canva-linked tool, students or teachers can easily access it via a web browser on phones, tablets, or computers without needing specialized software installation.",
+        b4Title: "Self-Paced Practice",
+        b4Desc: "Often allows students to navigate through math problems, quizzes, or instructional steps at their own pace.",
+        summaryTitle: "Contents and Summary",
+        summaryIntro: "While the exact syllabus topic (e.g., basic arithmetic, fractions, algebra, or geometry) depends on the specific grade level it targets, a typical \"Math Aplikasi\" template by educators on Canva generally contains:",
+        step1: "Introduction/Objective Page (Topics & formulas covered)",
+        step2: "Core Lesson / Step-by-step breaks of rules",
+        step3: "Interactive Practice / Exercises & Worksheets",
+        step4: "Quizzes or Games (Fun review sections to reinforce learning)",
+        checkoutTitle: "Checkout System",
+        amountLabel: "Total Amount:",
+        custName: "Full Name",
+        custEmail: "Email Address",
+        custPhone: "Phone Number",
+        gatewayInfo: "Transactions are processed securely via Yottibpayz gateway system. (Sandbox Mode active)",
+        submitBtn: "Confirm & Pay",
+        successMsg: "Thank you! Your payment through Yottibpayz was successfully simulated.",
+        processing: "Processing payment..."
+      },
+      zh: {
+        back: "← 返回",
+        title: "Interactive Canva Math Module (互动数学模块)",
+        creator: "由 <strong>Zuraiman</strong> 倾力设计与编写",
+        priceLabel: "价格",
+        buyBtn: "🛒 立即购买",
+        aboutTitle: "关于此模块",
+        aboutText: "此链接指向内置于 Canva 平台中的数字数学学习应用或互动式多媒体教学模组。该模组由专业教育工作者 Zuraiman 创作，旨在通过极具视觉吸引力和高度互动的数字化格式（如互动演示、数字练习册或电子化模组）辅助学生学习和温习数学概念。",
+        benefitsTitle: "核心优势",
+        b1Title: "互动与趣味性",
+        b1Desc: "摒弃了传统枯燥的纯文本数学教科书，利用 Canva 强大的视觉图形排版，让数学变得生动有趣，从而降低学习门槛。",
+        b2Title: "直观视觉学习",
+        b2Desc: "通过结构化的图标、图表以及创意设计排版，帮助学生轻松将抽象的数学公式、等式或几何图形具象化。",
+        b3Title: "便捷使用",
+        b3Desc: "作为基于 Canva 链接的数字工具，学生或教师只需使用手机、平板或电脑的浏览器即可轻松访问，无需安装任何专用软件。",
+        b4Title: "自主控制进度",
+        b4Desc: "允许学生根据自身的理解和学习速度，自主掌控答题进度、测试或教学法则的浏览节奏。",
+        summaryTitle: "核心内容与提要",
+        summaryIntro: "尽管教学大纲（如：基础算术、分数、代数或几何）取决于所针对的特定年级阶段，但教育工作者在 Canva 上设计的一般“数学应用（Math Aplikasi）”模板通常包含以下内容：",
+        step1: "课程介绍/目标页面 (涵盖的主题与公式概览)",
+        step2: "核心课程讲解 / 公式与定理的分步解析",
+        step3: "互动练习板块 / 随堂测验与工作表",
+        step4: "测验或小游戏 (旨在强化学习成果的趣味性回顾环节)",
+        checkoutTitle: "结账系统",
+        amountLabel: "应付总额:",
+        custName: "真实姓名",
+        custEmail: "电子邮箱",
+        custPhone: "联系电话",
+        gatewayInfo: "交易已通过 Yottibpayz 支付网关安全处理。（已启用沙盒测试模式）",
+        submitBtn: "确认付款",
+        successMsg: "谢谢！您的 Yottibpayz 网关模拟交易付款成功完成。",
+        processing: "付款处理中..."
+      }
+    };
+
+    const langSelect = document.getElementById("langSelect");
+    let currentLang = "ms";
+
+    function applyTranslations(lang) {
+      currentLang = lang;
+      const dict = translations[lang];
+      
+      document.querySelectorAll("[data-i18n]").forEach(element => {
+        const key = element.getAttribute("data-i18n");
+        if (dict[key]) {
+          if (element.tagName === "INPUT" || element.tagName === "TEXTAREA") {
+            element.placeholder = dict[key];
+          } else {
+            element.innerHTML = dict[key];
+          }
+        }
+      });
+      
+      // Update custom input placeholders dynamically based on language
+      const nameInput = document.getElementById("custName");
+      const emailInput = document.getElementById("custEmail");
+      const phoneInput = document.getElementById("custPhone");
+      
+      if (lang === "en") {
+        nameInput.placeholder = "e.g., John Doe";
+        emailInput.placeholder = "john@example.com";
+        phoneInput.placeholder = "+123456789";
+      } else if (lang === "zh") {
+        nameInput.placeholder = "例如：张小明";
+        emailInput.placeholder = "xiaoming@example.com";
+        phoneInput.placeholder = "13800000000";
+      } else {
+        nameInput.placeholder = "Contoh: Muhammad Ali";
+        emailInput.placeholder = "contoh@gmail.com";
+        phoneInput.placeholder = "0123456789";
+      }
+    }
+
+    langSelect.addEventListener("change", (e) => {
+      if (typeof SmartKiddoSound !== 'undefined') SmartKiddoSound.playClick();
+      applyTranslations(e.target.value);
+    });
+
+    // =========================================================
+    // MULTI-MEDIA CAROUSEL LOGIC
+    // =========================================================
     const carouselMediaList = [
       { type: "image", src: "assets/images/dashboard/shop/carousel1/slide1.jpg" },
       { type: "video", src: "assets/images/dashboard/shop/carousel1/slide2.mp4", poster: "assets/images/dashboard/shop/carousel1/slide2.jpg" },
@@ -766,7 +975,7 @@
     const track = document.getElementById("carouselTrack");
     const dotsContainer = document.getElementById("carouselDots");
     
-    // Bina Sliders Secara Automatik
+    // Bina Slaid Secara Dinamik
     carouselMediaList.forEach((media, idx) => {
       const slide = document.createElement("div");
       slide.className = "media-carousel__slide";
@@ -779,7 +988,7 @@
         video.muted = true;
         video.loop = true;
         video.playsInline = true;
-        video.controls = true; // Benarkan pengguna mengawal mainan/jeda video
+        video.controls = true;
         
         video.addEventListener("error", () => {
           if (media.poster) {
@@ -827,7 +1036,6 @@
         dot.classList.toggle("is-active", idx === index);
       });
       
-      // Mengawal tumpuan automasi mainan video berdasarkan slaid yang aktif
       const videos = track.querySelectorAll("video");
       videos.forEach(v => v.pause()); // Jeda semua video dahulu
       
@@ -848,7 +1056,9 @@
       goToSlide(currentSlideIndex + 1);
     });
 
-    // Kawalan Dialog Checkout (Popup)
+    // =========================================================
+    // CHECKOUT MODAL LOGIC
+    // =========================================================
     const checkoutModal = document.getElementById("checkoutModal");
     const openBtn = document.getElementById("openCheckoutBtn");
     const closeBtn = document.getElementById("closeCheckoutBtn");
@@ -869,24 +1079,27 @@
       }
     });
 
-    // Simulasi Pembayaran Yottibpayz
+    // Simulasi Pembayaran Yottibpayz (Mock Gateway)
     function handleMockPayment(event) {
       event.preventDefault();
       const submitBtn = document.getElementById("submitPaymentBtn");
-      submitBtn.textContent = "Memproses bayaran...";
+      const dict = translations[currentLang];
+      
+      submitBtn.textContent = dict.processing;
       submitBtn.disabled = true;
 
       setTimeout(() => {
-        alert("Terima kasih! Pembayaran anda melalui Yottibpayz berjaya disimulasikan.");
+        alert(dict.successMsg);
         checkoutModal.classList.remove("is-active");
-        submitBtn.textContent = "Sahkan & Bayar";
+        submitBtn.textContent = dict.submitBtn;
         submitBtn.disabled = false;
         document.getElementById("checkoutForm").reset();
       }, 2000);
     }
 
-    // Laraskan permulaan slaid pertama
+    // Laraskan permulaan slaid pertama dan bahasa asal
     window.addEventListener("DOMContentLoaded", () => {
+      applyTranslations("ms");
       setTimeout(() => goToSlide(0), 400);
     });
   </script>
