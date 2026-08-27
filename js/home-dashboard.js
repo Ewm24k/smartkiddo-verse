@@ -335,15 +335,9 @@ const SmartKiddoDashboard = (() => {
       video.loop = true;
       video.playsInline = true;
       video.preload = "none";
-      // Playback is controlled by cardVideoObserver below (only plays
-      // near the viewport) rather than the autoplay attribute, which
-      // would try to start all cards at once regardless of visibility.
-      // If the file doesn't exist yet, fail quietly instead of showing
-      // a broken-video icon — just leaves the placeholder background.
+      // Playback is controlled by cardVideoObserver below
       video.addEventListener("error", () => {
         if (video.poster) {
-          // If the video file is missing but a poster exists, convert
-          // the card to an img element so the preview image remains visible.
           const fallbackImg = document.createElement("img");
           fallbackImg.className = "dash-card__media";
           fallbackImg.src = video.poster;
@@ -368,8 +362,7 @@ const SmartKiddoDashboard = (() => {
       card.appendChild(img);
     }
 
-    // Center overlay shown on hover — "Masuk Kelas" for launched
-    // categories, "Very Soon Launching" for everything else.
+    // Center overlay shown on hover
     const overlay = document.createElement("div");
     overlay.className = "dash-card__overlay";
 
@@ -383,13 +376,14 @@ const SmartKiddoDashboard = (() => {
 
     if (isItemLaunched) {
       const ageLabel = (category.ageLabels && category.ageLabels[index - 1]) || "";
+      const overlayBtnText = category.id === "shop" ? "Lihat Produk" : "Masuk Kelas";
       overlay.innerHTML = `
         <span class="dash-card__overlay-label">${category.title.split(" / ")[0]} ${ageLabel}</span>
-        <button type="button" class="dash-card__overlay-btn">Masuk Kelas</button>
+        <button type="button" class="dash-card__overlay-btn">${overlayBtnText}</button>
       `;
       overlay.querySelector(".dash-card__overlay-btn").addEventListener("click", (e) => {
         e.stopPropagation(); // Prevents touch parent overlay toggle off
-        SmartKiddoSound.playClick();
+        if (typeof SmartKiddoSound !== 'undefined') SmartKiddoSound.playClick();
         if (targetLink) {
           window.location.href = targetLink;
         } else {
@@ -401,11 +395,13 @@ const SmartKiddoDashboard = (() => {
     }
     card.appendChild(overlay);
 
-    card.addEventListener("mouseenter", () => SmartKiddoSound.playHover());
+    card.addEventListener("mouseenter", () => {
+      if (typeof SmartKiddoSound !== 'undefined') SmartKiddoSound.playHover();
+    });
     
     // Touch Interaction (Android/iOS): Click reveals hover overlay controls instead of triggering navigation
     card.addEventListener("click", (e) => {
-      SmartKiddoSound.playClick();
+      if (typeof SmartKiddoSound !== 'undefined') SmartKiddoSound.playClick();
       
       const isHovered = card.classList.contains("is-hovered");
       
@@ -434,7 +430,6 @@ const SmartKiddoDashboard = (() => {
     btn.className = "dash-rows-toggle";
     btn.setAttribute("aria-label", "Terokai bahagian kedai");
     
-    // Configured with clean "Go Shop" text representation
     btn.innerHTML = `
       <span class="dash-rows-toggle__text">Go Shop</span>
       <span class="dash-rows-toggle__icon">⌄</span>
@@ -442,9 +437,11 @@ const SmartKiddoDashboard = (() => {
 
     let isExpanded = false;
 
-    btn.addEventListener("mouseenter", () => SmartKiddoSound.playHover());
+    btn.addEventListener("mouseenter", () => {
+      if (typeof SmartKiddoSound !== 'undefined') SmartKiddoSound.playHover();
+    });
     btn.addEventListener("click", () => {
-      SmartKiddoSound.playClick();
+      if (typeof SmartKiddoSound !== 'undefined') SmartKiddoSound.playClick();
       const extraWrap = document.getElementById("dashRowsExtra");
       if (!extraWrap) return;
 
@@ -505,11 +502,11 @@ const SmartKiddoDashboard = (() => {
     }
 
     leftArrow.addEventListener("click", () => {
-      SmartKiddoSound.playClick();
+      if (typeof SmartKiddoSound !== 'undefined') SmartKiddoSound.playClick();
       track.scrollBy({ left: -track.clientWidth * 0.8, behavior: "smooth" });
     });
     rightArrow.addEventListener("click", () => {
-      SmartKiddoSound.playClick();
+      if (typeof SmartKiddoSound !== 'undefined') SmartKiddoSound.playClick();
       track.scrollBy({ left: track.clientWidth * 0.8, behavior: "smooth" });
     });
 
@@ -520,7 +517,7 @@ const SmartKiddoDashboard = (() => {
       () => {
         if (!scrollSoundReady) return;
         scrollSoundReady = false;
-        SmartKiddoSound.playScroll();
+        if (typeof SmartKiddoSound !== 'undefined') SmartKiddoSound.playScroll();
         setTimeout(() => (scrollSoundReady = true), 250);
       },
       { passive: true }
@@ -532,7 +529,7 @@ const SmartKiddoDashboard = (() => {
     row.appendChild(wrap);
 
     header.querySelector(".dash-row__seeall").addEventListener("click", () => {
-      SmartKiddoSound.playClick();
+      if (typeof SmartKiddoSound !== 'undefined') SmartKiddoSound.playClick();
       openSeeAll(category);
     });
 
@@ -552,17 +549,17 @@ const SmartKiddoDashboard = (() => {
       btn.className = "dash-tab" + (tab.id === "all" ? " is-active" : "");
       btn.textContent = tab.label;
       btn.dataset.tab = tab.id;
-      btn.addEventListener("mouseenter", () => SmartKiddoSound.playHover());
+      btn.addEventListener("mouseenter", () => {
+        if (typeof SmartKiddoSound !== 'undefined') SmartKiddoSound.playHover();
+      });
       btn.addEventListener("click", () => {
-        SmartKiddoSound.playClick();
+        if (typeof SmartKiddoSound !== 'undefined') SmartKiddoSound.playClick();
         activeTab = tab.id;
         container.querySelectorAll(".dash-tab").forEach((el) => {
           el.classList.toggle("is-active", el === btn);
         });
         document.querySelectorAll(".dash-row").forEach(applyTabVisibility);
 
-        // If the selected tab needs to show a row that's currently
-        // collapsed away, expand the section so it's actually visible.
         const extraWrap = document.getElementById("dashRowsExtra");
         if (extraWrap) {
           const hasVisibleInsideExtra = Array.from(extraWrap.querySelectorAll(".dash-row")).some(
@@ -594,9 +591,11 @@ const SmartKiddoDashboard = (() => {
     popup.hidden = false;
   }
 
-  popupClose.addEventListener("mouseenter", () => SmartKiddoSound.playHover());
+  popupClose.addEventListener("mouseenter", () => {
+    if (typeof SmartKiddoSound !== 'undefined') SmartKiddoSound.playHover();
+  });
   popupClose.addEventListener("click", () => {
-    SmartKiddoSound.playClick();
+    if (typeof SmartKiddoSound !== 'undefined') SmartKiddoSound.playClick();
     popup.hidden = true;
   });
 
@@ -615,10 +614,8 @@ const SmartKiddoDashboard = (() => {
     data.categories.forEach((category) => {
       const row = createRow(category);
       if (!category.collapsible) {
-        // Normal display
         rowsContainer.appendChild(row);
       } else {
-        // Collapsible display logic (Improved to auto-inject the toggle wrap dynamically)
         let extraWrap = document.getElementById("dashRowsExtra");
         if (!extraWrap) {
           rowsContainer.appendChild(createRowsToggle());
@@ -634,17 +631,17 @@ const SmartKiddoDashboard = (() => {
 
     runHero2TextLoop(container);
 
-    // AI button interaction setup
     const aiFab = document.getElementById("aiFab");
     if (aiFab) {
-      aiFab.addEventListener("mouseenter", () => SmartKiddoSound.playHover());
+      aiFab.addEventListener("mouseenter", () => {
+        if (typeof SmartKiddoSound !== 'undefined') SmartKiddoSound.playHover();
+      });
       aiFab.addEventListener("click", () => {
-        SmartKiddoSound.playClick();
+        if (typeof SmartKiddoSound !== 'undefined') SmartKiddoSound.playClick();
         console.log("AI assistant: coming soon.");
       });
     }
 
-    // Close overlays if clicking outside active cards
     document.addEventListener("click", (e) => {
       if (!e.target.closest(".dash-card")) {
         document.querySelectorAll(".dash-card.is-hovered").forEach(c => {
